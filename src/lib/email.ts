@@ -104,7 +104,7 @@ export async function sendFeedbackEmail(userEmail: string, userName: string, fee
 
   return sendBrevoEmail({
     to: "skillspheretest@gmail.com",
-    subject: \`New Feedback: [\${feedbackType.toUpperCase()}] from \${userName}\`,
+    subject: `New Feedback: [${feedbackType.toUpperCase()}] from ${userName}`,
     htmlContent: html
   });
 }
