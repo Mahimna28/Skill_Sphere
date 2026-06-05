@@ -22,7 +22,8 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
         if (res.ok) {
           setUserRole(data.user.role);
         } else {
-          router.push("/login");
+          console.error("fetchUser failed in layout.tsx. Not redirecting to /login to allow debugging.");
+          // router.push("/login");
         }
       } catch (err) {
         console.error("Failed to fetch user role");
