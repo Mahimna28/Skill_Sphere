@@ -51,7 +51,7 @@ export async function POST(req: Request) {
     }
 
     // Teachers and admins are ALWAYS private, regardless of DB flag
-    const isEffectivelyPrivate = ["teacher", "admin"].includes(receiver.role) || !receiver.isProfilePublic;
+    const isEffectivelyPrivate = ["teacher", "superadmin", "institute_admin"].includes(receiver.role) || !receiver.isProfilePublic;
 
     if (isEffectivelyPrivate) {
       // Private account: check for an accepted chat request

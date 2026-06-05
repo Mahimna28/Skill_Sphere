@@ -67,7 +67,7 @@ export async function DELETE(req: Request) {
     if (!question) return NextResponse.json({ message: "Not found" }, { status: 404 });
 
     // Only author or admin can delete
-    if (question.authorId !== decoded.id && decoded.role !== "admin") {
+    if (question.authorId !== decoded.id && !["superadmin", "institute_admin"].includes(decoded.role)) {
       return NextResponse.json({ message: "Forbidden" }, { status: 403 });
     }
 

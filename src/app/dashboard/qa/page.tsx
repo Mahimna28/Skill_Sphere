@@ -183,7 +183,7 @@ export default function QAPage() {
                        <p className="text-sm font-bold leading-relaxed">{q.content}</p>
                        <p className="text-[10px] font-black mt-4 opacity-40 uppercase">Posted on {new Date(q.createdAt).toLocaleDateString()}</p>
                        
-                       {(q.authorId === userId || userRole === "admin") && (
+                       {(q.authorId === userId || userRole === "superadmin" || userRole === "institute_admin") && (
                          <Button 
                            onClick={(e) => { e.stopPropagation(); handleDelete(q.id); }}
                            variant="ghost" 

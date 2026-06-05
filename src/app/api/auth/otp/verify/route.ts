@@ -46,10 +46,20 @@ export async function POST(req: Request) {
       path: "/",
     });
 
+    // Map roles to their correct dashboard paths
+    const roleToPath: Record<string, string> = {
+      student: "/dashboard/student",
+      teacher: "/dashboard/teacher",
+      parent: "/dashboard/parent",
+      superadmin: "/dashboard/admin",
+      institute_admin: "/dashboard/admin",
+    };
+    const redirectPath = roleToPath[user.role] ?? `/dashboard/${user.role}`;
+
     return NextResponse.json({
       message: "Login successful",
       user: { id: user.id, name: user.name, email: user.email, role: user.role },
-      redirect: `/dashboard/${user.role}`,
+      redirect: redirectPath,
     });
   } catch (error: any) {
     return NextResponse.json({ message: "Server error", error: error.message }, { status: 500 });

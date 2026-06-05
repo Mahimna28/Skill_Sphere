@@ -33,7 +33,7 @@ export async function GET(req: Request) {
   // Teachers and admins are always private
   const responseUser = {
     ...user,
-    isProfilePublic: ["teacher", "admin"].includes(user.role) ? false : user.isProfilePublic,
+    isProfilePublic: ["teacher", "superadmin", "institute_admin"].includes(user.role) ? false : user.isProfilePublic,
   };
 
   return NextResponse.json({ user: responseUser });
