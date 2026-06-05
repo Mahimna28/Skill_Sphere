@@ -65,7 +65,7 @@ export function Footer() {
             <h4 className="font-black uppercase tracking-tighter text-xl mb-6">{userRole ? "My Account" : "Join Us"}</h4>
             <ul className="flex flex-col gap-4 font-bold">
               {userRole ? (
-                <li><Link href={`/dashboard/${userRole}`} className="hover:text-[#4F7DF3] transition-colors">Dashboard</Link></li>
+                <li><Link href={["superadmin", "institute_admin"].includes(userRole) ? "/dashboard/admin" : `/dashboard/${userRole}`} className="hover:text-[#4F7DF3] transition-colors">Dashboard</Link></li>
               ) : (
                 <>
                   <li><Link href="/login" className="hover:text-[#4F7DF3] transition-colors">Login</Link></li>

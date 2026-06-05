@@ -53,7 +53,7 @@ export function Header() {
         {/* Auth Buttons */}
         <div className="flex items-center gap-4">
           {userRole ? (
-            <Link href={`/dashboard/${userRole}`}>
+            <Link href={["superadmin", "institute_admin"].includes(userRole) ? "/dashboard/admin" : `/dashboard/${userRole}`}>
               <Button className="font-black neo-brutalism bg-[#34D399] h-10 px-6 text-white">Dashboard</Button>
             </Link>
           ) : (
