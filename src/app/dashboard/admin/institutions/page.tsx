@@ -9,7 +9,7 @@ export default async function AdminInstitutions() {
   const token = cookieStore.get("token")?.value;
   const decoded: any = token ? verifyToken(token) : null;
 
-  if (!decoded || decoded.role !== "admin") redirect("/login");
+  if (!decoded || !["superadmin", "institute_admin"].includes(decoded.role)) redirect("/login");
 
   const institutions = await prisma.institution.findMany({
     include: {

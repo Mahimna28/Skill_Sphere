@@ -10,7 +10,7 @@ export default async function AdminDashboard() {
   const token = cookieStore.get("token")?.value;
   const decoded: any = token ? verifyToken(token) : null;
 
-  if (!decoded || decoded.role !== "admin") redirect("/login");
+  if (!decoded || !["superadmin", "institute_admin"].includes(decoded.role)) redirect("/login");
 
   // Fetch REAL stats
   const [userCount, instCount, courseCount, teacherCount] = await Promise.all([

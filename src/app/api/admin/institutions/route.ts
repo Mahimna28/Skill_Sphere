@@ -3,12 +3,14 @@ import { prisma } from "@/lib/prisma";
 import { cookies } from "next/headers";
 import { verifyToken } from "@/lib/auth";
 
+const isAdmin = (role: string) => ["superadmin", "institute_admin"].includes(role);
+
 export async function GET() {
   const cookieStore = await cookies();
   const token = cookieStore.get("token")?.value;
   const decoded: any = token ? verifyToken(token) : null;
 
-  if (!decoded || decoded.role !== "admin") return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
+  if (!decoded || !isAdmin(decoded.role)) return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
 
   const institutions = await prisma.institution.findMany({
     include: {
@@ -27,13 +29,12 @@ export async function POST(req: Request) {
     const token = cookieStore.get("token")?.value;
     const decoded: any = token ? verifyToken(token) : null;
 
-    if (!decoded || decoded.role !== "admin") return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
+    if (!decoded || !isAdmin(decoded.role)) return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
 
     const institution = await prisma.institution.create({
       data: { name, adminId: decoded.id },
     });
 
-    // Automatically make the admin a member
     await prisma.user.update({
       where: { id: decoded.id },
       data: { institutionId: institution.id },

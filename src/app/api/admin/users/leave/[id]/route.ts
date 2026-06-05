@@ -3,6 +3,8 @@ import { prisma } from "@/lib/prisma";
 import { cookies } from "next/headers";
 import { verifyToken } from "@/lib/auth";
 
+const isAdmin = (role: string) => ["superadmin", "institute_admin"].includes(role);
+
 export async function PATCH(req: Request, { params }: { params: Promise<{ id: string }> }) {
   try {
     const { id } = await params;
@@ -11,16 +13,15 @@ export async function PATCH(req: Request, { params }: { params: Promise<{ id: st
     const token = cookieStore.get("token")?.value;
     const decoded: any = token ? verifyToken(token) : null;
 
-    if (!decoded || decoded.role !== "admin") return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
+    if (!decoded || !isAdmin(decoded.role)) return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
 
     const request = await prisma.leaveRequest.findUnique({ where: { id } });
     if (!request) return NextResponse.json({ message: "Request not found" }, { status: 404 });
 
     if (action === "approve") {
-      // Remove user from institution and department
       await prisma.user.update({
         where: { id: request.userId },
-        data: { 
+        data: {
           institutionId: null,
           departmentId: null
         }

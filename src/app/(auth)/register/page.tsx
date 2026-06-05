@@ -6,13 +6,12 @@ import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Loader2, ArrowLeft, ShieldCheck, GraduationCap, School, Users, Shield, Baby } from "lucide-react";
+import { Loader2, ArrowLeft, ShieldCheck, GraduationCap, School, Users, Baby } from "lucide-react";
 
 const roles = [
   { id: "student", name: "Student", icon: GraduationCap, color: "bg-[#34D399]" },
   { id: "teacher", name: "Teacher", icon: School, color: "bg-[#4F7DF3]" },
   { id: "parent", name: "Parent", icon: Users, color: "bg-[#F9A8D4]" },
-  { id: "admin", name: "Admin", icon: Shield, color: "bg-[#F5C84C]" },
 ];
 
 export default function RegisterPage() {

@@ -4,6 +4,8 @@ import bcrypt from "bcryptjs";
 import { generateToken } from "@/lib/auth";
 import { cookies } from "next/headers";
 
+const SUPER_ADMIN_EMAIL = "mahimnamistry281005@gmail.com";
+
 export async function POST(req: Request) {
   try {
     const { name, email, password, role, otpCode, childEmail } = await req.json();
@@ -41,22 +43,31 @@ export async function POST(req: Request) {
        childId = child.id;
     }
 
-    // 4. Create user
+    // 4. Determine final role — block manual superadmin/institute_admin attempts
+    const blockedRoles = ["superadmin", "institute_admin"];
+    let finalRole = blockedRoles.includes(role) ? "student" : role;
+
+    // Auto-assign superadmin for platform owner
+    if (email.toLowerCase() === SUPER_ADMIN_EMAIL.toLowerCase()) {
+      finalRole = "superadmin";
+    }
+
+    // 5. Create user
     const hashedPassword = await bcrypt.hash(password, 10);
     const user = await prisma.user.create({
       data: {
         name,
         email,
         password: hashedPassword,
-        role,
+        role: finalRole,
         ...(childId ? { children: { connect: { id: childId } } } : {}),
       },
     });
 
-    // 5. Cleanup OTP
+    // 6. Cleanup OTP
     await prisma.otp.delete({ where: { id: otpRecord.id } });
 
-    // 6. Generate token and log in
+    // 7. Generate token and log in
     const token = generateToken({ id: user.id, email: user.email, role: user.role });
 
     const cookieStore = await cookies();
@@ -67,10 +78,13 @@ export async function POST(req: Request) {
       path: "/",
     });
 
+    // Redirect: superadmin → /dashboard/admin, institute_admin → /dashboard/admin
+    const dashboardRole = ["superadmin", "institute_admin"].includes(user.role) ? "admin" : user.role;
+
     return NextResponse.json({
       message: "Account created successfully",
       user: { id: user.id, name: user.name, email: user.email, role: user.role },
-      redirect: `/dashboard/${user.role}`,
+      redirect: `/dashboard/${dashboardRole}`,
     });
   } catch (error: any) {
     console.error("Registration Error:", error);

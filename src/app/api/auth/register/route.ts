@@ -4,6 +4,8 @@ import bcrypt from "bcryptjs";
 import { generateToken } from "@/lib/auth";
 import { validatePassword } from "@/lib/validation";
 
+const SUPER_ADMIN_EMAIL = "mahimnamistry281005@gmail.com";
+
 export async function POST(req: Request) {
   try {
     const { name, email, password, role } = await req.json();
@@ -24,8 +26,16 @@ export async function POST(req: Request) {
 
     const hashedPassword = await bcrypt.hash(password, 10);
 
-    const userRole = role || "student";
-    const isProfilePublic = !["teacher", "admin"].includes(userRole);
+    // Block anyone from manually registering as superadmin or institute_admin
+    const blockedRoles = ["superadmin", "institute_admin"];
+    let userRole = blockedRoles.includes(role) ? "student" : (role || "student");
+
+    // Auto-assign superadmin for the platform owner email
+    if (email.toLowerCase() === SUPER_ADMIN_EMAIL.toLowerCase()) {
+      userRole = "superadmin";
+    }
+
+    const isProfilePublic = ["student", "parent"].includes(userRole);
 
     const user = await prisma.user.create({
       data: {
@@ -50,7 +60,7 @@ export async function POST(req: Request) {
       httpOnly: true,
       secure: process.env.NODE_ENV === "production",
       sameSite: "strict",
-      maxAge: 30 * 24 * 60 * 60, // 30 days
+      maxAge: 30 * 24 * 60 * 60,
       path: "/",
     });
 

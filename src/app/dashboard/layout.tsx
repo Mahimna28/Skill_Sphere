@@ -73,7 +73,15 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
         return [
           { href: "/dashboard/parent", label: "Overview", icon: LayoutDashboard },
         ];
-      case "admin":
+      case "superadmin":
+        return [
+          { href: "/dashboard/admin", label: "Master Panel", icon: LayoutDashboard },
+          { href: "/dashboard/admin/users", label: "Manage Users", icon: Users },
+          { href: "/dashboard/admin/institutions", label: "Institutions", icon: Shield },
+          { href: "/dashboard/admin/feedback", label: "Review Feedback", icon: Heart },
+          { href: "/dashboard/admin/promote", label: "Promote Admins", icon: Shield },
+        ];
+      case "institute_admin":
         return [
           { href: "/dashboard/admin", label: "Overview", icon: LayoutDashboard },
           { href: "/dashboard/admin/users", label: "Manage Users", icon: Users },
@@ -109,8 +117,14 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
       `}>
         <div className="p-4 border-b-4 border-black bg-white">
           <div className="flex justify-center mt-2">
-            <div className="inline-block px-2 py-0.5 bg-[#F5C84C] text-black text-[8px] font-black border-2 border-black rounded uppercase">
-              {userRole || "Loading..."} Portal
+            <div className={`inline-block px-2 py-0.5 text-[8px] font-black border-2 border-black rounded uppercase ${
+              userRole === "superadmin" ? "bg-red-500 text-white" :
+              userRole === "institute_admin" ? "bg-[#F5C84C] text-black" :
+              "bg-[#F5C84C] text-black"
+            }`}>
+              {userRole === "superadmin" ? "⚡ Super Admin" :
+               userRole === "institute_admin" ? "🏛 Institute Admin" :
+               `${userRole} Portal`}
             </div>
           </div>
         </div>
