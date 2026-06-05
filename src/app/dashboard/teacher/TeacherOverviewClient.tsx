@@ -7,7 +7,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { BookOpen, Users, Plus, Loader2, X, Globe, Lock } from "lucide-react";
+import { BookOpen, Users, Plus, Loader2, X, Globe, Lock, ShieldAlert } from "lucide-react";
 
 const SUBJECTS = ["AI & ML", "Python", "Web Dev", "CS Fundamentals", "Databases", "Networking", "Systems", "Security", "Cloud", "Electronics", "Software Eng.", "Java", "Mathematics", "Other"];
 
@@ -23,6 +23,10 @@ export default function TeacherOverviewClient({ teacher, initialCourses }: Props
   const [loading, setLoading] = useState(false);
   const [toast, setToast] = useState<{ message: string; type: "success" | "error" } | null>(null);
   const [form, setForm] = useState({ title: "", description: "", subject: "Python", thumbnail: "", isPublic: true });
+
+  const [showPromotionForm, setShowPromotionForm] = useState(false);
+  const [promotionReason, setPromotionReason] = useState("");
+  const [promotionLoading, setPromotionLoading] = useState(false);
 
   const totalStudents = courses.reduce((sum, c) => sum + c._count.enrollments, 0);
 
@@ -55,6 +59,30 @@ export default function TeacherOverviewClient({ teacher, initialCourses }: Props
       showToast("Network error. Please try again.", "error");
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handlePromotionRequest = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setPromotionLoading(true);
+    try {
+      const res = await fetch("/api/teacher/promote-request", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ reason: promotionReason }),
+      });
+      const data = await res.json();
+      if (res.ok) {
+        setShowPromotionForm(false);
+        setPromotionReason("");
+        showToast("✅ " + data.message, "success");
+      } else {
+        showToast(data.message || "Failed to submit request", "error");
+      }
+    } catch {
+      showToast("Network error. Please try again.", "error");
+    } finally {
+      setPromotionLoading(false);
     }
   };
 
@@ -134,10 +162,43 @@ export default function TeacherOverviewClient({ teacher, initialCourses }: Props
           <h1 className="text-4xl font-black mb-2">Welcome, {teacher?.name?.split(" ")[0] || "Teacher"}! 🎓</h1>
           <p className="text-muted-foreground font-medium text-lg">Manage your courses and track student progress.</p>
         </div>
-        <Button className="neo-brutalism font-bold text-lg h-12 px-6" onClick={() => setShowForm(true)}>
-          <Plus className="mr-2 h-5 w-5" /> Create New Course
-        </Button>
+        <div className="flex gap-2">
+          <Button variant="outline" className="font-bold text-lg h-12 px-6 border-2 border-black hover:bg-[#F5C84C] hover:text-black transition-colors" onClick={() => setShowPromotionForm(true)}>
+            <ShieldAlert className="mr-2 h-5 w-5" /> Request Promotion
+          </Button>
+          <Button className="neo-brutalism font-bold text-lg h-12 px-6" onClick={() => setShowForm(true)}>
+            <Plus className="mr-2 h-5 w-5" /> Create New Course
+          </Button>
+        </div>
       </div>
+
+      {/* Promotion Request Modal */}
+      {showPromotionForm && (
+        <div className="fixed inset-0 bg-black/50 z-40 flex items-center justify-center p-4">
+          <Card className="w-full max-w-lg bg-white border-4 border-black shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] rounded-2xl animate-in zoom-in-95 duration-200">
+            <CardHeader className="border-b-4 border-black flex flex-row items-center justify-between pb-4">
+              <CardTitle className="text-2xl font-black flex items-center gap-2"><ShieldAlert size={24} /> Request Promotion</CardTitle>
+              <button onClick={() => setShowPromotionForm(false)} className="w-9 h-9 border-2 border-black rounded-lg flex items-center justify-center hover:bg-muted transition-colors">
+                <X size={18} />
+              </button>
+            </CardHeader>
+            <CardContent className="p-6">
+              <form onSubmit={handlePromotionRequest} className="space-y-5">
+                <div className="space-y-2">
+                  <Label className="font-black text-base">Why do you want to become an Institute Admin? *</Label>
+                  <textarea required rows={4} placeholder="E.g., I want to manage my school's departments and teachers..." className="flex w-full rounded-xl border-2 border-black bg-background px-3 py-2 font-medium text-sm shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] focus:outline-none focus:ring-2 focus:ring-primary resize-none" value={promotionReason} onChange={(e) => setPromotionReason(e.target.value)} />
+                </div>
+                <div className="flex gap-3 pt-2">
+                  <Button type="button" variant="outline" className="flex-1 border-2 border-black font-bold h-12" onClick={() => setShowPromotionForm(false)}>Cancel</Button>
+                  <Button type="submit" className="flex-1 neo-brutalism bg-[#F5C84C] text-black font-bold h-12 text-lg hover:bg-[#e0b745]" disabled={promotionLoading}>
+                    {promotionLoading ? <><Loader2 className="mr-2 h-5 w-5 animate-spin" /> Submitting...</> : "Submit Request"}
+                  </Button>
+                </div>
+              </form>
+            </CardContent>
+          </Card>
+        </div>
+      )}
 
       {/* Stats */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">

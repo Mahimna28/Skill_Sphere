@@ -18,5 +18,11 @@ export default async function PromoteAdmins() {
     orderBy: { name: "asc" }
   });
 
-  return <PromoteClient users={users} />;
+  const requests = await prisma.promotionRequest.findMany({
+    where: { status: "pending" },
+    include: { user: { select: { name: true, email: true } } },
+    orderBy: { createdAt: "desc" }
+  });
+
+  return <PromoteClient users={users} initialRequests={requests} />;
 }

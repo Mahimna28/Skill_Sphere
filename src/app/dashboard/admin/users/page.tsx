@@ -11,7 +11,12 @@ export default async function AdminUsers() {
 
   if (!decoded || !["superadmin", "institute_admin"].includes(decoded.role)) redirect("/login");
 
+  if (decoded.role === "superadmin") {
+    redirect("/dashboard/admin/system");
+  }
+
   const institutions = await prisma.institution.findMany({
+    where: { adminId: decoded.id },
     include: {
       departments: true,
       members: { select: { id: true, name: true, email: true, role: true, department: { select: { name: true } } } },

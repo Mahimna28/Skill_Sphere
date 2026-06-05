@@ -3,7 +3,7 @@
 import Link from "next/link";
 import Image from "next/image";
 import { usePathname, useRouter } from "next/navigation";
-import { BookOpen, LogOut, MessageSquare, Sparkles, Trophy, Users, Shield, LayoutDashboard, UserCircle, Menu, X, School, Home, Bell, HelpCircle, Heart } from "lucide-react";
+import { BookOpen, LogOut, MessageSquare, Sparkles, Trophy, Users, Shield, LayoutDashboard, UserCircle, Menu, X, School, Home, Bell, HelpCircle, Heart, Globe } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useState, useEffect } from "react";
 
@@ -76,16 +76,15 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
       case "superadmin":
         return [
           { href: "/dashboard/admin", label: "Master Panel", icon: LayoutDashboard },
-          { href: "/dashboard/admin/users", label: "Manage Users", icon: Users },
-          { href: "/dashboard/admin/institutions", label: "Institutions", icon: Shield },
+          { href: "/dashboard/admin/system", label: "System Control", icon: Globe },
           { href: "/dashboard/admin/feedback", label: "Review Feedback", icon: Heart },
           { href: "/dashboard/admin/promote", label: "Promote Admins", icon: Shield },
         ];
       case "institute_admin":
         return [
           { href: "/dashboard/admin", label: "Overview", icon: LayoutDashboard },
-          { href: "/dashboard/admin/users", label: "Manage Users", icon: Users },
-          { href: "/dashboard/admin/institutions", label: "Institutions", icon: Shield },
+          { href: "/dashboard/admin/users", label: "My Users", icon: Users },
+          { href: "/dashboard/admin/institutions", label: "My Institution", icon: Shield },
           { href: "/dashboard/admin/feedback", label: "Review Feedback", icon: Heart },
         ];
       default:
