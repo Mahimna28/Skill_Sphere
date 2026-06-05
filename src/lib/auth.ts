@@ -8,7 +8,11 @@ export const generateToken = (payload: any) => {
 
 export const verifyToken = (token: string) => {
   try {
-    return jwt.verify(token, JWT_SECRET);
+    const decoded: any = jwt.verify(token, JWT_SECRET);
+    if (decoded && decoded.role === "admin") {
+      decoded.role = "superadmin"; // Backward compatibility for old tokens
+    }
+    return decoded;
   } catch (error) {
     return null;
   }

@@ -2,7 +2,7 @@ const { PrismaClient } = require('@prisma/client');
 const prisma = new PrismaClient();
 
 async function main() {
-  const user = await prisma.user.findFirst({ where: { email: 'mahimnamistry281005@gmail.com' } });
+  const user = await prisma.user.findUnique({ where: { id: 'cmoyb7puy0001el28rz45y5jv' } });
   console.log('User found:', JSON.stringify(user, null, 2));
   if (user) {
     console.log('Role:', user.role);

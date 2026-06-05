@@ -18,6 +18,11 @@ export async function GET() {
 
     if (!user) return NextResponse.json({ message: "User not found" }, { status: 404 });
 
+    // Backward compatibility: map 'admin' from DB to 'superadmin'
+    if (user.role === "admin") {
+      user.role = "superadmin";
+    }
+
     // --- Backfill: if student has no institution but is in a private class, auto-assign ---
     if (user.role === "student" && !user.institutionId) {
       const enrollmentWithInstitution = await prisma.enrollment.findFirst({

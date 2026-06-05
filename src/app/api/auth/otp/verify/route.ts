@@ -34,6 +34,11 @@ export async function POST(req: Request) {
       return NextResponse.json({ message: "User not found. Please register first." }, { status: 404 });
     }
 
+    // Backward compatibility: map 'admin' from DB to 'superadmin'
+    if (user.role === "admin") {
+      user.role = "superadmin";
+    }
+
     // Generate token
     const token = generateToken({ id: user.id, email: user.email, role: user.role });
 
