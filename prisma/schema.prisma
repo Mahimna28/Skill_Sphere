@@ -59,11 +59,14 @@ model User {
   // Relations
   courses     Course[]     @relation("TeacherCourses")
   enrollments Enrollment[]
+  enrollmentHistory EnrollmentHistory[]
   messages    Message[]
   marks       Marks[]
   attendances Attendance[]
   certificates Certificate[]
   completedLessons LessonCompletion[]
+  assignmentSubmissions AssignmentSubmission[]
+  announcements Announcement[]
 
   // Parent-child relationships
   children  User[]  @relation("ParentChild")
