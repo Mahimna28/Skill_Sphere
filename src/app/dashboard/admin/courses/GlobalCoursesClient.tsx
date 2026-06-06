@@ -117,8 +117,31 @@ export default function GlobalCoursesClient({ superadmin, initialCourses }: { su
           </h1>
           <p className="text-muted-foreground font-medium text-lg">Platform-wide courses managed by the Superadmin.</p>
         </div>
-        <div className="flex gap-2">
-          <Button className="neo-brutalism font-bold text-lg h-12 px-6" onClick={() => setShowForm(true)}>
+        <div className="flex flex-wrap gap-2">
+          <Button 
+            className="neo-brutalism bg-[#F9A8D4] text-black font-black text-sm md:text-lg h-12 px-6" 
+            onClick={async () => {
+              if (confirm("Are you sure you want to instantly deploy 10 Free CS Courses?")) {
+                setLoading(true);
+                try {
+                  const res = await fetch("/api/admin/seed-courses", { method: "POST" });
+                  const data = await res.json();
+                  if (res.ok) {
+                    showToast(data.message, "success");
+                    router.refresh();
+                  } else {
+                    showToast(data.message, "error");
+                  }
+                } finally {
+                  setLoading(false);
+                }
+              }
+            }}
+            disabled={loading}
+          >
+            <BookOpen className="mr-2 h-5 w-5" /> Seed Free CS Courses
+          </Button>
+          <Button className="neo-brutalism font-bold text-sm md:text-lg h-12 px-6" onClick={() => setShowForm(true)}>
             <Plus className="mr-2 h-5 w-5" /> Deploy New Course
           </Button>
         </div>
