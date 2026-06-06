@@ -28,7 +28,7 @@ export default async function ParentDashboard() {
             } 
           },
           marks: { orderBy: { createdAt: "desc" } },
-          lessonCompletions: { include: { lesson: { select: { moduleId: true } } } }
+          completedLessons: { include: { lesson: { select: { moduleId: true } } } }
         },
       },
     },
@@ -63,7 +63,7 @@ export default async function ParentDashboard() {
   const coursesWithProgress = child.enrollments.map((enr: any) => {
     const totalLessons = enr.course.modules.reduce((sum: number, mod: any) => sum + mod._count.lessons, 0);
     const courseModuleIds = enr.course.modules.map((m: any) => m.id);
-    const completedLessons = child.lessonCompletions.filter((lc: any) => courseModuleIds.includes(lc.lesson.moduleId)).length;
+    const completedLessons = child.completedLessons ? child.completedLessons.filter((lc: any) => courseModuleIds.includes(lc.lesson.moduleId)).length : 0;
     
     totalLessonsAcc += totalLessons;
     totalCompletionsAcc += completedLessons;

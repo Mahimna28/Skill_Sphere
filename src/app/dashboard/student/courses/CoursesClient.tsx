@@ -208,15 +208,10 @@ export default function CoursesClient({ courses, enrolledIds: initialEnrolledIds
                     </>
                   ) : (
                     <Button
-                      className="w-full font-bold neo-brutalism"
-                      onClick={() => handleEnroll(course.id)}
-                      disabled={isLoading}
+                      className="w-full font-bold neo-brutalism bg-[#4F7DF3] text-white hover:bg-[#4F7DF3]/90"
+                      onClick={() => router.push(`/dashboard/student/courses/${course.id}/details`)}
                     >
-                      {isLoading ? (
-                        <><Loader2 className="mr-2 h-4 w-4 animate-spin" /> Enrolling...</>
-                      ) : (
-                        "Enroll Now — Free"
-                      )}
+                      View Details
                     </Button>
                   )}
                 </CardFooter>

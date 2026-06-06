@@ -162,6 +162,7 @@ model Course {
   id          String   @id @default(cuid())
   title       String
   description String
+  details     String?  @db.Text
   subject     String
   thumbnail   String?
   isPublic    Boolean  @default(true)

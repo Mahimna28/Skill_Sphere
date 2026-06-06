@@ -91,8 +91,48 @@ export default function GlobalCoursesClient({ superadmin, initialCourses }: { su
                   <textarea required rows={4} placeholder="Describe what students will learn..." className="flex w-full rounded-xl border-2 border-black bg-background px-3 py-2 font-medium text-sm shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] focus:outline-none focus:ring-2 focus:ring-primary resize-none" value={form.description} onChange={(e) => setForm({ ...form, description: e.target.value })} />
                 </div>
                 <div className="space-y-2">
-                  <Label className="font-black text-base">Thumbnail URL <span className="font-normal text-muted-foreground">(optional)</span></Label>
-                  <Input placeholder="https://images.unsplash.com/..." className="neo-brutalism-static h-11" value={form.thumbnail} onChange={(e) => setForm({ ...form, thumbnail: e.target.value })} />
+                  <Label className="font-black text-base">Cover Photo <span className="font-normal text-muted-foreground">(optional)</span></Label>
+                  <div className="flex gap-2 items-center">
+                    <Input 
+                      type="file" 
+                      accept="image/*"
+                      className="neo-brutalism-static h-11 flex-1 cursor-pointer" 
+                      onChange={async (e) => {
+                        const file = e.target.files?.[0];
+                        if (!file) return;
+                        setLoading(true);
+                        try {
+                          const formData = new FormData();
+                          formData.append("file", file);
+                          const res = await fetch("/api/upload", {
+                            method: "POST",
+                            body: formData
+                          });
+                          const data = await res.json();
+                          if (res.ok) {
+                            setForm({ ...form, thumbnail: data.url });
+                            showToast("Image uploaded successfully!", "success");
+                          } else {
+                            showToast(data.message || "Upload failed", "error");
+                          }
+                        } catch (err) {
+                          showToast("Upload failed", "error");
+                        } finally {
+                          setLoading(false);
+                        }
+                      }} 
+                    />
+                    {form.thumbnail && (
+                      <div className="h-11 w-11 rounded border-2 border-black overflow-hidden shrink-0">
+                         <img src={form.thumbnail} alt="Preview" className="w-full h-full object-cover" />
+                      </div>
+                    )}
+                  </div>
+                  <p className="text-xs font-bold text-muted-foreground mt-1">Select an image file from your device.</p>
+                </div>
+                <div className="space-y-2">
+                  <Label className="font-black text-base">Course Details <span className="font-normal text-muted-foreground">(Detailed Description)</span></Label>
+                  <textarea rows={6} placeholder="Write a comprehensive description of what students will learn..." className="flex w-full rounded-xl border-2 border-black bg-background px-3 py-2 font-medium text-sm shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] focus:outline-none focus:ring-2 focus:ring-primary resize-y" value={(form as any).details || ""} onChange={(e) => setForm({ ...form, details: e.target.value } as any)} />
                 </div>
                 <div className="flex gap-3 pt-2">
                   <Button type="button" variant="outline" className="flex-1 border-2 border-black font-bold h-12" onClick={() => setShowForm(false)}>Cancel</Button>

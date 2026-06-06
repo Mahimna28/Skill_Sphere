@@ -13,12 +13,13 @@ export async function POST(req: Request) {
       return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
     }
 
-    const { title, description, subject, thumbnail, isPublic } = await req.json();
+    const { title, description, details, subject, thumbnail, isPublic } = await req.json();
 
     const course = await prisma.course.create({
       data: {
         title,
         description,
+        details: details || null,
         subject,
         thumbnail: thumbnail || null,
         isPublic: isPublic ?? true,
