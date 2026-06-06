@@ -79,21 +79,23 @@ export default function InstitutionsClient({ initialInstitutions }: { initialIns
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
         {/* Creation & List */}
         <div className="lg:col-span-1 space-y-6">
-          <Card className="neo-brutalism bg-white border-4 border-black p-6">
-            <h3 className="text-xl font-black uppercase mb-4">Register New Institution</h3>
-            <form onSubmit={handleCreateInst} className="space-y-4">
-               <Input 
-                 placeholder="Institution Name (e.g. Oxford)" 
-                 className="border-2 border-black font-bold h-12"
-                 value={name}
-                 onChange={e => setName(e.target.value)}
-                 required
-               />
-               <Button type="submit" disabled={loading} className="w-full h-12 font-black neo-brutalism bg-secondary text-black uppercase">
-                  {loading ? <Loader2 className="animate-spin" /> : <Plus className="mr-2" />} Create Institution
-               </Button>
-            </form>
-          </Card>
+          {initialInstitutions.length === 0 && (
+            <Card className="neo-brutalism bg-white border-4 border-black p-6">
+              <h3 className="text-xl font-black uppercase mb-4">Register New Institution</h3>
+              <form onSubmit={handleCreateInst} className="space-y-4">
+                 <Input 
+                   placeholder="Institution Name (e.g. Oxford)" 
+                   className="border-2 border-black font-bold h-12"
+                   value={name}
+                   onChange={e => setName(e.target.value)}
+                   required
+                 />
+                 <Button type="submit" disabled={loading} className="w-full h-12 font-black neo-brutalism bg-secondary text-black uppercase">
+                    {loading ? <Loader2 className="animate-spin" /> : <Plus className="mr-2" />} Create Institution
+                 </Button>
+              </form>
+            </Card>
+          )}
 
           <div className="space-y-4">
              <h4 className="text-xs font-black uppercase tracking-widest opacity-60">Your Institutions</h4>

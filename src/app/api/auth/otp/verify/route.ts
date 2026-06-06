@@ -57,7 +57,7 @@ export async function POST(req: Request) {
       teacher: "/dashboard/teacher",
       parent: "/dashboard/parent",
       superadmin: "/dashboard/admin",
-      institute_admin: "/dashboard/admin",
+      institute_admin: "/dashboard/teacher", // Institute Admins land on teacher dashboard
     };
     const redirectPath = roleToPath[user.role] ?? `/dashboard/${user.role}`;
 

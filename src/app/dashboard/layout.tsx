@@ -82,7 +82,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
         ];
       case "institute_admin":
         return [
-          { href: "/dashboard/admin", label: "Overview", icon: LayoutDashboard },
+          { href: "/dashboard/teacher", label: "Teacher Dashboard", icon: BookOpen },
           { href: "/dashboard/admin/users", label: "My Users", icon: Users },
           { href: "/dashboard/admin/institutions", label: "My Institution", icon: Shield },
           { href: "/dashboard/admin/feedback", label: "Review Feedback", icon: Heart },

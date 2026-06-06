@@ -10,7 +10,7 @@ export default async function AdminDashboard() {
   const token = cookieStore.get("token")?.value;
   const decoded: any = token ? verifyToken(token) : null;
 
-  if (!decoded || !["superadmin", "institute_admin", "admin"].includes(decoded?.role)) {
+  if (!decoded || decoded?.role !== "superadmin") {
     redirect("/login");
   }
 
