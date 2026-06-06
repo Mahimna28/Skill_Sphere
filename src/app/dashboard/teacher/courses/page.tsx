@@ -9,7 +9,7 @@ export default async function TeacherCoursesPage() {
   const token = cookieStore.get("token")?.value;
   const decoded: any = token ? verifyToken(token) : null;
 
-  if (!decoded || !["teacher", "institute_admin"].includes(decoded.role)) {
+  if (!decoded || !["teacher", "institute_admin", "superadmin"].includes(decoded.role)) {
     redirect("/login");
   }
 

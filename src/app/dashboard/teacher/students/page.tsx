@@ -12,7 +12,7 @@ export default async function TeacherStudents() {
   const token = cookieStore.get("token")?.value;
   const decoded: any = token ? verifyToken(token) : null;
 
-  if (!decoded || !["teacher", "institute_admin"].includes(decoded.role)) redirect("/login");
+  if (!decoded || !["teacher", "institute_admin", "superadmin"].includes(decoded.role)) redirect("/login");
 
   // Fetch real enrollments for this teacher's courses
   const enrollments = await prisma.enrollment.findMany({

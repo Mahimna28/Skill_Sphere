@@ -9,7 +9,7 @@ export default async function TeacherInstitutions() {
   const token = cookieStore.get("token")?.value;
   const decoded: any = token ? verifyToken(token) : null;
 
-  if (!decoded || !["teacher", "institute_admin"].includes(decoded.role)) redirect("/login");
+  if (!decoded || !["teacher", "institute_admin", "superadmin"].includes(decoded.role)) redirect("/login");
 
   const teacher = await prisma.user.findUnique({
     where: { id: decoded.id },
