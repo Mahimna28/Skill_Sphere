@@ -117,6 +117,7 @@ model Institution {
   departments   Department[]
   joinRequests  JoinRequest[]
   leaveRequests LeaveRequest[]
+  announcements Announcement[]
 }
 
 model Department {
@@ -171,9 +172,12 @@ model Course {
   department   Department? @relation(fields: [departmentId], references: [id])
 
   enrollments  Enrollment[]
+  enrollmentHistory EnrollmentHistory[]
   messages     Message[]
   modules      Module[]
   leaveRequests CourseLeaveRequest[]
+  assignments  Assignment[]
+  announcements Announcement[]
 }
 
 model Module {
@@ -211,6 +215,18 @@ model LessonCompletion {
 }
 
 model Enrollment {
+  id        String   @id @default(cuid())
+  userId    String
+  courseId  String
+  createdAt DateTime @default(now())
+
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  course Course @relation(fields: [courseId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, courseId])
+}
+
+model EnrollmentHistory {
   id        String   @id @default(cuid())
   userId    String
   courseId  String
@@ -391,4 +407,46 @@ model PromotionRequest {
   createdAt DateTime @default(now())
 
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model Assignment {
+  id          String   @id @default(cuid())
+  title       String
+  description String
+  dueDate     DateTime
+  courseId    String
+  createdAt   DateTime @default(now())
+
+  course      Course   @relation(fields: [courseId], references: [id], onDelete: Cascade)
+  submissions AssignmentSubmission[]
+}
+
+model AssignmentSubmission {
+  id           String   @id @default(cuid())
+  assignmentId String
+  studentId    String
+  fileUrl      String?
+  content      String?
+  grade        Float?
+  feedback     String?
+  createdAt    DateTime @default(now())
+
+  assignment   Assignment @relation(fields: [assignmentId], references: [id], onDelete: Cascade)
+  student      User       @relation(fields: [studentId], references: [id], onDelete: Cascade)
+
+  @@unique([assignmentId, studentId])
+}
+
+model Announcement {
+  id            String   @id @default(cuid())
+  title         String
+  content       String
+  authorId      String
+  institutionId String?
+  courseId      String?
+  createdAt     DateTime @default(now())
+
+  author      User         @relation(fields: [authorId], references: [id], onDelete: Cascade)
+  institution Institution? @relation(fields: [institutionId], references: [id], onDelete: Cascade)
+  course      Course?      @relation(fields: [courseId], references: [id], onDelete: Cascade)
 }

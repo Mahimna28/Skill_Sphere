@@ -9,7 +9,7 @@ import { Card } from "@/components/ui/card";
 import { Save, Trash2, ArrowLeft, Loader2, Plus, BookOpen, Video, FileText, Users, Mail, UserPlus, X, Upload, File } from "lucide-react";
 import Link from "next/link";
 
-export default function ManageCourseClient({ course }: { course: any }) {
+export default function ManageCourseClient({ course, studentsProgress = [] }: { course: any, studentsProgress?: any[] }) {
   const router = useRouter();
   const [loading, setLoading] = useState(false);
   const [activeTab, setActiveTab] = useState<"settings" | "curriculum" | "students">("settings");
@@ -200,6 +200,8 @@ export default function ManageCourseClient({ course }: { course: any }) {
              { id: "settings", label: "Settings", icon: Save },
              { id: "curriculum", label: "Curriculum", icon: BookOpen },
              { id: "students", label: "Students", icon: Users },
+             { id: "gradebook", label: "Gradebook", icon: FileText },
+             { id: "assignments", label: "Assignments", icon: FileText },
            ].map((tab) => (
              <button 
                key={tab.id}
@@ -379,30 +381,164 @@ export default function ManageCourseClient({ course }: { course: any }) {
                     <h3 className="text-xl font-black uppercase">Enrolled Students ({course.enrollments.length})</h3>
                  </div>
                  <div className="p-0">
-                    {course.enrollments.length === 0 ? (
+                    {studentsProgress.length === 0 ? (
                       <div className="p-12 text-center opacity-30 font-bold italic">No students enrolled in this class.</div>
                     ) : (
                       <table className="w-full text-left">
                          <tbody className="divide-y-2 divide-black">
-                            {course.enrollments.map((enr: any) => (
-                              <tr key={enr.id} className="hover:bg-muted/10 transition-colors">
-                                 <td className="p-4">
-                                    <p className="font-black text-sm uppercase">{enr.user.name}</p>
-                                    <p className="text-[10px] font-bold opacity-60">{enr.user.email}</p>
+                            {studentsProgress.map((student: any) => {
+                              const enrId = course.enrollments.find((e: any) => e.userId === student.id)?.id;
+                              return (
+                              <tr key={student.id} className="hover:bg-muted/10 transition-colors">
+                                 <td className="p-4 w-1/3">
+                                    <p className="font-black text-sm uppercase">{student.name}</p>
+                                    <p className="text-[10px] font-bold opacity-60">{student.email}</p>
+                                 </td>
+                                 <td className="p-4 w-1/2">
+                                    <div className="flex items-center gap-2">
+                                      <div className="flex-1 h-2 bg-muted rounded-full overflow-hidden border border-black">
+                                        <div 
+                                          className="h-full bg-[#34D399]" 
+                                          style={{ width: `${student.progress || 0}%` }}
+                                        />
+                                      </div>
+                                      <span className="text-xs font-black uppercase w-12 text-right">{student.progress || 0}%</span>
+                                    </div>
+                                    <p className="text-[9px] font-bold opacity-60 mt-0.5">{student.completedLessons || 0} / {student.totalLessons || 0} Lessons</p>
                                  </td>
                                  <td className="p-4 text-right">
-                                    <Button variant="ghost" onClick={() => handleUnenroll(enr.id)} className="h-8 w-8 p-0 text-red-600 border-2 border-black hover:bg-red-50">
+                                    <Button variant="ghost" onClick={() => enrId && handleUnenroll(enrId)} className="h-8 w-8 p-0 text-red-600 border-2 border-black hover:bg-red-50">
                                        <X size={14} />
                                     </Button>
                                  </td>
                               </tr>
-                            ))}
+                            )})}
                          </tbody>
                       </table>
                     )}
                  </div>
               </Card>
            </div>
+        </div>
+      )}
+      {activeTab === "gradebook" && (
+        <Card className="neo-brutalism bg-white border-4 border-black overflow-hidden">
+          <div className="p-4 bg-muted border-b-4 border-black">
+            <h3 className="text-xl font-black uppercase">Student Gradebook</h3>
+            <p className="text-xs font-bold text-muted-foreground">Enter final marks for {course.subject}</p>
+          </div>
+          <div className="p-4">
+            {studentsProgress.length === 0 ? (
+              <div className="p-12 text-center opacity-30 font-bold italic">No students enrolled.</div>
+            ) : (
+              <table className="w-full text-left">
+                 <thead>
+                   <tr className="border-b-2 border-black">
+                     <th className="p-2 font-black uppercase">Student</th>
+                     <th className="p-2 font-black uppercase w-32">Score (%)</th>
+                     <th className="p-2 font-black uppercase w-24">Action</th>
+                   </tr>
+                 </thead>
+                 <tbody className="divide-y border-black">
+                    {studentsProgress.map((student: any) => (
+                      <tr key={student.id} className="hover:bg-muted/10">
+                         <td className="p-2">
+                            <p className="font-black text-sm uppercase">{student.name}</p>
+                         </td>
+                         <td className="p-2">
+                            <Input 
+                              type="number" 
+                              min="0" max="100" 
+                              placeholder="0-100"
+                              className="border-2 border-black font-bold h-10 w-full"
+                              id={`mark-${student.id}`}
+                            />
+                         </td>
+                         <td className="p-2">
+                            <Button 
+                              onClick={async () => {
+                                const input = document.getElementById(`mark-${student.id}`) as HTMLInputElement;
+                                if (!input || !input.value) return;
+                                setLoading(true);
+                                try {
+                                  const res = await fetch(`/api/marks`, {
+                                    method: "POST",
+                                    headers: { "Content-Type": "application/json" },
+                                    body: JSON.stringify({ studentId: student.id, subject: course.subject, score: parseFloat(input.value) })
+                                  });
+                                  if (res.ok) alert("Mark saved!");
+                                } finally {
+                                  setLoading(false);
+                                }
+                              }}
+                              disabled={loading} 
+                              className="w-full h-10 bg-[#34D399] text-black font-black border-2 border-black"
+                            >
+                              Save
+                            </Button>
+                         </td>
+                      </tr>
+                    ))}
+                 </tbody>
+              </table>
+            )}
+          </div>
+        </Card>
+      )}
+
+      {activeTab === "assignments" && (
+        <div className="space-y-6">
+          <Card className="neo-brutalism bg-[#F5C84C] p-6 border-4 border-black">
+            <h3 className="text-xl font-black uppercase mb-4 flex items-center gap-2"><Plus size={24} /> New Assignment</h3>
+            <form onSubmit={async (e) => {
+              e.preventDefault();
+              const formData = new FormData(e.currentTarget);
+              const title = formData.get("title");
+              const description = formData.get("description");
+              const dueDate = formData.get("dueDate");
+              if (!title || !description || !dueDate) return;
+              setLoading(true);
+              try {
+                const res = await fetch(`/api/courses/${course.id}/assignments`, {
+                  method: "POST",
+                  headers: { "Content-Type": "application/json" },
+                  body: JSON.stringify({ title, description, dueDate: new Date(dueDate as string).toISOString() })
+                });
+                if (res.ok) {
+                  alert("Assignment created!");
+                  router.refresh();
+                }
+              } finally {
+                setLoading(false);
+              }
+            }} className="space-y-4">
+              <Input name="title" placeholder="Assignment Title" className="h-12 border-2 border-black font-bold bg-white" required />
+              <Textarea name="description" placeholder="Instructions..." className="border-2 border-black font-bold bg-white" required />
+              <div className="flex gap-4">
+                <Input name="dueDate" type="datetime-local" className="flex-1 h-12 border-2 border-black font-bold bg-white" required />
+                <Button type="submit" disabled={loading} className="w-1/3 h-12 bg-black text-white font-black neo-brutalism uppercase">Create</Button>
+              </div>
+            </form>
+          </Card>
+          
+          <div className="space-y-4">
+             {course.assignments?.map((assignment: any) => (
+                <Card key={assignment.id} className="neo-brutalism bg-white border-4 border-black p-4">
+                   <div className="flex justify-between items-start">
+                      <div>
+                         <h4 className="text-lg font-black uppercase">{assignment.title}</h4>
+                         <p className="text-xs font-bold opacity-70 mb-2">Due: {new Date(assignment.dueDate).toLocaleString()}</p>
+                         <p className="text-sm font-medium">{assignment.description}</p>
+                      </div>
+                      <div className="text-right">
+                         <span className="text-xs font-black bg-muted px-2 py-1 rounded border-2 border-black">
+                            {assignment.submissions?.length || 0} Submissions
+                         </span>
+                      </div>
+                   </div>
+                </Card>
+             ))}
+          </div>
         </div>
       )}
     </div>

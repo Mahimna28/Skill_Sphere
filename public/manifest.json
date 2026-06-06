@@ -1,0 +1,21 @@
+{
+  "name": "Skill Sphere Academy",
+  "short_name": "SkillSphere",
+  "description": "The ultimate learning platform for students and teachers.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#4F7DF3",
+  "icons": [
+    {
+      "src": "/favicon.ico",
+      "sizes": "192x192",
+      "type": "image/x-icon"
+    },
+    {
+      "src": "/favicon.ico",
+      "sizes": "512x512",
+      "type": "image/x-icon"
+    }
+  ]
+}

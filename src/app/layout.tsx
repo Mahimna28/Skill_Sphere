@@ -14,8 +14,10 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Skill Sphere | AI-Powered Learning",
-  description: "Advanced Learning Management System for the next generation.",
+  title: "Skill Sphere Academy",
+  description: "Next Generation Learning Platform",
+  manifest: "/manifest.json",
+  themeColor: "#4F7DF3",
 };
 
 export default function RootLayout({

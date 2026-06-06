@@ -14,6 +14,7 @@ export default async function StudentDashboard() {
 
   let enrollments: any[] = [];
   let marks: any[] = [];
+  let certificates: any[] = [];
   let user: any = null;
 
   if (decoded?.id) {
@@ -23,6 +24,7 @@ export default async function StudentDashboard() {
       include: { course: { include: { teacher: { select: { name: true } } } } },
     });
     marks = await prisma.marks.findMany({ where: { studentId: decoded.id } });
+    certificates = await prisma.certificate.findMany({ where: { userId: decoded.id }, orderBy: { issueDate: "desc" } });
   }
 
   return (
@@ -151,6 +153,27 @@ export default async function StudentDashboard() {
               </Link>
             </CardContent>
           </Card>
+
+          {/* Certificates */}
+          {certificates.length > 0 && (
+            <Card className="neo-brutalism-static bg-white mb-6">
+              <CardHeader className="border-b-2 border-black bg-[#F5C84C]">
+                <CardTitle className="font-black flex items-center gap-2">
+                  <Star size={20} /> My Certificates
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="p-0">
+                {certificates.map((cert, i) => (
+                  <div key={i} className="p-4 border-b border-gray-100 last:border-0 flex justify-between items-center bg-[#F5C84C]/10">
+                    <span className="font-bold text-sm truncate pr-2" title={cert.title}>{cert.title}</span>
+                    <span className="text-xs font-black px-2 py-0.5 rounded border-2 border-black bg-white">
+                      {new Date(cert.issueDate).toLocaleDateString()}
+                    </span>
+                  </div>
+                ))}
+              </CardContent>
+            </Card>
+          )}
 
           {/* Marks */}
           {marks.length > 0 && (

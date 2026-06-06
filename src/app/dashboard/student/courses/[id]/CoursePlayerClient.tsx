@@ -135,6 +135,27 @@ export default function CoursePlayerClient({ course }: { course: any }) {
             </Button>
           </div>
         </div>
+
+        {/* Assignments Section */}
+        {course.assignments && course.assignments.length > 0 && (
+          <div className="neo-brutalism bg-[#F5C84C] p-8 space-y-6 mt-8">
+            <h3 className="text-2xl font-black border-b-4 border-black pb-2 inline-block">Course Assignments</h3>
+            <div className="space-y-4">
+              {course.assignments.map((assignment: any) => (
+                <div key={assignment.id} className="bg-white border-4 border-black p-6 rounded-2xl flex flex-col md:flex-row justify-between gap-4 items-start md:items-center">
+                  <div>
+                    <h4 className="text-lg font-black uppercase">{assignment.title}</h4>
+                    <p className="text-xs font-bold text-red-600 mb-2">Due: {new Date(assignment.dueDate).toLocaleString()}</p>
+                    <p className="text-sm font-medium">{assignment.description}</p>
+                  </div>
+                  <Button className="neo-brutalism font-black border-2 border-black whitespace-nowrap" onClick={() => alert("Submission UI coming soon!")}>
+                    Submit Work
+                  </Button>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
       </div>
 
       {/* 2. Sidebar - Course Content */}

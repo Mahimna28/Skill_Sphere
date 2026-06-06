@@ -39,6 +39,9 @@ export default async function CoursePlayerPage({ params }: { params: Promise<{ i
           },
         },
       },
+      assignments: {
+        orderBy: { dueDate: "asc" }
+      }
     },
   });
 

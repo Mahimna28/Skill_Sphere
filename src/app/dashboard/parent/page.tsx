@@ -18,8 +18,17 @@ export default async function ParentDashboard() {
     include: {
       children: {
         include: {
-          enrollments: { include: { course: true } },
+          enrollments: { 
+            include: { 
+              course: { 
+                include: { 
+                  modules: { include: { _count: { select: { lessons: true } } } } 
+                } 
+              } 
+            } 
+          },
           marks: { orderBy: { createdAt: "desc" } },
+          lessonCompletions: { include: { lesson: { select: { moduleId: true } } } }
         },
       },
     },
@@ -44,8 +53,30 @@ export default async function ParentDashboard() {
   }
 
   const avgScore = child.marks && child.marks.length > 0
-    ? Math.round(child.marks.reduce((s, m) => s + m.score, 0) / child.marks.length)
+    ? Math.round(child.marks.reduce((s: any, m: any) => s + m.score, 0) / child.marks.length)
     : null;
+
+  // Calculate real attendance/progress
+  let totalLessonsAcc = 0;
+  let totalCompletionsAcc = 0;
+  
+  const coursesWithProgress = child.enrollments.map((enr: any) => {
+    const totalLessons = enr.course.modules.reduce((sum: number, mod: any) => sum + mod._count.lessons, 0);
+    const courseModuleIds = enr.course.modules.map((m: any) => m.id);
+    const completedLessons = child.lessonCompletions.filter((lc: any) => courseModuleIds.includes(lc.lesson.moduleId)).length;
+    
+    totalLessonsAcc += totalLessons;
+    totalCompletionsAcc += completedLessons;
+    
+    return {
+      ...enr.course,
+      totalLessons,
+      completedLessons,
+      progress: totalLessons === 0 ? 0 : Math.round((completedLessons / totalLessons) * 100)
+    };
+  });
+
+  const overallAttendance = totalLessonsAcc === 0 ? 0 : Math.round((totalCompletionsAcc / totalLessonsAcc) * 100);
 
   return (
     <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500 pb-20">
@@ -113,8 +144,8 @@ export default async function ParentDashboard() {
             <Users className="h-6 w-6" />
           </CardHeader>
           <CardContent>
-            <div className="text-5xl font-black">94%</div>
-            <p className="text-black/60 font-bold mt-2 uppercase text-xs">Present This Month</p>
+            <div className="text-5xl font-black">{overallAttendance}%</div>
+            <p className="text-black/60 font-bold mt-2 uppercase text-xs">Overall Progress</p>
           </CardContent>
         </Card>
       </div>
@@ -131,7 +162,7 @@ export default async function ParentDashboard() {
               <div className="p-12 text-center text-muted-foreground font-bold">No exam results published yet.</div>
             ) : (
               <div className="divide-y-4 divide-black">
-                {child.marks.map((m, i) => (
+                {child.marks.map((m: any, i: number) => (
                   <div key={i} className="p-6 flex items-center justify-between hover:bg-muted/10 transition-colors">
                     <div>
                       <h4 className="font-black text-xl uppercase tracking-tight">{m.subject}</h4>
@@ -150,23 +181,32 @@ export default async function ParentDashboard() {
         </div>
 
         {/* Courses */}
-        <div className="neo-brutalism bg-white border-4 border-black p-0 overflow-hidden">
+        <div className="neo-brutalism bg-white border-4 border-black p-0 overflow-hidden flex flex-col">
           <div className="p-6 border-b-4 border-black bg-muted/30">
             <h3 className="text-2xl font-black uppercase">Ongoing Curriculum</h3>
           </div>
-          <div className="p-0">
-            {child.enrollments.length === 0 ? (
+          <div className="p-0 flex-1">
+            {coursesWithProgress.length === 0 ? (
               <div className="p-12 text-center text-muted-foreground font-bold">Not enrolled in any subjects.</div>
             ) : (
               <div className="divide-y-4 divide-black">
-                {child.enrollments.map((enr, i) => (
-                  <div key={i} className="p-6 flex items-center gap-6 hover:bg-muted/10 transition-colors">
-                    <div className="w-16 h-16 bg-primary/10 border-4 border-black rounded-2xl flex items-center justify-center shrink-0 shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]">
-                      <BookOpen className="text-primary h-8 w-8" />
+                {coursesWithProgress.map((course: any, i: number) => (
+                  <div key={i} className="p-6 flex flex-col gap-4 hover:bg-muted/10 transition-colors">
+                    <div className="flex items-center gap-6">
+                      <div className="w-16 h-16 bg-primary/10 border-4 border-black rounded-2xl flex items-center justify-center shrink-0 shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]">
+                        <BookOpen className="text-primary h-8 w-8" />
+                      </div>
+                      <div className="flex-1">
+                        <h4 className="font-black text-xl uppercase tracking-tight line-clamp-1">{course.title}</h4>
+                        <p className="text-sm font-bold text-muted-foreground mt-1 uppercase">Category: {course.subject}</p>
+                      </div>
                     </div>
-                    <div>
-                      <h4 className="font-black text-xl uppercase tracking-tight">{enr.course.title}</h4>
-                      <p className="text-sm font-bold text-muted-foreground mt-1">Category: {enr.course.subject}</p>
+                    <div className="flex items-center gap-3 w-full">
+                       <span className="text-xs font-black w-8">{course.progress}%</span>
+                       <div className="flex-1 h-3 bg-muted rounded-full overflow-hidden border-2 border-black">
+                          <div className="h-full bg-[#34D399]" style={{ width: `${course.progress}%` }}></div>
+                       </div>
+                       <span className="text-[10px] font-bold text-muted-foreground w-16 text-right">{course.completedLessons}/{course.totalLessons}</span>
                     </div>
                   </div>
                 ))}

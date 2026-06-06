@@ -44,6 +44,43 @@ export async function POST(req: Request, { params }: { params: Promise<{ id: str
       data: { points: { increment: 20 } },
     });
 
+    // Check if the whole course is completed
+    const lesson = await prisma.lesson.findUnique({
+      where: { id: lessonId },
+      include: { module: { select: { courseId: true, course: { select: { title: true } } } } }
+    });
+
+    if (lesson) {
+      const courseId = lesson.module.courseId;
+      const courseTitle = lesson.module.course.title;
+      
+      const totalCourseLessons = await prisma.lesson.count({
+        where: { module: { courseId } }
+      });
+      
+      const completedCourseLessons = await prisma.lessonCompletion.count({
+        where: { userId, lesson: { module: { courseId } } }
+      });
+
+      if (totalCourseLessons > 0 && completedCourseLessons === totalCourseLessons) {
+        // Course completed! Award Certificate if not already awarded
+        const existingCert = await prisma.certificate.findFirst({
+          where: { userId, title: `Certificate of Completion: ${courseTitle}` }
+        });
+
+        if (!existingCert) {
+          await prisma.certificate.create({
+            data: {
+              title: `Certificate of Completion: ${courseTitle}`,
+              userId,
+              url: `/certificates/${courseId}` // Placeholder URL for future certificate generation
+            }
+          });
+          return NextResponse.json({ message: "Lesson completed! Course finished! Certificate Awarded!", pointsEarned: 20, courseCompleted: true });
+        }
+      }
+    }
+
     return NextResponse.json({ message: "Lesson completed! +20 points", pointsEarned: 20 });
   } catch (error: any) {
     console.error("Lesson completion error:", error);

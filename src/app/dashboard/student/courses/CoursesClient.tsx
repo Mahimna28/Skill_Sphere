@@ -22,6 +22,9 @@ interface Course {
   teacher: { name: string };
   _count: { enrollments: number };
   isPublic?: boolean;
+  totalLessons?: number;
+  completedLessons?: number;
+  progress?: number;
 }
 
 interface Props {
@@ -145,8 +148,26 @@ export default function CoursesClient({ courses, enrolledIds: initialEnrolledIds
                   </p>
                 </CardHeader>
 
-                <CardContent className="flex-1">
+                <CardContent className="flex-1 flex flex-col justify-between space-y-4">
                   <p className="text-sm text-muted-foreground font-medium line-clamp-3">{course.description}</p>
+                  
+                  {isEnrolled && (
+                    <div className="space-y-1.5 mt-auto pt-2">
+                      <div className="flex justify-between text-xs font-black uppercase">
+                        <span>Progress</span>
+                        <span>{course.progress || 0}%</span>
+                      </div>
+                      <div className="h-3 w-full bg-muted rounded-full overflow-hidden border-2 border-black">
+                        <div 
+                          className="h-full bg-[#34D399]" 
+                          style={{ width: `${course.progress || 0}%` }}
+                        />
+                      </div>
+                      <p className="text-[10px] text-muted-foreground font-bold text-right">
+                        {course.completedLessons || 0} of {course.totalLessons || 0} Lessons
+                      </p>
+                    </div>
+                  )}
                 </CardContent>
 
                 <CardFooter className="p-4 border-t-2 border-black bg-muted/30 flex gap-2">

@@ -58,11 +58,22 @@ export async function POST(req: Request, { params }: { params: Promise<{ id: str
       }
     });
 
-    // Award +50 points for enrollment
-    await prisma.user.update({
-      where: { id: targetUserId },
-      data: { points: { increment: 50 } }
+    // Check if they ever enrolled before to prevent point farming
+    const history = await prisma.enrollmentHistory.findUnique({
+      where: { userId_courseId: { userId: targetUserId, courseId } }
     });
+
+    if (!history) {
+      // Record history and award points
+      await prisma.enrollmentHistory.create({
+        data: { userId: targetUserId, courseId }
+      });
+
+      await prisma.user.update({
+        where: { id: targetUserId },
+        data: { points: { increment: 50 } }
+      });
+    }
 
     return NextResponse.json({ message: "Enrollment successful!" });
   } catch (error: any) {
