@@ -10,7 +10,7 @@ export async function PATCH(req: Request, { params }: { params: Promise<{ id: st
     const token = cookieStore.get("token")?.value;
     const decoded: any = token ? verifyToken(token) : null;
 
-    if (!decoded || decoded.role !== "teacher") {
+    if (!decoded || !["teacher", "institute_admin", "superadmin"].includes(decoded.role)) {
       return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
     }
 
@@ -40,7 +40,7 @@ export async function DELETE(req: Request, { params }: { params: Promise<{ id: s
     const token = cookieStore.get("token")?.value;
     const decoded: any = token ? verifyToken(token) : null;
 
-    if (!decoded || decoded.role !== "teacher") {
+    if (!decoded || !["teacher", "institute_admin", "superadmin"].includes(decoded.role)) {
       return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
     }
 

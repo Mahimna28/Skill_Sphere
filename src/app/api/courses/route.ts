@@ -9,7 +9,7 @@ export async function POST(req: Request) {
     const token = cookieStore.get("token")?.value;
     const decoded: any = token ? verifyToken(token) : null;
 
-    if (!decoded?.id || decoded.role !== "teacher") {
+    if (!decoded?.id || !["teacher", "institute_admin", "superadmin"].includes(decoded.role)) {
       return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
     }
 

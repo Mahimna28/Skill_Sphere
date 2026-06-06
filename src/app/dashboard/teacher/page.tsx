@@ -11,14 +11,13 @@ export default async function TeacherDashboard() {
   let courses: any[] = [];
   let teacher: any = null;
 
-  if (decoded?.id) {
-    teacher = await prisma.user.findUnique({ where: { id: decoded.id } });
-    courses = await prisma.course.findMany({
-      where: { teacherId: decoded.id, isPublic: true },
-      include: { _count: { select: { enrollments: true } } },
-      orderBy: { createdAt: "desc" },
-    });
-  }
+  if (!decoded || !["teacher", "institute_admin"].includes(decoded.role)) redirect("/login");
+  teacher = await prisma.user.findUnique({ where: { id: decoded.id } });
+  courses = await prisma.course.findMany({
+    where: { teacherId: decoded.id, isPublic: true },
+    include: { _count: { select: { enrollments: true } } },
+    orderBy: { createdAt: "desc" },
+  });
 
   return <TeacherOverviewClient teacher={teacher} initialCourses={courses} />;
 }

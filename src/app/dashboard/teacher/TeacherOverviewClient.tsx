@@ -163,9 +163,11 @@ export default function TeacherOverviewClient({ teacher, initialCourses }: Props
           <p className="text-muted-foreground font-medium text-lg">Manage your courses and track student progress.</p>
         </div>
         <div className="flex gap-2">
-          <Button variant="outline" className="font-bold text-lg h-12 px-6 border-2 border-black hover:bg-[#F5C84C] hover:text-black transition-colors" onClick={() => setShowPromotionForm(true)}>
-            <ShieldAlert className="mr-2 h-5 w-5" /> Request Promotion
-          </Button>
+          {teacher?.role === "teacher" && (
+            <Button variant="outline" className="font-bold text-lg h-12 px-6 border-2 border-black hover:bg-[#F5C84C] hover:text-black transition-colors" onClick={() => setShowPromotionForm(true)}>
+              <ShieldAlert className="mr-2 h-5 w-5" /> Request Promotion
+            </Button>
+          )}
           <Button className="neo-brutalism font-bold text-lg h-12 px-6" onClick={() => setShowForm(true)}>
             <Plus className="mr-2 h-5 w-5" /> Create New Course
           </Button>

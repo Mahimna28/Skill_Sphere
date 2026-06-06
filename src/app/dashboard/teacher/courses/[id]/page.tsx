@@ -10,7 +10,7 @@ export default async function ManageCoursePage({ params }: { params: Promise<{ i
   const token = cookieStore.get("token")?.value;
   const decoded: any = token ? verifyToken(token) : null;
 
-  if (!decoded || decoded.role !== "teacher") redirect("/login");
+  if (!decoded || !["teacher", "institute_admin"].includes(decoded.role)) redirect("/login");
 
   const course = await prisma.course.findUnique({
     where: { id },
