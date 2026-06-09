@@ -22,8 +22,8 @@ export async function GET(req: Request) {
       id: { not: decoded.id },
       username: { not: null },
       OR: [
-        { username: { contains: cleanUsername, mode: "insensitive" } },
-        { name: { contains: cleanUsername, mode: "insensitive" } }
+        { username: { contains: cleanUsername } },
+        { name: { contains: cleanUsername } }
       ]
     },
     select: { id: true, name: true, email: true, username: true, role: true, image: true, isProfilePublic: true },

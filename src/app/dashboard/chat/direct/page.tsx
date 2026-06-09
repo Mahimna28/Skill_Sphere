@@ -4,6 +4,7 @@ import { Card, CardContent, CardFooter } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { MessageSquare, Send, Search, Loader2, ArrowLeft, Trash2, Lock, Unlock, UserPlus, CheckCheck, X, Clock, AtSign, Users, Plus } from "lucide-react";
+import Link from "next/link";
 
 export default function MessagesPage() {
   const [myUsername, setMyUsername] = useState<string|null>(undefined as any);
