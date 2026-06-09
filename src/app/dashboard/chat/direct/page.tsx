@@ -33,8 +33,19 @@ export default function MessagesPage() {
   const [groupName, setGroupName] = useState("");
   const [groupMembers, setGroupMembers] = useState("");
   const bottomRef = useRef<HTMLDivElement>(null);
+  const searchContainerRef = useRef<HTMLFormElement>(null);
 
   useEffect(() => { checkUsername(); fetchContacts(); fetchRequests(); fetchGroups(); fetchSuggestions(); }, []);
+  
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (searchContainerRef.current && !searchContainerRef.current.contains(event.target as Node)) {
+        setIsSearchFocused(false);
+      }
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
   
   useEffect(() => {
     const t = setTimeout(() => { if (searchQuery) handleSearch(); else setSearchResults([]); }, 300);
@@ -133,8 +144,8 @@ export default function MessagesPage() {
       <div className="w-full md:w-80 flex flex-col gap-4 shrink-0 overflow-hidden">
         <div className="neo-brutalism bg-white p-5 border-4 border-black">
           <h2 className="text-sm font-black uppercase tracking-tight mb-3 flex items-center gap-2"><Search size={16} /> Find User</h2>
-          <form onSubmit={handleSearch} className="flex gap-2 relative">
-            <div className="relative flex-1"><AtSign className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" /><Input placeholder="Search users..." className="pl-9 border-2 border-black font-bold h-10 text-xs" value={searchQuery} onChange={e => setSearchQuery(e.target.value)} onFocus={() => setIsSearchFocused(true)} onBlur={() => setTimeout(() => setIsSearchFocused(false), 200)} /></div>
+          <form ref={searchContainerRef} onSubmit={handleSearch} className="flex gap-2 relative">
+            <div className="relative flex-1"><AtSign className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" /><Input placeholder="Search users..." className="pl-9 border-2 border-black font-bold h-10 text-xs" value={searchQuery} onChange={e => setSearchQuery(e.target.value)} onFocus={() => setIsSearchFocused(true)} /></div>
             <Button type="submit" disabled={searching} className="h-10 w-10 p-0 neo-brutalism bg-primary text-white">{searching ? <Loader2 className="animate-spin" size={16} /> : <Search size={16} />}</Button>
             
             {/* Dropdown Suggestions */}
@@ -149,15 +160,15 @@ export default function MessagesPage() {
                         <div className="w-8 h-8 rounded-full bg-white border-2 border-black flex items-center justify-center font-black overflow-hidden shrink-0">{u?.image ? <img src={u.image} className="w-full h-full object-cover" /> : (u?.name?.charAt(0) || "?")}</div>
                         <div className="flex-1 min-w-0">
                           <p className="font-black text-xs uppercase truncate">{u?.name || "Unknown"}</p>
-                          <p className="text-[8px] font-bold text-muted-foreground truncate">@{u.username} · {u.role}</p>
+                          <p className="text-[8px] font-bold text-muted-foreground truncate">@{u?.username} · {u?.role}</p>
                         </div>
                       </div>
                       <div className="flex gap-2">
-                        <Link href={`/dashboard/user/${u.username}`} target="_blank" className="flex-1">
+                        <Link href={`/dashboard/user/${u?.username}`} className="flex-1" onClick={() => setIsSearchFocused(false)}>
                           <Button type="button" variant="outline" className="w-full h-7 text-[10px] font-black border-2 border-black">View Profile</Button>
                         </Link>
                         <Button type="button" onClick={() => openChat(u)} className="flex-1 h-7 text-[10px] font-black neo-brutalism bg-primary text-white">
-                          {u.isProfilePublic ? <><MessageSquare size={12} className="mr-1" /> Chat</> : <><UserPlus size={12} className="mr-1" /> Connect</>}
+                          {u?.isProfilePublic ? <><MessageSquare size={12} className="mr-1" /> Chat</> : <><UserPlus size={12} className="mr-1" /> Connect</>}
                         </Button>
                       </div>
                     </div>
