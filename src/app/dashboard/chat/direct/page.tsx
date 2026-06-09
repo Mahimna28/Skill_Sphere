@@ -142,7 +142,7 @@ export default function MessagesPage() {
   return (
     <div className="max-w-6xl mx-auto h-[calc(100vh-140px)] flex flex-col md:flex-row gap-6 animate-in fade-in slide-in-from-bottom-4 duration-500">
       {/* Sidebar */}
-      <div className="w-full md:w-80 flex flex-col gap-4 shrink-0 overflow-hidden">
+      <div className="w-full md:w-80 flex flex-col gap-4 shrink-0">
         <div className="neo-brutalism bg-white p-5 border-4 border-black">
           <h2 className="text-sm font-black uppercase tracking-tight mb-3 flex items-center gap-2"><Search size={16} /> Find User</h2>
           <form ref={searchContainerRef} onSubmit={handleSearch} className="flex gap-2 relative z-50">
@@ -157,7 +157,7 @@ export default function MessagesPage() {
                  {searching && <div className="flex justify-center p-4"><Loader2 className="animate-spin" /></div>}
                  {!searchQuery && suggestedUsers.length === 0 && <div className="flex justify-center p-4"><Loader2 className="animate-spin text-muted-foreground" size={16} /></div>}
                  {((!searchQuery ? suggestedUsers : searchResults) || []).map((u: any, i: number) => (
-                    <div key={u?.id || u?.username || i} className="p-2 hover:bg-muted/30 rounded-lg flex flex-col gap-2 border-b-2 border-black/10 last:border-0 transition-colors">
+                    <div key={u?.id || u?.username || i} className="p-2 hover:bg-gray-100 rounded-lg flex flex-col gap-2 border-b-2 border-black/10 last:border-0 transition-colors">
                       <div className="flex items-center gap-3">
                         <div className="w-8 h-8 rounded-full bg-white border-2 border-black flex items-center justify-center font-black overflow-hidden shrink-0">{u?.image ? <img src={u.image} className="w-full h-full object-cover" /> : (u?.name?.charAt(0) || "?")}</div>
                         <div className="flex-1 min-w-0">
@@ -180,7 +180,7 @@ export default function MessagesPage() {
         </div>
 
         {/* Tabs */}
-        <div className="neo-brutalism bg-white border-4 border-black flex-1 flex flex-col min-h-0 overflow-hidden">
+        <div className="neo-brutalism bg-white border-4 border-black flex-1 flex flex-col min-h-0 overflow-hidden relative z-10">
           <div className="flex border-b-4 border-black shrink-0">
             {(["contacts","groups","requests"] as const).map((tab: "contacts" | "groups" | "requests") => (
               <button key={tab} onClick={() => setActiveTab(tab)} className={`flex-1 p-2.5 text-[9px] font-black uppercase text-center transition-colors border-r-2 last:border-r-0 border-black relative ${activeTab === tab ? (tab==="requests"?"bg-[#F5C84C] text-black":"bg-primary text-white") : "hover:bg-muted/20"}`}>
