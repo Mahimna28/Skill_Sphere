@@ -3,8 +3,7 @@ import { useState, useEffect, useRef } from "react";
 import { Card, CardContent, CardFooter } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { MessageSquare, Send, Search, Loader2, ArrowLeft, Trash2, Lock, Unlock, UserPlus, CheckCheck, X, Clock, AtSign, Users, Plus } from "lucide-react";
-import Link from "next/link";
+import { MessageSquare, Send, Search, Loader2, ArrowLeft, Trash2, Lock, UserPlus, CheckCheck, X, Clock, AtSign, Users, Plus } from "lucide-react";
 
 export default function MessagesPage() {
   const [myUsername, setMyUsername] = useState<string|null>(undefined as any);
@@ -15,7 +14,7 @@ export default function MessagesPage() {
   const [searching, setSearching] = useState(false);
   const [searchResults, setSearchResults] = useState<any[]>([]);
   const [suggestedUsers, setSuggestedUsers] = useState<any[]>([]);
-  const [isSearchFocused, setIsSearchFocused] = useState(false);
+  const [showDropdown, setShowDropdown] = useState(false);
   const [otherUser, setOtherUser] = useState<any>(null);
   const [chatStatus, setChatStatus] = useState<"allowed"|"request_needed"|"pending"|null>(null);
   const [messages, setMessages] = useState<any[]>([]);
@@ -33,24 +32,20 @@ export default function MessagesPage() {
   const [groupName, setGroupName] = useState("");
   const [groupMembers, setGroupMembers] = useState("");
   const bottomRef = useRef<HTMLDivElement>(null);
-  const searchContainerRef = useRef<HTMLFormElement>(null);
+  const inputRef = useRef<HTMLInputElement>(null);
+  const dropdownRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => { checkUsername(); fetchContacts(); fetchRequests(); fetchGroups(); fetchSuggestions(); }, []);
-  
+
+  // Debounced search
   useEffect(() => {
-    const handleClickOutside = (event: MouseEvent) => {
-      if (searchContainerRef.current && !searchContainerRef.current.contains(event.target as Node)) {
-        setIsSearchFocused(false);
-      }
-    };
-    document.addEventListener("mousedown", handleClickOutside);
-    return () => document.removeEventListener("mousedown", handleClickOutside);
-  }, []);
-  
-  useEffect(() => {
-    const t = setTimeout(() => { if (searchQuery) handleSearch(); else setSearchResults([]); }, 300);
+    const t = setTimeout(() => {
+      if (searchQuery.trim()) handleSearch();
+      else setSearchResults([]);
+    }, 300);
     return () => clearTimeout(t);
   }, [searchQuery]);
+
   useEffect(() => { if (otherUser && chatStatus === "allowed") { fetchMessages(); const i = setInterval(fetchMessages, 3000); return () => clearInterval(i); } }, [otherUser, chatStatus]);
   useEffect(() => { if (activeGroup) { fetchGroupMessages(); const i = setInterval(fetchGroupMessages, 3000); return () => clearInterval(i); } }, [activeGroup]);
   useEffect(() => { bottomRef.current?.scrollIntoView({ behavior: "smooth" }); }, [messages, groupMessages]);
@@ -75,14 +70,18 @@ export default function MessagesPage() {
   const handleSearch = async (e?: React.FormEvent) => {
     if (e) e.preventDefault();
     if (!searchQuery.trim()) { setSearchResults([]); return; }
-    setSearching(true); setError(""); 
+    setSearching(true); setError("");
     try { const r = await fetch(`/api/users/search?username=${searchQuery}`); const d = await r.json(); if (r.ok) setSearchResults(d.users || []); else setError(d.message); }
     catch(e) { setError("Search failed"); } finally { setSearching(false); }
   };
 
-  const openChat = async (user: any) => {
-    setIsSearchFocused(false);
-    setOtherUser(user); setActiveGroup(null); setSearchResults([]); setSearchQuery(""); setMessages([]);
+  const closeDropdown = () => { setShowDropdown(false); };
+
+  const handleUserClick = async (user: any) => {
+    closeDropdown();
+    setSearchQuery("");
+    setSearchResults([]);
+    setOtherUser(user); setActiveGroup(null); setMessages([]);
     if (user.isProfilePublic) { setChatStatus("allowed"); } else {
       const r = await fetch(`/api/chat/direct?otherId=${user.id}`); const d = await r.json();
       if (r.ok && d.messages.length > 0) { setChatStatus("allowed"); setMessages(d.messages); } else {
@@ -91,6 +90,11 @@ export default function MessagesPage() {
         setChatStatus(sent ? "pending" : "request_needed");
       }
     }
+  };
+
+  const handleViewProfile = (username: string) => {
+    closeDropdown();
+    window.location.href = `/dashboard/user/${username}`;
   };
 
   const openGroupChat = (group: any) => { setActiveGroup(group); setOtherUser(null); setChatStatus(null); setGroupMessages([]); };
@@ -117,6 +121,10 @@ export default function MessagesPage() {
     try { const r = await fetch("/api/chat/group", { method: "POST", headers: {"Content-Type":"application/json"}, body: JSON.stringify({ name: groupName, memberUsernames: usernames }) }); if (r.ok) { setShowCreateGroup(false); setGroupName(""); setGroupMembers(""); fetchGroups(); } } catch(e){} finally { setLoading(false); }
   };
 
+  // The list to show in the dropdown
+  const displayList = searchQuery.trim() ? searchResults : suggestedUsers;
+  const dropdownLabel = searchQuery.trim() ? "Search Results" : "Suggested Users";
+
   // USERNAME SETUP GATE
   if (myUsername === undefined) return <div className="flex items-center justify-center h-[60vh]"><Loader2 className="animate-spin" size={32} /></div>;
   if (myUsername === null) {
@@ -142,89 +150,144 @@ export default function MessagesPage() {
   return (
     <div className="max-w-6xl mx-auto h-[calc(100vh-140px)] flex flex-col md:flex-row gap-6 animate-in fade-in slide-in-from-bottom-4 duration-500">
       {/* Sidebar */}
-      <div className="w-full md:w-80 flex flex-col gap-4 shrink-0">
-        <div className="neo-brutalism bg-white p-5 border-4 border-black">
+      <div className="w-full md:w-80 flex flex-col gap-0 shrink-0 neo-brutalism bg-white border-4 border-black overflow-hidden">
+
+        {/* Search Section — INLINE, not absolute */}
+        <div className="p-4 border-b-4 border-black">
           <h2 className="text-sm font-black uppercase tracking-tight mb-3 flex items-center gap-2"><Search size={16} /> Find User</h2>
-          <form ref={searchContainerRef} onSubmit={handleSearch} className="flex gap-2 relative z-50">
-            <div className="relative flex-1"><AtSign className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" /><Input placeholder="Search users..." className="pl-9 border-2 border-black font-bold h-10 text-xs" value={searchQuery} onChange={e => setSearchQuery(e.target.value)} onFocus={() => setIsSearchFocused(true)} /></div>
-            <Button type="submit" disabled={searching} className="h-10 w-10 p-0 neo-brutalism bg-primary text-white">{searching ? <Loader2 className="animate-spin" size={16} /> : <Search size={16} />}</Button>
-            
-            {/* Dropdown Suggestions */}
-            {isSearchFocused && (
-              <div className="absolute top-12 left-0 right-0 z-50 bg-white border-4 border-black rounded-xl shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] max-h-80 overflow-y-auto p-2">
-                 <p className="text-[10px] font-black uppercase text-muted-foreground mb-2 px-2">{searchQuery ? "Search Results" : "Suggested Users"}</p>
-                 {searchQuery && searchResults.length === 0 && !searching && <p className="text-xs font-bold text-center p-4">No users found.</p>}
-                 {searching && <div className="flex justify-center p-4"><Loader2 className="animate-spin" /></div>}
-                 {!searchQuery && suggestedUsers.length === 0 && <div className="flex justify-center p-4"><Loader2 className="animate-spin text-muted-foreground" size={16} /></div>}
-                 {((!searchQuery ? suggestedUsers : searchResults) || []).map((u: any, i: number) => (
-                    <div key={u?.id || u?.username || i} className="p-2 hover:bg-gray-100 rounded-lg flex flex-col gap-2 border-b-2 border-black/10 last:border-0 transition-colors">
-                      <div className="flex items-center gap-3">
-                        <div className="w-8 h-8 rounded-full bg-white border-2 border-black flex items-center justify-center font-black overflow-hidden shrink-0">{u?.image ? <img src={u.image} className="w-full h-full object-cover" /> : (u?.name?.charAt(0) || "?")}</div>
-                        <div className="flex-1 min-w-0">
-                          <p className="font-black text-xs uppercase truncate">{u?.name || "Unknown"}</p>
-                          <p className="text-[8px] font-bold text-muted-foreground truncate">@{u?.username} · {u?.role}</p>
-                        </div>
-                      </div>
-                      <div className="flex gap-2">
-                        <Button type="button" variant="outline" onClick={() => { setIsSearchFocused(false); window.location.href = `/dashboard/user/${u?.username}`; }} className="flex-1 h-7 text-[10px] font-black border-2 border-black">View Profile</Button>
-                        <Button type="button" onClick={() => openChat(u)} className="flex-1 h-7 text-[10px] font-black neo-brutalism bg-primary text-white">
-                          {u?.isProfilePublic ? <><MessageSquare size={12} className="mr-1" /> Chat</> : <><UserPlus size={12} className="mr-1" /> Connect</>}
-                        </Button>
-                      </div>
-                    </div>
-                 ))}
-              </div>
-            )}
+          <form onSubmit={handleSearch} className="flex gap-2">
+            <div className="relative flex-1">
+              <AtSign className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
+              <Input
+                ref={inputRef}
+                placeholder="Search users..."
+                className="pl-9 border-2 border-black font-bold h-10 text-xs"
+                value={searchQuery}
+                onChange={e => setSearchQuery(e.target.value)}
+                onFocus={() => setShowDropdown(true)}
+              />
+            </div>
+            <Button type="submit" disabled={searching} className="h-10 w-10 p-0 neo-brutalism bg-primary text-white">
+              {searching ? <Loader2 className="animate-spin" size={16} /> : <Search size={16} />}
+            </Button>
           </form>
-          {error && <p className="text-[10px] font-bold text-red-600 mt-2">{error}</p>}
+
+          {/* INLINE dropdown — no absolute positioning at all */}
+          {showDropdown && (
+            <div ref={dropdownRef} className="mt-2 bg-white border-2 border-black rounded-xl shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] max-h-72 overflow-y-auto">
+              {/* Header row */}
+              <div className="flex items-center justify-between px-3 py-2 border-b border-black/10">
+                <p className="text-[10px] font-black uppercase text-gray-500">{dropdownLabel}</p>
+                <button
+                  type="button"
+                  onMouseDown={e => { e.preventDefault(); closeDropdown(); }}
+                  className="text-gray-400 hover:text-black"
+                >
+                  <X size={14} />
+                </button>
+              </div>
+
+              {/* Loading spinner for search */}
+              {searching && (
+                <div className="flex justify-center p-4">
+                  <Loader2 className="animate-spin" size={18} />
+                </div>
+              )}
+
+              {/* Loading spinner for suggestions */}
+              {!searching && !searchQuery.trim() && suggestedUsers.length === 0 && (
+                <div className="flex justify-center p-4">
+                  <Loader2 className="animate-spin text-gray-400" size={16} />
+                </div>
+              )}
+
+              {/* No results */}
+              {!searching && searchQuery.trim() && searchResults.length === 0 && (
+                <p className="text-xs font-bold text-center p-4 text-gray-500">No users found.</p>
+              )}
+
+              {/* User list */}
+              {!searching && displayList.map((u: any, i: number) => (
+                <div key={u?.id || u?.username || i} className="border-b border-black/10 last:border-0">
+                  {/* User info row */}
+                  <div className="flex items-center gap-3 px-3 pt-3">
+                    <div className="w-9 h-9 rounded-full bg-gray-100 border-2 border-black flex items-center justify-center font-black overflow-hidden shrink-0 text-sm">
+                      {u?.image ? <img src={u.image} className="w-full h-full object-cover" alt="" /> : (u?.name?.charAt(0) || "?")}
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <p className="font-black text-xs uppercase truncate">{u?.name || "Unknown"}</p>
+                      <p className="text-[9px] font-bold text-gray-500 truncate">@{u?.username} · {u?.role}</p>
+                    </div>
+                  </div>
+                  {/* Action buttons */}
+                  <div className="flex gap-2 px-3 pb-3 pt-2">
+                    <button
+                      type="button"
+                      onMouseDown={e => { e.preventDefault(); handleViewProfile(u?.username); }}
+                      className="flex-1 h-8 text-[10px] font-black border-2 border-black rounded-lg bg-white hover:bg-gray-50 active:bg-gray-100"
+                    >
+                      View Profile
+                    </button>
+                    <button
+                      type="button"
+                      onMouseDown={e => { e.preventDefault(); handleUserClick(u); }}
+                      className="flex-1 h-8 text-[10px] font-black border-2 border-black rounded-lg bg-primary text-white hover:opacity-90 active:opacity-80 flex items-center justify-center gap-1"
+                    >
+                      {u?.isProfilePublic ? <><MessageSquare size={11} /> Chat</> : <><UserPlus size={11} /> Connect</>}
+                    </button>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
         </div>
 
         {/* Tabs */}
-        <div className="neo-brutalism bg-white border-4 border-black flex-1 flex flex-col min-h-0 overflow-hidden relative z-10">
-          <div className="flex border-b-4 border-black shrink-0">
-            {(["contacts","groups","requests"] as const).map((tab: "contacts" | "groups" | "requests") => (
-              <button key={tab} onClick={() => setActiveTab(tab)} className={`flex-1 p-2.5 text-[9px] font-black uppercase text-center transition-colors border-r-2 last:border-r-0 border-black relative ${activeTab === tab ? (tab==="requests"?"bg-[#F5C84C] text-black":"bg-primary text-white") : "hover:bg-muted/20"}`}>
-                {tab}{tab === "requests" && (pendingRequests.length + pendingInvites.length > 0) && <span className="absolute top-0.5 right-1 bg-red-500 text-white text-[7px] font-black w-4 h-4 rounded-full flex items-center justify-center">{pendingRequests.length + pendingInvites.length}</span>}
-              </button>
-            ))}
-          </div>
-          <div className="flex-1 overflow-y-auto">
-            {activeTab === "contacts" && (contacts.length === 0 ? <div className="p-6 text-center"><p className="text-xs font-bold text-muted-foreground italic">No conversations yet</p></div> : <div className="divide-y-2 divide-black">{contacts.map((c: any) => (
-              <button key={c.id} onClick={() => openChat(c)} className={`w-full p-4 text-left hover:bg-accent/10 transition-colors flex items-center gap-3 ${otherUser?.id === c.id ? "bg-primary/10" : ""}`}>
-                <div className="w-10 h-10 rounded-full bg-muted border-2 border-black flex items-center justify-center text-xs font-black shrink-0 overflow-hidden">{c.image ? <img src={c.image} className="w-full h-full object-cover" /> : c.name.charAt(0)}</div>
-                <div className="flex-1 min-w-0"><p className="font-black text-xs uppercase truncate">{c.name}</p><p className="text-[8px] text-muted-foreground font-bold">@{c.username || "---"}</p></div>
-              </button>
-            ))}</div>)}
+        <div className="flex border-b-4 border-black shrink-0">
+          {(["contacts","groups","requests"] as const).map((tab) => (
+            <button key={tab} onClick={() => setActiveTab(tab)} className={`flex-1 p-2.5 text-[9px] font-black uppercase text-center transition-colors border-r-2 last:border-r-0 border-black relative ${activeTab === tab ? (tab==="requests"?"bg-[#F5C84C] text-black":"bg-primary text-white") : "hover:bg-gray-50"}`}>
+              {tab}{tab === "requests" && (pendingRequests.length + pendingInvites.length > 0) && <span className="absolute top-0.5 right-1 bg-red-500 text-white text-[7px] font-black w-4 h-4 rounded-full flex items-center justify-center">{pendingRequests.length + pendingInvites.length}</span>}
+            </button>
+          ))}
+        </div>
 
-            {activeTab === "groups" && (<div>
-              <div className="p-3 border-b-2 border-black"><Button onClick={() => setShowCreateGroup(!showCreateGroup)} className="w-full h-8 text-[10px] font-black neo-brutalism bg-[#34D399] text-black"><Plus size={12} className="mr-1" /> New Group</Button></div>
-              {showCreateGroup && <form onSubmit={createGroup} className="p-3 border-b-2 border-black space-y-2 bg-muted/10">
-                <Input className="h-8 border-2 border-black font-bold text-xs" placeholder="Group name" value={groupName} onChange={e => setGroupName(e.target.value)} maxLength={30} />
-                <Input className="h-8 border-2 border-black font-bold text-xs" placeholder="@user1, @user2" value={groupMembers} onChange={e => setGroupMembers(e.target.value)} />
-                <Button type="submit" disabled={loading || !groupName.trim()} className="w-full h-8 text-[10px] font-black bg-primary text-white border-2 border-black">Create</Button>
-              </form>}
-              {groups.length === 0 && !showCreateGroup ? <div className="p-6 text-center"><p className="text-xs font-bold text-muted-foreground italic">No groups yet</p></div> : <div className="divide-y-2 divide-black">{groups.map((g: any) => (
-                <button key={g.id} onClick={() => openGroupChat(g)} className={`w-full p-4 text-left hover:bg-accent/10 flex items-center gap-3 ${activeGroup?.id === g.id ? "bg-primary/10" : ""}`}>
-                  <div className="w-10 h-10 rounded-xl bg-[#4F7DF3] border-2 border-black flex items-center justify-center text-white text-xs font-black"><Users size={16} /></div>
-                  <div className="flex-1 min-w-0"><p className="font-black text-xs uppercase truncate">{g.name}</p><p className="text-[8px] text-muted-foreground font-bold">{g.memberCount} members</p></div>
-                </button>
-              ))}</div>}
-              {pendingInvites.length > 0 && <div className="border-t-2 border-black"><p className="text-[8px] font-black uppercase p-2 bg-[#F5C84C]/20">Pending Invites</p>{pendingInvites.map((inv: any) => (
-                <div key={inv.id} className="p-3 border-b border-black/10 space-y-2">
-                  <p className="text-xs font-black uppercase">{inv.group.name}</p>
-                  <p className="text-[8px] text-muted-foreground">From @{inv.group.createdBy.username}</p>
-                  <div className="flex gap-2"><Button onClick={() => respondToGroupInvite(inv.groupId, "accept")} className="flex-1 h-7 text-[9px] font-black bg-[#34D399] text-black border border-black">Join</Button><Button onClick={() => respondToGroupInvite(inv.groupId, "reject")} variant="destructive" className="flex-1 h-7 text-[9px] font-black border border-black">Decline</Button></div>
-                </div>
-              ))}</div>}
-            </div>)}
+        {/* Tab content */}
+        <div className="flex-1 overflow-y-auto">
+          {activeTab === "contacts" && (contacts.length === 0 ? <div className="p-6 text-center"><p className="text-xs font-bold text-muted-foreground italic">No conversations yet</p></div> : <div className="divide-y-2 divide-black">{contacts.map((c: any) => (
+            <button key={c.id} onClick={() => handleUserClick(c)} className={`w-full p-4 text-left hover:bg-gray-50 transition-colors flex items-center gap-3 ${otherUser?.id === c.id ? "bg-primary/10" : ""}`}>
+              <div className="w-10 h-10 rounded-full bg-gray-100 border-2 border-black flex items-center justify-center text-xs font-black shrink-0 overflow-hidden">{c.image ? <img src={c.image} className="w-full h-full object-cover" alt="" /> : c.name.charAt(0)}</div>
+              <div className="flex-1 min-w-0"><p className="font-black text-xs uppercase truncate">{c.name}</p><p className="text-[8px] text-muted-foreground font-bold">@{c.username || "---"}</p></div>
+            </button>
+          ))}</div>)}
 
-            {activeTab === "requests" && (pendingRequests.length === 0 ? <div className="p-6 text-center"><p className="text-xs font-bold text-muted-foreground italic">No pending requests</p></div> : <div className="divide-y-2 divide-black">{pendingRequests.map((req: any) => (
-              <div key={req.id} className="p-4 space-y-3">
-                <div className="flex items-center gap-3"><div className="w-10 h-10 rounded-full bg-[#F5C84C] border-2 border-black flex items-center justify-center text-xs font-black overflow-hidden">{req.sender.image ? <img src={req.sender.image} className="w-full h-full object-cover" /> : req.sender.name.charAt(0)}</div><div><p className="font-black text-xs uppercase">{req.sender.name}</p><p className="text-[8px] font-bold text-muted-foreground">{req.sender.role}</p></div></div>
-                <div className="flex gap-2"><Button onClick={() => respondToRequest(req.id, "accept")} className="flex-1 h-8 text-[10px] font-black bg-[#34D399] text-black border-2 border-black shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]"><CheckCheck size={12} className="mr-1" /> Accept</Button><Button onClick={() => respondToRequest(req.id, "reject")} variant="destructive" className="flex-1 h-8 text-[10px] font-black border-2 border-black shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]"><X size={12} className="mr-1" /> Reject</Button></div>
+          {activeTab === "groups" && (<div>
+            <div className="p-3 border-b-2 border-black"><Button onClick={() => setShowCreateGroup(!showCreateGroup)} className="w-full h-8 text-[10px] font-black neo-brutalism bg-[#34D399] text-black"><Plus size={12} className="mr-1" /> New Group</Button></div>
+            {showCreateGroup && <form onSubmit={createGroup} className="p-3 border-b-2 border-black space-y-2 bg-gray-50">
+              <Input className="h-8 border-2 border-black font-bold text-xs" placeholder="Group name" value={groupName} onChange={e => setGroupName(e.target.value)} maxLength={30} />
+              <Input className="h-8 border-2 border-black font-bold text-xs" placeholder="@user1, @user2" value={groupMembers} onChange={e => setGroupMembers(e.target.value)} />
+              <Button type="submit" disabled={loading || !groupName.trim()} className="w-full h-8 text-[10px] font-black bg-primary text-white border-2 border-black">Create</Button>
+            </form>}
+            {groups.length === 0 && !showCreateGroup ? <div className="p-6 text-center"><p className="text-xs font-bold text-muted-foreground italic">No groups yet</p></div> : <div className="divide-y-2 divide-black">{groups.map((g: any) => (
+              <button key={g.id} onClick={() => openGroupChat(g)} className={`w-full p-4 text-left hover:bg-gray-50 flex items-center gap-3 ${activeGroup?.id === g.id ? "bg-primary/10" : ""}`}>
+                <div className="w-10 h-10 rounded-xl bg-[#4F7DF3] border-2 border-black flex items-center justify-center text-white text-xs font-black"><Users size={16} /></div>
+                <div className="flex-1 min-w-0"><p className="font-black text-xs uppercase truncate">{g.name}</p><p className="text-[8px] text-muted-foreground font-bold">{g.memberCount} members</p></div>
+              </button>
+            ))}</div>}
+            {pendingInvites.length > 0 && <div className="border-t-2 border-black"><p className="text-[8px] font-black uppercase p-2 bg-[#F5C84C]/20">Pending Invites</p>{pendingInvites.map((inv: any) => (
+              <div key={inv.id} className="p-3 border-b border-black/10 space-y-2">
+                <p className="text-xs font-black uppercase">{inv.group.name}</p>
+                <p className="text-[8px] text-muted-foreground">From @{inv.group.createdBy.username}</p>
+                <div className="flex gap-2"><Button onClick={() => respondToGroupInvite(inv.groupId, "accept")} className="flex-1 h-7 text-[9px] font-black bg-[#34D399] text-black border border-black">Join</Button><Button onClick={() => respondToGroupInvite(inv.groupId, "reject")} variant="destructive" className="flex-1 h-7 text-[9px] font-black border border-black">Decline</Button></div>
               </div>
-            ))}</div>)}
-          </div>
+            ))}</div>}
+          </div>)}
+
+          {activeTab === "requests" && (pendingRequests.length === 0 ? <div className="p-6 text-center"><p className="text-xs font-bold text-muted-foreground italic">No pending requests</p></div> : <div className="divide-y-2 divide-black">{pendingRequests.map((req: any) => (
+            <div key={req.id} className="p-4 space-y-3">
+              <div className="flex items-center gap-3"><div className="w-10 h-10 rounded-full bg-[#F5C84C] border-2 border-black flex items-center justify-center text-xs font-black overflow-hidden">{req.sender.image ? <img src={req.sender.image} className="w-full h-full object-cover" alt="" /> : req.sender.name.charAt(0)}</div><div><p className="font-black text-xs uppercase">{req.sender.name}</p><p className="text-[8px] font-bold text-muted-foreground">{req.sender.role}</p></div></div>
+              <div className="flex gap-2"><Button onClick={() => respondToRequest(req.id, "accept")} className="flex-1 h-8 text-[10px] font-black bg-[#34D399] text-black border-2 border-black shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]"><CheckCheck size={12} className="mr-1" /> Accept</Button><Button onClick={() => respondToRequest(req.id, "reject")} variant="destructive" className="flex-1 h-8 text-[10px] font-black border-2 border-black shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]"><X size={12} className="mr-1" /> Reject</Button></div>
+            </div>
+          ))}</div>)}
         </div>
       </div>
 
@@ -252,9 +315,9 @@ export default function MessagesPage() {
           </div>
         ) : (
           <>
-            <div className="p-4 border-b-4 border-black bg-muted/20 flex items-center justify-between shrink-0">
+            <div className="p-4 border-b-4 border-black bg-gray-50 flex items-center justify-between shrink-0">
               <div className="flex items-center gap-3">
-                {activeGroup ? <div className="w-8 h-8 rounded-xl bg-[#4F7DF3] text-white border-2 border-black flex items-center justify-center text-xs font-black"><Users size={14} /></div> : <div className="w-8 h-8 rounded-full bg-primary text-white border-2 border-black flex items-center justify-center text-xs font-black overflow-hidden">{otherUser?.image ? <img src={otherUser.image} className="w-full h-full object-cover" /> : otherUser?.name?.charAt(0)}</div>}
+                {activeGroup ? <div className="w-8 h-8 rounded-xl bg-[#4F7DF3] text-white border-2 border-black flex items-center justify-center text-xs font-black"><Users size={14} /></div> : <div className="w-8 h-8 rounded-full bg-primary text-white border-2 border-black flex items-center justify-center text-xs font-black overflow-hidden">{otherUser?.image ? <img src={otherUser.image} className="w-full h-full object-cover" alt="" /> : otherUser?.name?.charAt(0)}</div>}
                 <div><span className="font-black uppercase text-sm">{activeGroup ? activeGroup.name : otherUser?.name}</span>{!activeGroup && otherUser?.username && <p className="text-[8px] font-bold text-muted-foreground">@{otherUser.username}</p>}{activeGroup && <p className="text-[8px] font-bold text-muted-foreground">{activeGroup.memberCount} members</p>}</div>
               </div>
               <div className="flex items-center gap-2">
@@ -264,16 +327,12 @@ export default function MessagesPage() {
             </div>
             <CardContent className="flex-1 overflow-y-auto p-6 space-y-4 min-h-0 scrollbar-thin bg-[#f8f9fa]">
               {(activeGroup ? groupMessages : messages).length === 0 ? <div className="text-center py-20"><p className="font-bold text-muted-foreground italic text-sm">No messages yet. Say hello! 👋</p></div> : (activeGroup ? groupMessages : messages).map((msg: any, i: number) => {
-                const isMine = activeGroup ? msg.senderId !== undefined && msg.sender?.id === undefined : msg.receiverId === otherUser?.id;
                 const isMineDM = !activeGroup && msg.receiverId === otherUser?.id;
-                const isMineGroup = activeGroup && msg.senderId && !msg.sender;
-                // For group messages the sender info is included
                 if (activeGroup) {
-                  const fromMe = msg.sender && otherUser === null;
                   return (
                     <div key={i} className="flex flex-col">
                       {msg.sender && <p className="text-[8px] font-black uppercase text-muted-foreground mb-1 ml-1">{msg.sender.name}</p>}
-                      <div className={`max-w-[75%] px-4 py-2 border-2 border-black rounded-2xl font-medium text-sm shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] bg-white text-black rounded-tl-none`}>{msg.text}</div>
+                      <div className="max-w-[75%] px-4 py-2 border-2 border-black rounded-2xl font-medium text-sm shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] bg-white text-black rounded-tl-none">{msg.text}</div>
                     </div>
                   );
                 }
