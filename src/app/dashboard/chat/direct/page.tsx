@@ -47,7 +47,7 @@ export default function MessagesPage() {
   const fetchContacts = async () => { try { const r = await fetch("/api/chat/contacts"); const d = await r.json(); if (r.ok) setContacts(d.contacts); } catch(e) {} };
   const fetchRequests = async () => { try { const r = await fetch("/api/chat/request"); const d = await r.json(); if (r.ok) setPendingRequests(d.received); } catch(e) {} };
   const fetchGroups = async () => { try { const r = await fetch("/api/chat/group"); const d = await r.json(); if (r.ok) { setGroups(d.groups); setPendingInvites(d.pendingInvites); } } catch(e) {} };
-  const fetchSuggestions = async () => { try { const r = await fetch("/api/users/suggested"); const d = await r.json(); if (r.ok) setSuggestedUsers(d.users); } catch(e) {} };
+  const fetchSuggestions = async () => { try { const r = await fetch("/api/users/suggested"); const d = await r.json(); if (r.ok) setSuggestedUsers(d.users || []); } catch(e) {} };
   const fetchMessages = async () => { if (!otherUser) return; try { const r = await fetch(`/api/chat/direct?otherId=${otherUser.id}`); const d = await r.json(); if (r.ok) setMessages(d.messages); } catch(e) {} };
   const fetchGroupMessages = async () => { if (!activeGroup) return; try { const r = await fetch(`/api/chat/group/${activeGroup.id}`); const d = await r.json(); if (r.ok) setGroupMessages(d.messages); } catch(e) {} };
 
@@ -64,7 +64,7 @@ export default function MessagesPage() {
     if (e) e.preventDefault();
     if (!searchQuery.trim()) { setSearchResults([]); return; }
     setSearching(true); setError(""); setSearchResults([]);
-    try { const r = await fetch(`/api/users/search?username=${searchQuery}`); const d = await r.json(); if (r.ok) setSearchResults(d.users); else setError(d.message); }
+    try { const r = await fetch(`/api/users/search?username=${searchQuery}`); const d = await r.json(); if (r.ok) setSearchResults(d.users || []); else setError(d.message); }
     catch(e) { setError("Search failed"); } finally { setSearching(false); }
   };
 
@@ -142,12 +142,12 @@ export default function MessagesPage() {
                  <p className="text-[10px] font-black uppercase text-muted-foreground mb-2 px-2">{searchQuery ? "Search Results" : "Suggested Users"}</p>
                  {searchQuery && searchResults.length === 0 && !searching && <p className="text-xs font-bold text-center p-4">No users found.</p>}
                  {searching && <div className="flex justify-center p-4"><Loader2 className="animate-spin" /></div>}
-                 {(!searchQuery ? suggestedUsers : searchResults).map((u: any) => (
-                    <div key={u.id} className="p-2 hover:bg-muted/30 rounded-lg flex flex-col gap-2 border-b-2 border-black/10 last:border-0">
+                 {((!searchQuery ? suggestedUsers : searchResults) || []).map((u: any) => (
+                    <div key={u?.id || Math.random()} className="p-2 hover:bg-muted/30 rounded-lg flex flex-col gap-2 border-b-2 border-black/10 last:border-0">
                       <div className="flex items-center gap-3">
-                        <div className="w-8 h-8 rounded-full bg-white border-2 border-black flex items-center justify-center font-black overflow-hidden shrink-0">{u.image ? <img src={u.image} className="w-full h-full object-cover" /> : u.name.charAt(0)}</div>
+                        <div className="w-8 h-8 rounded-full bg-white border-2 border-black flex items-center justify-center font-black overflow-hidden shrink-0">{u?.image ? <img src={u.image} className="w-full h-full object-cover" /> : (u?.name?.charAt(0) || "?")}</div>
                         <div className="flex-1 min-w-0">
-                          <p className="font-black text-xs uppercase truncate">{u.name}</p>
+                          <p className="font-black text-xs uppercase truncate">{u?.name || "Unknown"}</p>
                           <p className="text-[8px] font-bold text-muted-foreground truncate">@{u.username} · {u.role}</p>
                         </div>
                       </div>
