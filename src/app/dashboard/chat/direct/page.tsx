@@ -75,7 +75,7 @@ export default function MessagesPage() {
   const handleSearch = async (e?: React.FormEvent) => {
     if (e) e.preventDefault();
     if (!searchQuery.trim()) { setSearchResults([]); return; }
-    setSearching(true); setError(""); setSearchResults([]);
+    setSearching(true); setError(""); 
     try { const r = await fetch(`/api/users/search?username=${searchQuery}`); const d = await r.json(); if (r.ok) setSearchResults(d.users || []); else setError(d.message); }
     catch(e) { setError("Search failed"); } finally { setSearching(false); }
   };
