@@ -81,6 +81,7 @@ export default function MessagesPage() {
   };
 
   const openChat = async (user: any) => {
+    setIsSearchFocused(false);
     setOtherUser(user); setActiveGroup(null); setSearchResults([]); setSearchQuery(""); setMessages([]);
     if (user.isProfilePublic) { setChatStatus("allowed"); } else {
       const r = await fetch(`/api/chat/direct?otherId=${user.id}`); const d = await r.json();
@@ -154,8 +155,9 @@ export default function MessagesPage() {
                  <p className="text-[10px] font-black uppercase text-muted-foreground mb-2 px-2">{searchQuery ? "Search Results" : "Suggested Users"}</p>
                  {searchQuery && searchResults.length === 0 && !searching && <p className="text-xs font-bold text-center p-4">No users found.</p>}
                  {searching && <div className="flex justify-center p-4"><Loader2 className="animate-spin" /></div>}
-                 {((!searchQuery ? suggestedUsers : searchResults) || []).map((u: any) => (
-                    <div key={u?.id || Math.random()} className="p-2 hover:bg-muted/30 rounded-lg flex flex-col gap-2 border-b-2 border-black/10 last:border-0">
+                 {!searchQuery && suggestedUsers.length === 0 && <div className="flex justify-center p-4"><Loader2 className="animate-spin text-muted-foreground" size={16} /></div>}
+                 {((!searchQuery ? suggestedUsers : searchResults) || []).map((u: any, i: number) => (
+                    <div key={u?.id || u?.username || i} className="p-2 hover:bg-muted/30 rounded-lg flex flex-col gap-2 border-b-2 border-black/10 last:border-0 transition-colors">
                       <div className="flex items-center gap-3">
                         <div className="w-8 h-8 rounded-full bg-white border-2 border-black flex items-center justify-center font-black overflow-hidden shrink-0">{u?.image ? <img src={u.image} className="w-full h-full object-cover" /> : (u?.name?.charAt(0) || "?")}</div>
                         <div className="flex-1 min-w-0">
@@ -164,9 +166,7 @@ export default function MessagesPage() {
                         </div>
                       </div>
                       <div className="flex gap-2">
-                        <Link href={`/dashboard/user/${u?.username}`} className="flex-1" onClick={() => setIsSearchFocused(false)}>
-                          <Button type="button" variant="outline" className="w-full h-7 text-[10px] font-black border-2 border-black">View Profile</Button>
-                        </Link>
+                        <Button type="button" variant="outline" onClick={() => { setIsSearchFocused(false); window.location.href = `/dashboard/user/${u?.username}`; }} className="flex-1 h-7 text-[10px] font-black border-2 border-black">View Profile</Button>
                         <Button type="button" onClick={() => openChat(u)} className="flex-1 h-7 text-[10px] font-black neo-brutalism bg-primary text-white">
                           {u?.isProfilePublic ? <><MessageSquare size={12} className="mr-1" /> Chat</> : <><UserPlus size={12} className="mr-1" /> Connect</>}
                         </Button>
