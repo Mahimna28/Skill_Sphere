@@ -145,7 +145,7 @@ export default function MessagesPage() {
       <div className="w-full md:w-80 flex flex-col gap-4 shrink-0 overflow-hidden">
         <div className="neo-brutalism bg-white p-5 border-4 border-black">
           <h2 className="text-sm font-black uppercase tracking-tight mb-3 flex items-center gap-2"><Search size={16} /> Find User</h2>
-          <form ref={searchContainerRef} onSubmit={handleSearch} className="flex gap-2 relative">
+          <form ref={searchContainerRef} onSubmit={handleSearch} className="flex gap-2 relative z-50">
             <div className="relative flex-1"><AtSign className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" /><Input placeholder="Search users..." className="pl-9 border-2 border-black font-bold h-10 text-xs" value={searchQuery} onChange={e => setSearchQuery(e.target.value)} onFocus={() => setIsSearchFocused(true)} /></div>
             <Button type="submit" disabled={searching} className="h-10 w-10 p-0 neo-brutalism bg-primary text-white">{searching ? <Loader2 className="animate-spin" size={16} /> : <Search size={16} />}</Button>
             
