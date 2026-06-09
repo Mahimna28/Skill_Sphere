@@ -12,7 +12,9 @@ export default function MessagesPage() {
   const [usernameLoading, setUsernameLoading] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
   const [searching, setSearching] = useState(false);
-  const [searchResult, setSearchResult] = useState<any>(null);
+  const [searchResults, setSearchResults] = useState<any[]>([]);
+  const [suggestedUsers, setSuggestedUsers] = useState<any[]>([]);
+  const [isSearchFocused, setIsSearchFocused] = useState(false);
   const [otherUser, setOtherUser] = useState<any>(null);
   const [chatStatus, setChatStatus] = useState<"allowed"|"request_needed"|"pending"|null>(null);
   const [messages, setMessages] = useState<any[]>([]);
@@ -31,7 +33,12 @@ export default function MessagesPage() {
   const [groupMembers, setGroupMembers] = useState("");
   const bottomRef = useRef<HTMLDivElement>(null);
 
-  useEffect(() => { checkUsername(); fetchContacts(); fetchRequests(); fetchGroups(); }, []);
+  useEffect(() => { checkUsername(); fetchContacts(); fetchRequests(); fetchGroups(); fetchSuggestions(); }, []);
+  
+  useEffect(() => {
+    const t = setTimeout(() => { if (searchQuery) handleSearch(); else setSearchResults([]); }, 300);
+    return () => clearTimeout(t);
+  }, [searchQuery]);
   useEffect(() => { if (otherUser && chatStatus === "allowed") { fetchMessages(); const i = setInterval(fetchMessages, 3000); return () => clearInterval(i); } }, [otherUser, chatStatus]);
   useEffect(() => { if (activeGroup) { fetchGroupMessages(); const i = setInterval(fetchGroupMessages, 3000); return () => clearInterval(i); } }, [activeGroup]);
   useEffect(() => { bottomRef.current?.scrollIntoView({ behavior: "smooth" }); }, [messages, groupMessages]);
@@ -40,6 +47,7 @@ export default function MessagesPage() {
   const fetchContacts = async () => { try { const r = await fetch("/api/chat/contacts"); const d = await r.json(); if (r.ok) setContacts(d.contacts); } catch(e) {} };
   const fetchRequests = async () => { try { const r = await fetch("/api/chat/request"); const d = await r.json(); if (r.ok) setPendingRequests(d.received); } catch(e) {} };
   const fetchGroups = async () => { try { const r = await fetch("/api/chat/group"); const d = await r.json(); if (r.ok) { setGroups(d.groups); setPendingInvites(d.pendingInvites); } } catch(e) {} };
+  const fetchSuggestions = async () => { try { const r = await fetch("/api/users/suggested"); const d = await r.json(); if (r.ok) setSuggestedUsers(d.users); } catch(e) {} };
   const fetchMessages = async () => { if (!otherUser) return; try { const r = await fetch(`/api/chat/direct?otherId=${otherUser.id}`); const d = await r.json(); if (r.ok) setMessages(d.messages); } catch(e) {} };
   const fetchGroupMessages = async () => { if (!activeGroup) return; try { const r = await fetch(`/api/chat/group/${activeGroup.id}`); const d = await r.json(); if (r.ok) setGroupMessages(d.messages); } catch(e) {} };
 
@@ -52,14 +60,16 @@ export default function MessagesPage() {
     } catch(e) { setUsernameError("Failed"); } finally { setUsernameLoading(false); }
   };
 
-  const handleSearch = async (e: React.FormEvent) => {
-    e.preventDefault(); if (!searchQuery.trim()) return; setSearching(true); setError(""); setSearchResult(null);
-    try { const r = await fetch(`/api/users/search?username=${searchQuery}`); const d = await r.json(); if (r.ok) setSearchResult(d.user); else setError(d.message); }
+  const handleSearch = async (e?: React.FormEvent) => {
+    if (e) e.preventDefault();
+    if (!searchQuery.trim()) { setSearchResults([]); return; }
+    setSearching(true); setError(""); setSearchResults([]);
+    try { const r = await fetch(`/api/users/search?username=${searchQuery}`); const d = await r.json(); if (r.ok) setSearchResults(d.users); else setError(d.message); }
     catch(e) { setError("Search failed"); } finally { setSearching(false); }
   };
 
   const openChat = async (user: any) => {
-    setOtherUser(user); setActiveGroup(null); setSearchResult(null); setSearchQuery(""); setMessages([]);
+    setOtherUser(user); setActiveGroup(null); setSearchResults([]); setSearchQuery(""); setMessages([]);
     if (user.isProfilePublic) { setChatStatus("allowed"); } else {
       const r = await fetch(`/api/chat/direct?otherId=${user.id}`); const d = await r.json();
       if (r.ok && d.messages.length > 0) { setChatStatus("allowed"); setMessages(d.messages); } else {
@@ -122,25 +132,39 @@ export default function MessagesPage() {
       <div className="w-full md:w-80 flex flex-col gap-4 shrink-0 overflow-hidden">
         <div className="neo-brutalism bg-white p-5 border-4 border-black">
           <h2 className="text-sm font-black uppercase tracking-tight mb-3 flex items-center gap-2"><Search size={16} /> Find User</h2>
-          <form onSubmit={handleSearch} className="flex gap-2">
-            <div className="relative flex-1"><AtSign className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" /><Input placeholder="username" className="pl-9 border-2 border-black font-bold h-10 text-xs" value={searchQuery} onChange={e => setSearchQuery(e.target.value)} /></div>
+          <form onSubmit={handleSearch} className="flex gap-2 relative">
+            <div className="relative flex-1"><AtSign className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" /><Input placeholder="Search users..." className="pl-9 border-2 border-black font-bold h-10 text-xs" value={searchQuery} onChange={e => setSearchQuery(e.target.value)} onFocus={() => setIsSearchFocused(true)} onBlur={() => setTimeout(() => setIsSearchFocused(false), 200)} /></div>
             <Button type="submit" disabled={searching} className="h-10 w-10 p-0 neo-brutalism bg-primary text-white">{searching ? <Loader2 className="animate-spin" size={16} /> : <Search size={16} />}</Button>
+            
+            {/* Dropdown Suggestions */}
+            {isSearchFocused && (
+              <div className="absolute top-12 left-0 right-0 z-50 bg-white border-4 border-black rounded-xl shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] max-h-80 overflow-y-auto p-2">
+                 <p className="text-[10px] font-black uppercase text-muted-foreground mb-2 px-2">{searchQuery ? "Search Results" : "Suggested Users"}</p>
+                 {searchQuery && searchResults.length === 0 && !searching && <p className="text-xs font-bold text-center p-4">No users found.</p>}
+                 {searching && <div className="flex justify-center p-4"><Loader2 className="animate-spin" /></div>}
+                 {(!searchQuery ? suggestedUsers : searchResults).map((u: any) => (
+                    <div key={u.id} className="p-2 hover:bg-muted/30 rounded-lg flex flex-col gap-2 border-b-2 border-black/10 last:border-0">
+                      <div className="flex items-center gap-3">
+                        <div className="w-8 h-8 rounded-full bg-white border-2 border-black flex items-center justify-center font-black overflow-hidden shrink-0">{u.image ? <img src={u.image} className="w-full h-full object-cover" /> : u.name.charAt(0)}</div>
+                        <div className="flex-1 min-w-0">
+                          <p className="font-black text-xs uppercase truncate">{u.name}</p>
+                          <p className="text-[8px] font-bold text-muted-foreground truncate">@{u.username} · {u.role}</p>
+                        </div>
+                      </div>
+                      <div className="flex gap-2">
+                        <Link href={`/dashboard/user/${u.username}`} target="_blank" className="flex-1">
+                          <Button type="button" variant="outline" className="w-full h-7 text-[10px] font-black border-2 border-black">View Profile</Button>
+                        </Link>
+                        <Button type="button" onClick={() => openChat(u)} className="flex-1 h-7 text-[10px] font-black neo-brutalism bg-primary text-white">
+                          {u.isProfilePublic ? <><MessageSquare size={12} className="mr-1" /> Chat</> : <><UserPlus size={12} className="mr-1" /> Connect</>}
+                        </Button>
+                      </div>
+                    </div>
+                 ))}
+              </div>
+            )}
           </form>
           {error && <p className="text-[10px] font-bold text-red-600 mt-2">{error}</p>}
-          {searchResult && (
-            <div className="mt-4 p-4 border-2 border-black rounded-xl bg-accent/10 animate-in zoom-in-95">
-              <div className="flex items-center gap-3 mb-3">
-                <div className="w-10 h-10 rounded-full bg-white border-2 border-black flex items-center justify-center font-black overflow-hidden">{searchResult.image ? <img src={searchResult.image} className="w-full h-full object-cover" /> : searchResult.name.charAt(0)}</div>
-                <div className="flex-1 min-w-0">
-                  <p className="font-black text-xs uppercase truncate">{searchResult.name}</p>
-                  <p className="text-[8px] font-bold text-muted-foreground">@{searchResult.username} · {searchResult.role}</p>
-                </div>
-              </div>
-              <Button onClick={() => openChat(searchResult)} className="w-full h-9 text-xs font-black neo-brutalism bg-primary text-white">
-                {searchResult.isProfilePublic ? <><MessageSquare size={14} className="mr-1.5" /> Message</> : <><UserPlus size={14} className="mr-1.5" /> Connect</>}
-              </Button>
-            </div>
-          )}
         </div>
 
         {/* Tabs */}

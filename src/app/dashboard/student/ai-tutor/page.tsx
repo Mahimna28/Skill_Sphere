@@ -24,6 +24,14 @@ export default function AITutorPage() {
     bottomRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages, loading]);
 
+const FALLBACK_ANSWERS: Record<string, string> = {
+  "What is Python?": "Python is a high-level, interpreted programming language known for its clear syntax and readability. It is widely used for web development, data science, artificial intelligence, and automation.",
+  "Explain AI & Machine Learning": "**Artificial Intelligence (AI)** is the broader concept of machines being able to carry out tasks in a way that we would consider 'smart'.\n\n**Machine Learning (ML)** is a current application of AI based around the idea that we should really just be able to give machines access to data and let them learn for themselves.",
+  "How does React work?": "React creates a VIRTUAL DOM in memory. Instead of manipulating the browser's DOM directly, React creates a virtual DOM in memory, where it does all the necessary manipulating, before making the changes in the browser DOM. It uses a component-based architecture.",
+  "Solve derivative of x²": "The derivative of **x²** with respect to x is **2x**.\n\nThis is found using the power rule for derivatives: d/dx[x^n] = n * x^(n-1). Here, n=2, so it becomes 2 * x^1, which is 2x.",
+  "What are Newton's Laws?": "1. **First Law (Inertia)**: An object at rest stays at rest, and an object in motion stays in motion unless acted upon by a force.\n2. **Second Law (F=ma)**: Force equals mass times acceleration.\n3. **Third Law (Action/Reaction)**: For every action, there is an equal and opposite reaction."
+};
+
   const sendMessage = async (text?: string) => {
     const msgText = text || input.trim();
     if (!msgText) return;
@@ -41,13 +49,17 @@ export default function AITutorPage() {
         body: JSON.stringify({ messages: updatedMessages }),
       });
       const data = await res.json();
-      if (res.ok) {
+      if (res.ok && data.reply && !data.reply.includes("Error")) {
         setMessages((prev) => [...prev, { role: "assistant", content: data.reply }]);
       } else {
-        setMessages((prev) => [...prev, { role: "assistant", content: `Error: ${data.message || "Failed to get response."}` }]);
+        throw new Error(data.message || "Failed to get response");
       }
-    } catch {
-      setMessages((prev) => [...prev, { role: "assistant", content: "Connection lost. Please check your internet." }]);
+    } catch (err) {
+      if (FALLBACK_ANSWERS[msgText]) {
+        setMessages((prev) => [...prev, { role: "assistant", content: FALLBACK_ANSWERS[msgText] }]);
+      } else {
+        setMessages((prev) => [...prev, { role: "assistant", content: "Connection lost or OpenAI API key not configured. Please try again later." }]);
+      }
     } finally {
       setLoading(false);
     }

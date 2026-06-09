@@ -108,10 +108,13 @@ export default function CoursesClient({ courses, enrolledIds: initialEnrolledIds
       )}
 
       {courses.length === 0 ? (
-        <div className="py-24 text-center border-4 border-dashed border-gray-300 rounded-2xl bg-white">
-          <BookOpen className="h-20 w-20 mx-auto text-muted-foreground/20 mb-4" />
-          <h3 className="text-2xl font-black mb-2">No Courses Available</h3>
-          <p className="text-muted-foreground font-medium">Check back soon — new courses are being added!</p>
+        <div className="py-24 text-center border-4 border-dashed border-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] rounded-3xl bg-[#F5C84C]/20">
+          <BookOpen className="h-20 w-20 mx-auto text-muted-foreground/40 mb-4" />
+          <h3 className="text-2xl font-black mb-2 uppercase">No Courses Enrolled</h3>
+          <p className="text-muted-foreground font-bold mb-6">You haven't enrolled in any courses yet. Start your learning journey today!</p>
+          <Button className="neo-brutalism font-black bg-[#4F7DF3] text-white hover:bg-[#4F7DF3]/90 px-8 h-12" onClick={() => router.push("/courses")}>
+            Browse Available Courses
+          </Button>
         </div>
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">

@@ -14,27 +14,31 @@ export async function GET(req: Request) {
   if (!decoded) return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
   if (!username) return NextResponse.json({ message: "Username required" }, { status: 400 });
 
-  // Search by username (strip @ if included)
+  // Search by username or name (partial match)
   const cleanUsername = username.replace(/^@/, "").toLowerCase();
 
-  const user = await prisma.user.findUnique({
-    where: { username: cleanUsername },
-    select: { id: true, name: true, email: true, username: true, role: true, image: true, isProfilePublic: true }
+  const users = await prisma.user.findMany({
+    where: {
+      id: { not: decoded.id },
+      username: { not: null },
+      OR: [
+        { username: { contains: cleanUsername, mode: "insensitive" } },
+        { name: { contains: cleanUsername, mode: "insensitive" } }
+      ]
+    },
+    select: { id: true, name: true, email: true, username: true, role: true, image: true, isProfilePublic: true },
+    take: 10
   });
 
-  if (!user) {
-    return NextResponse.json({ message: "No user found with this username" }, { status: 404 });
-  }
-
-  if (user.id === decoded.id) {
-    return NextResponse.json({ message: "You cannot chat with yourself" }, { status: 400 });
+  if (users.length === 0) {
+    return NextResponse.json({ message: "No users found" }, { status: 404 });
   }
 
   // Teachers and admins are always private
-  const responseUser = {
+  const responseUsers = users.map(user => ({
     ...user,
     isProfilePublic: ["teacher", "superadmin", "institute_admin"].includes(user.role) ? false : user.isProfilePublic,
-  };
+  }));
 
-  return NextResponse.json({ user: responseUser });
+  return NextResponse.json({ users: responseUsers });
 }
