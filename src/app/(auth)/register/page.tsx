@@ -6,7 +6,7 @@ import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Loader2, ArrowLeft, ShieldCheck, GraduationCap, School, Users, Baby } from "lucide-react";
+import { Loader2, ArrowLeft, ShieldCheck, GraduationCap, School, Users, Baby, Eye, EyeOff } from "lucide-react";
 
 const roles = [
   { id: "student", name: "Student", icon: GraduationCap, color: "bg-[#34D399]" },
@@ -17,6 +17,7 @@ const roles = [
 export default function RegisterPage() {
   const router = useRouter();
   const [formData, setFormData] = useState({ name: "", email: "", password: "", role: "student", childEmail: "" });
+  const [showPassword, setShowPassword] = useState(false);
   const [otpCode, setOtpCode] = useState("");
   const [error, setError] = useState("");
   const [message, setMessage] = useState("");
@@ -171,10 +172,19 @@ export default function RegisterPage() {
                 </div>
                 <div className="space-y-2">
                   <Label className="font-bold">Password</Label>
-                  <Input 
-                    type="password" required className="neo-brutalism-static h-11" placeholder="••••••••"
-                    value={formData.password} onChange={e => setFormData({ ...formData, password: e.target.value })}
-                  />
+                  <div className="relative">
+                    <Input 
+                      type={showPassword ? "text" : "password"} required className="neo-brutalism-static h-11 pr-10" placeholder="••••••••"
+                      value={formData.password} onChange={e => setFormData({ ...formData, password: e.target.value })}
+                    />
+                    <button 
+                      type="button" 
+                      onClick={() => setShowPassword(!showPassword)} 
+                      className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-black"
+                    >
+                      {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+                    </button>
+                  </div>
                   <div className="grid grid-cols-2 gap-x-4 gap-y-1 mt-1 px-1">
                     <p className={`text-[10px] font-bold ${formData.password.length >= 8 ? "text-green-600" : "text-muted-foreground opacity-50"}`}>• 8+ characters</p>
                     <p className={`text-[10px] font-bold ${/[A-Z]/.test(formData.password) && /[a-z]/.test(formData.password) ? "text-green-600" : "text-muted-foreground opacity-50"}`}>• Upper & Lowercase</p>

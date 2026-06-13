@@ -53,7 +53,7 @@ export default function CoursesPageClient({ courses, userRole, initialEnrolledId
       const res = await fetch(`/api/courses/${courseId}/enroll`, { method: "POST" });
       if (res.ok) {
         setEnrolledIds((prev) => new Set([...prev, courseId]));
-        router.refresh();
+        router.push(`/dashboard/student/courses/${courseId}`);
       } else {
         alert("Enrollment failed. Please try again.");
       }

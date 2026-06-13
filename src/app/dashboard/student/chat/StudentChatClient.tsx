@@ -28,7 +28,21 @@ export default function StudentChatClient({ enrollments, currentUser }: Props) {
   useEffect(() => {
     if (!activeCourse) return;
     socket.emit("join_course", activeCourse.id);
-    setMessages([]);
+    
+    // Fetch chat history
+    fetch(`/api/chat/messages?courseId=${activeCourse.id}`)
+      .then(res => res.json())
+      .then(data => {
+        if (data.messages) {
+          setMessages(data.messages);
+        } else {
+          setMessages([]);
+        }
+      })
+      .catch(err => {
+        console.error("Failed to fetch messages", err);
+        setMessages([]);
+      });
 
     socket.off("receive_message");
     socket.on("receive_message", (data) => {
@@ -42,18 +56,29 @@ export default function StudentChatClient({ enrollments, currentUser }: Props) {
     bottomRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages]);
 
-  const sendMessage = (e: React.FormEvent) => {
+  const sendMessage = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!input.trim() || !activeCourse) return;
-    const msgData = {
-      courseId: activeCourse.id,
-      text: input,
-      senderId: currentUser.id,
-      senderName: currentUser.name,
-      createdAt: new Date().toISOString(),
-    };
-    socket.emit("send_message", msgData);
-    setInput("");
+    
+    const textToSend = input;
+    setInput(""); // Optimistically clear input
+
+    try {
+      const res = await fetch("/api/chat/messages", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ courseId: activeCourse.id, text: textToSend }),
+      });
+      
+      const data = await res.json();
+      if (res.ok && data.savedMessage) {
+        socket.emit("send_message", data.savedMessage);
+      } else {
+        console.error("Failed to save message", data);
+      }
+    } catch (err) {
+      console.error("Failed to send message", err);
+    }
   };
 
   return (

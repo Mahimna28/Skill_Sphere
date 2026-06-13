@@ -69,14 +69,16 @@ export async function POST(req: Request, { params }: { params: Promise<{ id: str
         });
 
         if (!existingCert) {
-          await prisma.certificate.create({
+          const newCert = await prisma.certificate.create({
             data: {
               title: `Certificate of Completion: ${courseTitle}`,
               userId,
-              url: `/certificates/${courseId}` // Placeholder URL for future certificate generation
+              url: ""
             }
           });
-          return NextResponse.json({ message: "Lesson completed! Course finished! Certificate Awarded!", pointsEarned: 20, courseCompleted: true });
+          return NextResponse.json({ message: "Lesson completed! Course finished! Certificate Awarded!", pointsEarned: 20, courseCompleted: true, certificateId: newCert.id });
+        } else {
+          return NextResponse.json({ message: "Lesson completed! Course finished!", pointsEarned: 20, courseCompleted: true, certificateId: existingCert.id });
         }
       }
     }

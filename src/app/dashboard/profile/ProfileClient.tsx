@@ -238,7 +238,7 @@ export default function ProfileClient({ user, roleData }: { user: any, roleData:
                               <p className="text-[10px] font-bold text-muted-foreground uppercase">{new Date(cert.issueDate).toLocaleDateString()}</p>
                            </div>
                         </div>
-                        <Button size="icon" variant="ghost" className="border-2 border-black hover:bg-black hover:text-white transition-all">
+                        <Button size="icon" variant="ghost" onClick={() => window.open(`/certificates/${cert.id}`, '_blank')} className="border-2 border-black hover:bg-black hover:text-white transition-all">
                            <Download size={16} />
                         </Button>
                       </div>
@@ -370,6 +370,20 @@ export default function ProfileClient({ user, roleData }: { user: any, roleData:
                      <p className="text-xs font-bold text-muted-foreground uppercase">{new Date(user.lastActiveAt).toLocaleString()}</p>
                   </div>
                </div>
+               {user.enrollments && user.enrollments.length > 0 && (
+                 <div className="flex gap-4">
+                    <div className="relative">
+                       <div className="w-10 h-10 bg-[#4F7DF3] text-white border-2 border-black rounded-full flex items-center justify-center z-10 relative">
+                          <BookOpen size={20} />
+                       </div>
+                       <div className="absolute top-10 left-1/2 -translate-x-1/2 w-1 h-12 bg-black/10"></div>
+                    </div>
+                    <div>
+                       <p className="font-black text-sm uppercase">Enrolled in Course</p>
+                       <p className="text-xs font-bold text-muted-foreground uppercase">{user.enrollments[0].course?.title || "A new course"}</p>
+                    </div>
+                 </div>
+               )}
                <div className="flex gap-4 opacity-50">
                   <div className="relative">
                      <div className="w-10 h-10 bg-primary/20 border-2 border-black rounded-full flex items-center justify-center">
@@ -666,14 +680,7 @@ export default function ProfileClient({ user, roleData }: { user: any, roleData:
                     )}
                   </div>
                   
-                  <div className="p-4 bg-muted/20 border-2 border-black border-dashed rounded-2xl">
-                    <p className="text-[10px] font-black uppercase opacity-60 mb-2 tracking-widest">Account Overview</p>
-                    <ul className="text-xs font-bold space-y-2">
-                      <li className="flex items-center gap-2">• ID: <span className="text-[10px] font-mono">{user.id.slice(0, 10)}...</span></li>
-                      <li className="flex items-center gap-2">• Role: {user.role.toUpperCase()}</li>
-                      <li className="flex items-center gap-2">• Last Login: {new Date(user.lastActiveAt).toLocaleDateString()}</li>
-                    </ul>
-                  </div>
+
                 </div>
               )}
             </form>

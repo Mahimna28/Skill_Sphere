@@ -19,15 +19,55 @@ export async function POST(req: Request) {
       );
     }
 
-    const lastUserMessage = messages.filter((m: any) => m.role === "user").pop()?.content || "";
     const systemPrompt = "You are an academic AI tutor for Skill Sphere. Help students with their questions concisely and professionally.";
 
+    // Gemini requires alternating roles starting with 'user'. 'assistant' must be mapped to 'model'.
+    let formattedContents: any[] = [];
+    
+    // Process messages into Gemini format
+    for (let i = 0; i < messages.length; i++) {
+      const msg = messages[i];
+      // Skip empty messages
+      if (!msg.content || msg.content.trim() === "") continue;
+      
+      const role = msg.role === "assistant" ? "model" : "user";
+      
+      // For the very first user message, prepend the system prompt
+      let text = msg.content;
+      if (formattedContents.length === 0 && role === "user") {
+        text = `System Prompt: ${systemPrompt}\n\nUser Question: ${text}`;
+      }
+
+      // If the last added message has the same role, append to it instead of creating a new object
+      // (Gemini API throws errors for consecutive messages with the same role)
+      if (formattedContents.length > 0 && formattedContents[formattedContents.length - 1].role === role) {
+        formattedContents[formattedContents.length - 1].parts[0].text += `\n\n${text}`;
+      } else {
+        formattedContents.push({
+          role: role,
+          parts: [{ text: text }]
+        });
+      }
+    }
+
+    // Ensure it starts with user (in case history starts with assistant somehow)
+    if (formattedContents.length > 0 && formattedContents[0].role !== "user") {
+      formattedContents.unshift({
+        role: "user",
+        parts: [{ text: `System Prompt: ${systemPrompt}\n\nHi.` }]
+      });
+    }
+
+    // If history is completely empty for some reason, provide a fallback
+    if (formattedContents.length === 0) {
+      formattedContents.push({
+        role: "user",
+        parts: [{ text: `System Prompt: ${systemPrompt}\n\nHello.` }]
+      });
+    }
+
     const requestBody = JSON.stringify({
-      contents: [
-        {
-          parts: [{ text: `System: ${systemPrompt}\n\nUser: ${lastUserMessage}` }]
-        }
-      ],
+      contents: formattedContents,
       generationConfig: {
         temperature: 0.7,
         topK: 40,

@@ -114,7 +114,7 @@ export default async function LandingPage() {
               {dbCourses.map((c: any, i: number) => {
                 const color = ["bg-[#4F7DF3]", "bg-[#34D399]", "bg-[#F5C84C]"][i % 3];
                 return (
-                  <div key={c.id} className="bg-white border-4 border-black p-8 rounded-3xl shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] hover:-translate-y-2 transition-transform group flex flex-col">
+                  <Link href={`/courses/${c.id}`} key={c.id} className="bg-white border-4 border-black p-8 rounded-3xl shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] hover:-translate-y-2 transition-transform group flex flex-col cursor-pointer block">
                     <div className={`w-full h-48 ${color} border-4 border-black rounded-2xl mb-6 flex items-center justify-center overflow-hidden relative`}>
                       {c.thumbnail ? (
                         <img src={c.thumbnail} alt={c.title} className="w-full h-full object-cover" />
@@ -128,7 +128,7 @@ export default async function LandingPage() {
                       <p className="text-sm font-bold text-muted-foreground">{c._count?.enrollments || 0} active students</p>
                       <p className="text-sm font-bold">by {c.teacher?.name || "Unknown"}</p>
                     </div>
-                  </div>
+                  </Link>
                 );
               })}
             </div>

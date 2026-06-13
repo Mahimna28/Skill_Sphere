@@ -2,13 +2,14 @@
 
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
-import { CheckCircle2, ChevronRight, PlayCircle, BookText, ArrowLeft, Trophy, Download, File } from "lucide-react";
+import { CheckCircle2, ChevronRight, PlayCircle, BookText, ArrowLeft, Trophy, Download, File, Award } from "lucide-react";
 import Link from "next/link";
 
 export default function CoursePlayerClient({ course }: { course: any }) {
   const allLessons = course.modules.flatMap((m: any) => m.lessons);
   const [activeLesson, setActiveLesson] = useState(allLessons[0] || null);
   const [loading, setLoading] = useState(false);
+  const [completedCertId, setCompletedCertId] = useState<string | null>(null);
 
   const handleComplete = async () => {
     if (!activeLesson) return;
@@ -18,15 +19,15 @@ export default function CoursePlayerClient({ course }: { course: any }) {
       const data = await res.json();
       
       if (res.ok) {
-        // Points awarded
-        // Could show a toast here in the future
+        if (data.courseCompleted && data.certificateId) {
+          setCompletedCertId(data.certificateId);
+          return;
+        }
       }
       
       const currentIndex = allLessons.findIndex((l: any) => l.id === activeLesson.id);
       if (currentIndex < allLessons.length - 1) {
         setActiveLesson(allLessons[currentIndex + 1]);
-      } else {
-        alert("You have reached the end of the course!");
       }
     } catch (err) {
       console.error(err);
@@ -53,6 +54,35 @@ export default function CoursePlayerClient({ course }: { course: any }) {
         <Link href="/dashboard/student/courses">
           <Button className="mt-6 neo-brutalism">Go Back</Button>
         </Link>
+      </div>
+    );
+  }
+
+  const currentIndex = allLessons.findIndex((l: any) => l.id === activeLesson?.id);
+  const isLastLesson = currentIndex === allLessons.length - 1;
+
+  if (completedCertId) {
+    return (
+      <div className="flex flex-col items-center justify-center h-[calc(100vh-160px)] text-center animate-in fade-in zoom-in duration-500">
+        <div className="w-32 h-32 bg-[#F5C84C] text-black border-4 border-black rounded-full flex items-center justify-center mb-8 shadow-[8px_8px_0px_0px_rgba(0,0,0,1)]">
+          <Award size={64} />
+        </div>
+        <h2 className="text-5xl md:text-7xl font-black uppercase tracking-tighter mb-4">Course Finished!</h2>
+        <p className="text-xl font-bold text-muted-foreground mb-8 max-w-xl">
+          Congratulations! You have successfully completed all modules in this course and earned a new certificate.
+        </p>
+        <div className="flex gap-4">
+          <Link href="/dashboard/student/courses">
+            <Button variant="outline" className="h-14 px-8 font-black border-4 border-black text-lg">
+              Back to Dashboard
+            </Button>
+          </Link>
+          <Link href={`/certificates/${completedCertId}`} target="_blank">
+            <Button className="neo-brutalism bg-[#4F7DF3] text-white h-14 px-8 font-black text-lg">
+              View Certificate
+            </Button>
+          </Link>
+        </div>
       </div>
     );
   }
@@ -131,7 +161,7 @@ export default function CoursePlayerClient({ course }: { course: any }) {
               onClick={handleComplete}
               disabled={loading}
             >
-               {loading ? "Completing..." : "Complete & Next"}
+               {loading ? "Completing..." : (isLastLesson ? "Finish Course" : "Complete & Next")}
             </Button>
           </div>
         </div>
@@ -148,9 +178,15 @@ export default function CoursePlayerClient({ course }: { course: any }) {
                     <p className="text-xs font-bold text-red-600 mb-2">Due: {new Date(assignment.dueDate).toLocaleString()}</p>
                     <p className="text-sm font-medium">{assignment.description}</p>
                   </div>
-                  <Button className="neo-brutalism font-black border-2 border-black whitespace-nowrap" onClick={() => alert("Submission UI coming soon!")}>
-                    Submit Work
-                  </Button>
+                  {new Date() > new Date(assignment.dueDate) ? (
+                    <Button disabled className="neo-brutalism font-black border-2 border-black whitespace-nowrap opacity-50 bg-gray-300 text-black">
+                      Deadline Passed
+                    </Button>
+                  ) : (
+                    <Button className="neo-brutalism font-black border-2 border-black whitespace-nowrap" onClick={() => alert("Submission UI coming soon!")}>
+                      Submit Work
+                    </Button>
+                  )}
                 </div>
               ))}
             </div>
