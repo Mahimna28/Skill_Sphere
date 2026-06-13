@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Card } from "@/components/ui/card";
-import { Save, Trash2, ArrowLeft, Loader2, Plus, BookOpen, Video, FileText, Users, Mail, UserPlus, X, Upload, File } from "lucide-react";
+import { Save, Trash2, ArrowLeft, Loader2, Plus, BookOpen, Video, FileText, Users, Mail, UserPlus, X, Upload, File, Pencil, Check, ChevronDown, ChevronUp, ImageIcon } from "lucide-react";
 import Link from "next/link";
 
 export default function ManageCourseClient({ course, studentsProgress = [] }: { course: any, studentsProgress?: any[] }) {
@@ -32,7 +32,11 @@ export default function ManageCourseClient({ course, studentsProgress = [] }: { 
     fileType: ""
   });
   const [uploading, setUploading] = useState(false);
+  const [thumbnailUploading, setThumbnailUploading] = useState(false);
   const [studentEmail, setStudentEmail] = useState("");
+  // Curriculum UX state
+  const [expandedModuleId, setExpandedModuleId] = useState<string | null>(null);
+  const [editingLesson, setEditingLesson] = useState<{ id: string; title: string; content: string; videoUrl: string } | null>(null);
 
   const handleUpdate = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -46,6 +50,40 @@ export default function ManageCourseClient({ course, studentsProgress = [] }: { 
       if (res.ok) {
         router.refresh();
         alert("Settings updated!");
+      }
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleThumbnailUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    setThumbnailUploading(true);
+    try {
+      const fd = new FormData();
+      fd.append("file", file);
+      const res = await fetch("/api/upload", { method: "POST", body: fd });
+      const data = await res.json();
+      if (res.ok) {
+        setFormData(prev => ({ ...prev, thumbnail: data.url }));
+      } else {
+        alert(data.message || "Upload failed");
+      }
+    } catch { alert("Upload error."); }
+    finally { setThumbnailUploading(false); }
+  };
+
+  const handleDeleteCourse = async () => {
+    if (!confirm(`Are you sure you want to permanently delete "${course.title}"? This cannot be undone.`)) return;
+    setLoading(true);
+    try {
+      const res = await fetch(`/api/courses/${course.id}`, { method: "DELETE" });
+      if (res.ok) {
+        router.push("/dashboard/teacher/courses");
+      } else {
+        const d = await res.json();
+        alert(d.message || "Failed to delete course.");
       }
     } finally {
       setLoading(false);
@@ -184,6 +222,27 @@ export default function ManageCourseClient({ course, studentsProgress = [] }: { 
     }
   };
 
+  const handleSaveLesson = async () => {
+    if (!editingLesson) return;
+    setLoading(true);
+    try {
+      const res = await fetch(`/api/lessons/${editingLesson.id}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ title: editingLesson.title, content: editingLesson.content, videoUrl: editingLesson.videoUrl }),
+      });
+      if (res.ok) {
+        setEditingLesson(null);
+        router.refresh();
+      } else {
+        const d = await res.json();
+        alert(d.message || "Failed to update lesson.");
+      }
+    } finally {
+      setLoading(false);
+    }
+  };
+
   return (
     <div className="max-w-5xl mx-auto space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500 pb-20">
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
@@ -231,6 +290,24 @@ export default function ManageCourseClient({ course, studentsProgress = [] }: { 
                   <label className="text-xs font-black uppercase tracking-widest">Description</label>
                   <Textarea required className="min-h-[150px] border-2 border-black font-bold" value={formData.description} onChange={e => setFormData({...formData, description: e.target.value})} />
                 </div>
+                {/* Thumbnail Upload */}
+                <div className="space-y-2">
+                  <label className="text-xs font-black uppercase tracking-widest flex items-center gap-2"><ImageIcon size={14} /> Course Cover Photo</label>
+                  <div className="flex gap-3 items-center">
+                    {formData.thumbnail && (
+                      <div className="relative shrink-0">
+                        <img src={formData.thumbnail} alt="Thumbnail" className="w-20 h-16 object-cover border-2 border-black rounded-lg" />
+                        <button type="button" onClick={() => setFormData(prev => ({...prev, thumbnail: ""}))} className="absolute -top-2 -right-2 w-5 h-5 bg-red-500 text-white rounded-full border-2 border-black flex items-center justify-center">
+                          <X size={10} />
+                        </button>
+                      </div>
+                    )}
+                    <label className="flex-1 h-12 border-2 border-black border-dashed rounded-lg flex items-center justify-center gap-2 cursor-pointer hover:bg-muted/30 transition-colors font-bold text-sm">
+                      {thumbnailUploading ? <><Loader2 size={14} className="animate-spin" /> Uploading...</> : <><Upload size={14} /> {formData.thumbnail ? "Change Photo" : "Upload Photo"}</>}
+                      <input type="file" accept="image/*" className="hidden" onChange={handleThumbnailUpload} disabled={thumbnailUploading} />
+                    </label>
+                  </div>
+                </div>
                 <div className="space-y-2">
                   <label className="text-xs font-black uppercase tracking-widest">Course Type</label>
                   <div className="flex gap-4">
@@ -250,15 +327,18 @@ export default function ManageCourseClient({ course, studentsProgress = [] }: { 
                     </label>
                   </div>
                 </div>
-                <Button type="submit" disabled={loading} className="w-full h-14 text-lg font-black neo-brutalism bg-[#34D399] text-black uppercase">
+                <Button type="submit" disabled={loading || thumbnailUploading} className="w-full h-14 text-lg font-black neo-brutalism bg-[#34D399] text-black uppercase">
                   {loading ? <Loader2 className="animate-spin mr-2" /> : <Save className="mr-2" />} Save Changes
                 </Button>
               </form>
             </Card>
           </div>
-          <div className="neo-brutalism bg-white p-6 border-4 border-black self-start">
-             <h3 className="font-black uppercase mb-4 text-red-600">Danger Zone</h3>
-             <Button variant="destructive" className="w-full font-black border-2 border-black">Delete Course</Button>
+          <div className="neo-brutalism bg-white p-6 border-4 border-black self-start space-y-4">
+             <h3 className="font-black uppercase text-red-600 flex items-center gap-2"><Trash2 size={16}/> Danger Zone</h3>
+             <p className="text-xs font-bold text-muted-foreground">Deleting this course is permanent and cannot be undone. All modules, lessons and enrollments will be removed.</p>
+             <Button variant="destructive" onClick={handleDeleteCourse} disabled={loading} className="w-full font-black border-2 border-black">
+               {loading ? <Loader2 size={14} className="mr-2 animate-spin" /> : <Trash2 size={14} className="mr-2" />} Delete Course
+             </Button>
           </div>
         </div>
       )}
@@ -278,55 +358,76 @@ export default function ManageCourseClient({ course, studentsProgress = [] }: { 
                    <h4 className="text-lg font-black uppercase">{module.title}</h4>
                    <Button variant="ghost" onClick={() => handleDeleteItem("module", module.id)} className="h-8 w-8 p-0 text-red-600 border-2 border-black"><Trash2 size={16} /></Button>
                 </div>
-                <div className="p-4 space-y-4">
+                <div className="p-4 space-y-3">
                    {module.lessons.map((lesson: any) => (
-                     <div key={lesson.id} className="flex items-center justify-between p-3 bg-muted/20 border-2 border-black rounded-lg">
-                        <div className="flex items-center gap-3 text-sm font-bold">
-                           {lesson.videoUrl ? <Video size={16} /> : lesson.fileUrl ? <File size={16} className="text-primary" /> : <FileText size={16} />} 
-                           {lesson.title}
-                           {lesson.fileType && <span className="text-[10px] bg-accent px-1.5 rounded-md uppercase">{lesson.fileType}</span>}
-                        </div>
-                        <Button variant="ghost" onClick={() => handleDeleteItem("lesson", lesson.id)} className="h-7 w-7 p-0 text-red-600"><Trash2 size={14}/></Button>
+                     <div key={lesson.id}>
+                       {/* Lesson row */}
+                       <div className="flex items-center justify-between p-3 bg-muted/20 border-2 border-black rounded-lg">
+                          <div className="flex items-center gap-3 text-sm font-bold">
+                             {lesson.videoUrl ? <Video size={16} /> : lesson.fileUrl ? <File size={16} className="text-primary" /> : <FileText size={16} />}
+                             {lesson.title}
+                             {lesson.fileType && <span className="text-[10px] bg-accent px-1.5 rounded-md uppercase">{lesson.fileType}</span>}
+                          </div>
+                          <div className="flex gap-1">
+                            <Button variant="ghost" onClick={() => setEditingLesson(editingLesson?.id === lesson.id ? null : { id: lesson.id, title: lesson.title, content: lesson.content || "", videoUrl: lesson.videoUrl || "" })} className="h-7 w-7 p-0 text-blue-600 hover:bg-blue-50">
+                              <Pencil size={14} />
+                            </Button>
+                            <Button variant="ghost" onClick={() => handleDeleteItem("lesson", lesson.id)} className="h-7 w-7 p-0 text-red-600 hover:bg-red-50">
+                              <Trash2 size={14} />
+                            </Button>
+                          </div>
+                       </div>
+                       {/* Inline edit form */}
+                       {editingLesson?.id === lesson.id && (
+                         <div className="mt-2 p-4 bg-blue-50 border-2 border-blue-300 rounded-xl space-y-3 animate-in slide-in-from-top-2 duration-200">
+                           <p className="text-xs font-black uppercase tracking-widest text-blue-700">✏️ Editing: {lesson.title}</p>
+                           <Input placeholder="Lesson Title" className="border-2 border-black font-bold" value={editingLesson.title} onChange={e => setEditingLesson({...editingLesson, title: e.target.value})} />
+                           <Input placeholder="Video URL (YouTube/Vimeo embed)" className="border-2 border-black font-bold" value={editingLesson.videoUrl} onChange={e => setEditingLesson({...editingLesson, videoUrl: e.target.value})} />
+                           <Textarea placeholder="Lesson Notes / Content" className="border-2 border-black font-bold h-20" value={editingLesson.content} onChange={e => setEditingLesson({...editingLesson, content: e.target.value})} />
+                           <div className="flex gap-2">
+                             <Button onClick={handleSaveLesson} disabled={loading} className="flex-1 h-10 bg-[#34D399] text-black font-black border-2 border-black">
+                               {loading ? <Loader2 size={14} className="mr-2 animate-spin" /> : <Check size={14} className="mr-2" />} Save Changes
+                             </Button>
+                             <Button variant="outline" onClick={() => setEditingLesson(null)} className="h-10 border-2 border-black font-bold"><X size={14} /></Button>
+                           </div>
+                         </div>
+                       )}
                      </div>
                    ))}
-                   <div className="p-4 bg-muted/10 border-2 border-black border-dashed rounded-xl space-y-4">
-                      <Input placeholder="Lesson Title" className="border-2 border-black font-bold" value={newLesson.moduleId === module.id ? newLesson.title : ""} onChange={e => setNewLesson({...newLesson, moduleId: module.id, title: e.target.value})} />
-                      <Input placeholder="Video Link (YouTube/Vimeo)" className="border-2 border-black font-bold" value={newLesson.moduleId === module.id ? newLesson.videoUrl : ""} onChange={e => setNewLesson({...newLesson, moduleId: module.id, videoUrl: e.target.value})} />
-                      
-                      <div className="space-y-2">
-                         <label className="text-[10px] font-black uppercase opacity-60">Academic Material (PDF/PPT)</label>
-                         <div className="flex gap-2">
-                            <div className="relative flex-1">
-                               <Input 
-                                 type="file" 
-                                 accept=".pdf,.ppt,.pptx" 
-                                 className="absolute inset-0 opacity-0 cursor-pointer z-10" 
-                                 onChange={(e) => handleFileUpload(e, module.id)}
-                                 disabled={uploading}
-                               />
-                               <div className="h-10 border-2 border-black border-dashed rounded-lg flex items-center justify-center gap-2 bg-white font-bold text-xs">
-                                  {uploading ? <Loader2 className="animate-spin" size={14} /> : <Upload size={14} />}
-                                  {newLesson.moduleId === module.id && newLesson.fileUrl ? "File Ready" : "Choose PDF/PPT"}
-                               </div>
-                            </div>
-                            {newLesson.moduleId === module.id && newLesson.fileUrl && (
-                              <Button 
-                                variant="ghost" 
-                                className="h-10 border-2 border-black bg-green-100 text-green-700"
-                                onClick={() => setNewLesson({...newLesson, fileUrl: "", fileType: ""})}
-                              >
-                                <X size={14} />
-                              </Button>
-                            )}
-                         </div>
-                         {newLesson.moduleId === module.id && newLesson.fileUrl && (
-                           <p className="text-[9px] font-black text-green-600 uppercase">✓ Material Attached</p>
-                         )}
-                      </div>
-
-                      <Textarea placeholder="Lesson Notes / Content" className="border-2 border-black font-bold h-24" value={newLesson.moduleId === module.id ? newLesson.content : ""} onChange={e => setNewLesson({...newLesson, moduleId: module.id, content: e.target.value})} />
-                      <Button onClick={() => handleAddLesson(module.id)} disabled={loading || uploading || !newLesson.title} className="w-full bg-[#34D399] text-black font-black border-2 border-black">Add Lesson</Button>
-                   </div>
+                   {/* Add Lesson toggle button */}
+                   <button
+                     type="button"
+                     onClick={() => setExpandedModuleId(expandedModuleId === module.id ? null : module.id)}
+                     className="w-full mt-2 flex items-center justify-center gap-2 p-3 border-2 border-black border-dashed rounded-xl font-black text-xs uppercase hover:bg-[#34D399]/10 transition-colors"
+                   >
+                     {expandedModuleId === module.id ? <><ChevronUp size={14} /> Hide Form</> : <><Plus size={14} /> Add Lesson</>}
+                   </button>
+                   {/* Collapsible Add Lesson form */}
+                   {expandedModuleId === module.id && (
+                     <div className="p-4 bg-muted/10 border-2 border-black border-dashed rounded-xl space-y-4 animate-in slide-in-from-top-2 duration-200">
+                        <Input placeholder="Lesson Title" className="border-2 border-black font-bold" value={newLesson.moduleId === module.id ? newLesson.title : ""} onChange={e => setNewLesson({...newLesson, moduleId: module.id, title: e.target.value})} />
+                        <Input placeholder="Video Link (YouTube/Vimeo)" className="border-2 border-black font-bold" value={newLesson.moduleId === module.id ? newLesson.videoUrl : ""} onChange={e => setNewLesson({...newLesson, moduleId: module.id, videoUrl: e.target.value})} />
+                        <div className="space-y-2">
+                           <label className="text-[10px] font-black uppercase opacity-60">Academic Material (PDF/PPT)</label>
+                           <div className="flex gap-2">
+                              <div className="relative flex-1">
+                                 <Input type="file" accept=".pdf,.ppt,.pptx" className="absolute inset-0 opacity-0 cursor-pointer z-10" onChange={(e) => handleFileUpload(e, module.id)} disabled={uploading} />
+                                 <div className="h-10 border-2 border-black border-dashed rounded-lg flex items-center justify-center gap-2 bg-white font-bold text-xs">
+                                    {uploading ? <Loader2 className="animate-spin" size={14} /> : <Upload size={14} />}
+                                    {newLesson.moduleId === module.id && newLesson.fileUrl ? "File Ready" : "Choose PDF/PPT"}
+                                 </div>
+                              </div>
+                              {newLesson.moduleId === module.id && newLesson.fileUrl && (
+                                <Button variant="ghost" className="h-10 border-2 border-black bg-green-100 text-green-700" onClick={() => setNewLesson({...newLesson, fileUrl: "", fileType: ""})}>
+                                  <X size={14} />
+                                </Button>
+                              )}
+                           </div>
+                        </div>
+                        <Textarea placeholder="Lesson Notes / Content" className="border-2 border-black font-bold h-24" value={newLesson.moduleId === module.id ? newLesson.content : ""} onChange={e => setNewLesson({...newLesson, moduleId: module.id, content: e.target.value})} />
+                        <Button onClick={() => handleAddLesson(module.id)} disabled={loading || uploading || !newLesson.title} className="w-full bg-[#34D399] text-black font-black border-2 border-black">Add Lesson</Button>
+                     </div>
+                   )}
                 </div>
               </Card>
             ))}

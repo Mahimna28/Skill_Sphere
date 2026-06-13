@@ -54,11 +54,12 @@ const FALLBACK_ANSWERS: Record<string, string> = {
       } else {
         throw new Error(data.message || "Failed to get response");
       }
-    } catch (err) {
+    } catch (err: any) {
       if (FALLBACK_ANSWERS[msgText]) {
         setMessages((prev) => [...prev, { role: "assistant", content: FALLBACK_ANSWERS[msgText] }]);
       } else {
-        setMessages((prev) => [...prev, { role: "assistant", content: "Connection lost or OpenAI API key not configured. Please try again later." }]);
+        const errMsg = err?.message || "Unknown error. Please check your API key configuration.";
+        setMessages((prev) => [...prev, { role: "assistant", content: `⚠️ AI Error: ${errMsg}` }]);
       }
     } finally {
       setLoading(false);
