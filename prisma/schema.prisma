@@ -12,7 +12,8 @@ model User {
   name      String
   email     String   @unique
   username  String?  @unique  // Set on first visit to Messages
-  password  String
+  password  String?          // Nullable: Google OAuth users won't have a password initially
+  googleId  String?  @unique // Google OAuth "sub" ID — used to link accounts
   image     String?  // Profile picture URL
   role      String   @default("student") // student, teacher, parent, admin
   points    Int      @default(0)
