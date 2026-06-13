@@ -4,7 +4,9 @@ import { verifyToken } from "@/lib/auth";
 import { redirect, notFound } from "next/navigation";
 import CertificateClient from "./CertificateClient";
 
-export default async function CertificatePage({ params }: { params: { id: string } }) {
+export default async function CertificatePage({ params }: { params: Promise<{ id: string }> }) {
+  const resolvedParams = await params;
+  const certificateId = resolvedParams.id;
   const cookieStore = await cookies();
   const token = cookieStore.get("token")?.value;
   const decoded: any = token ? verifyToken(token) : null;
@@ -12,7 +14,7 @@ export default async function CertificatePage({ params }: { params: { id: string
   if (!decoded) redirect("/login");
 
   const certificate = await prisma.certificate.findUnique({
-    where: { id: params.id },
+    where: { id: certificateId },
     include: {
       user: { select: { name: true, email: true } }
     }

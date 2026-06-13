@@ -31,7 +31,6 @@ export default function CoursesPageClient({ courses, userRole, initialEnrolledId
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedCategory, setSelectedCategory] = useState("All");
   const [enrolledIds, setEnrolledIds] = useState<Set<string>>(new Set(initialEnrolledIds));
-  const [loadingId, setLoadingId] = useState<string | null>(null);
 
   const categories = ["All", ...Array.from(new Set(courses.map(c => c.subject)))];
 
@@ -42,27 +41,6 @@ export default function CoursesPageClient({ courses, userRole, initialEnrolledId
     return matchesSearch && matchesCategory;
   });
 
-  const handleEnroll = async (courseId: string) => {
-    if (userRole !== "student") {
-      router.push("/login");
-      return;
-    }
-
-    setLoadingId(courseId);
-    try {
-      const res = await fetch(`/api/courses/${courseId}/enroll`, { method: "POST" });
-      if (res.ok) {
-        setEnrolledIds((prev) => new Set([...prev, courseId]));
-        router.push(`/dashboard/student/courses/${courseId}`);
-      } else {
-        alert("Enrollment failed. Please try again.");
-      }
-    } catch {
-      alert("Network error.");
-    } finally {
-      setLoadingId(null);
-    }
-  };
 
   return (
     <div className="py-24 px-4 max-w-7xl mx-auto min-h-screen">
@@ -111,7 +89,6 @@ export default function CoursesPageClient({ courses, userRole, initialEnrolledId
         {filteredCourses.length > 0 ? (
           filteredCourses.map((course, idx) => {
             const isEnrolled = enrolledIds.has(course.id);
-            const isLoading = loadingId === course.id;
             const color = courseColors[idx % courseColors.length];
 
             return (
@@ -152,11 +129,10 @@ export default function CoursesPageClient({ courses, userRole, initialEnrolledId
                 ) : (
                   <Button 
                     className="w-full neo-brutalism bg-[#4F7DF3] h-14 font-black text-lg group text-white"
-                    onClick={() => handleEnroll(course.id)}
-                    disabled={isLoading}
+                    onClick={() => router.push(`/courses/${course.id}`)}
                   >
-                    {isLoading ? <Loader2 className="mr-2 h-5 w-5 animate-spin" /> : "ENROLL NOW"} 
-                    {!isLoading && <ArrowRight className="ml-2 group-hover:translate-x-1 transition-transform" />}
+                    VIEW DETAILS
+                    <ArrowRight className="ml-2 group-hover:translate-x-1 transition-transform" />
                   </Button>
                 )}
               </div>

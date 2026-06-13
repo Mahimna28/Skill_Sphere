@@ -4,13 +4,15 @@ import { verifyToken } from "@/lib/auth";
 import { notFound } from "next/navigation";
 import CourseDetailClient from "./CourseDetailClient";
 
-export default async function CourseDetailPage({ params }: { params: { id: string } }) {
+export default async function CourseDetailPage({ params }: { params: Promise<{ id: string }> }) {
+  const resolvedParams = await params;
+  const courseId = resolvedParams.id;
   const cookieStore = await cookies();
   const token = cookieStore.get("token")?.value;
   const decoded: any = token ? verifyToken(token) : null;
 
   const course = await prisma.course.findUnique({
-    where: { id: params.id },
+    where: { id: courseId },
     include: {
       teacher: { select: { name: true, image: true, expertise: true } },
       modules: {
