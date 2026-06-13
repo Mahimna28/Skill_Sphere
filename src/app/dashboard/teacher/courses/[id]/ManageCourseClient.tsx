@@ -254,7 +254,7 @@ export default function ManageCourseClient({ course, studentsProgress = [] }: { 
           </Link>
           <h1 className="text-3xl font-black uppercase tracking-tight">{course.title}</h1>
         </div>
-        <div className="flex bg-white border-4 border-black p-1 rounded-xl shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]">
+        <div className="flex overflow-x-auto scrollbar-none bg-white border-4 border-black p-1 rounded-xl shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] max-w-full">
            {[
              { id: "settings", label: "Settings", icon: Save },
              { id: "curriculum", label: "Curriculum", icon: BookOpen },
@@ -265,7 +265,7 @@ export default function ManageCourseClient({ course, studentsProgress = [] }: { 
              <button 
                key={tab.id}
                onClick={() => setActiveTab(tab.id as any)}
-               className={`px-4 py-2 rounded-lg font-black text-xs uppercase flex items-center gap-2 transition-all ${activeTab === tab.id ? 'bg-primary text-white shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]' : 'hover:bg-muted'}`}
+               className={`whitespace-nowrap shrink-0 px-4 py-2 rounded-lg font-black text-xs uppercase flex items-center gap-2 transition-all ${activeTab === tab.id ? 'bg-primary text-white shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]' : 'hover:bg-muted'}`}
              >
                <tab.icon size={14} /> {tab.label}
              </button>

@@ -118,9 +118,9 @@ export default function RegisterPage() {
 
   return (
     <div className="min-h-screen grid grid-cols-1 lg:grid-cols-2">
-      <div className="flex flex-col justify-center px-8 sm:px-16 lg:px-24 bg-white border-r-4 border-black relative">
-        <Link href="/" className="absolute top-8 left-8 text-xl font-black">SKILL SPHERE</Link>
-        <div className="max-w-md w-full mx-auto">
+      <div className="flex flex-col justify-center px-6 sm:px-10 lg:px-24 bg-white border-r-0 lg:border-r-4 border-black relative py-12">
+        <Link href="/" className="absolute top-6 left-6 text-base font-black">SKILL SPHERE</Link>
+        <div className="max-w-md w-full mx-auto mt-8">
           {step === "details" ? (
             <>
               <h2 className="text-4xl font-black mb-2">Join Skill Sphere</h2>

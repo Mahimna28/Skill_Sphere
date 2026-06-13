@@ -62,28 +62,28 @@ export default async function LandingPage() {
     <div className="flex flex-col">
       <main className="flex-1">
         {/* Hero Section */}
-        <section className="max-w-7xl mx-auto px-4 py-24 md:py-32 grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
+        <section className="max-w-7xl mx-auto px-4 py-16 md:py-32 grid grid-cols-1 lg:grid-cols-2 gap-10 lg:gap-16 items-center">
           <div className="flex flex-col items-start text-left">
-            <div className="inline-block bg-[#F5C84C] px-4 py-1.5 border-4 border-black font-black text-sm uppercase mb-8 shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]">
+            <div className="inline-block bg-[#F5C84C] px-4 py-1.5 border-4 border-black font-black text-sm uppercase mb-6 shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]">
               Future-Ready Education
             </div>
-            <h1 className="text-7xl md:text-9xl font-black mb-8 leading-[0.85] tracking-tighter uppercase">
+            <h1 className="text-5xl sm:text-7xl md:text-9xl font-black mb-6 leading-[0.85] tracking-tighter uppercase">
               Skill <br />
               <span className="text-[#4F7DF3] underline decoration-[#F5C84C] decoration-8 underline-offset-8">Sphere</span>
             </h1>
-            <p className="text-2xl font-bold max-w-xl mb-12 leading-relaxed">
+            <p className="text-lg md:text-2xl font-bold max-w-xl mb-10 leading-relaxed">
               Unlock your potential with an AI-powered LMS designed for role-based learning and real-time collaboration.
             </p>
-            <div className="flex flex-col sm:flex-row gap-6 w-full">
+            <div className="flex flex-col sm:flex-row gap-4 w-full">
               <Link href="/register">
-                <Button size="lg" className="text-2xl px-12 py-10 neo-brutalism font-black bg-[#4F7DF3] h-auto w-full sm:w-auto text-white">
-                  START LEARNING <ArrowRight className="ml-3 h-8 w-8" />
+                <Button size="lg" className="text-xl md:text-2xl px-8 md:px-12 py-8 md:py-10 neo-brutalism font-black bg-[#4F7DF3] h-auto w-full sm:w-auto text-white">
+                  START LEARNING <ArrowRight className="ml-3 h-6 w-6 md:h-8 md:w-8" />
                 </Button>
               </Link>
             </div>
           </div>
 
-          <div className="relative aspect-square">
+          <div className="relative aspect-square max-w-sm mx-auto lg:max-w-none w-full">
             <div className="absolute inset-0 bg-[#34D399] border-4 border-black rounded-[3rem] shadow-[16px_16px_0px_0px_rgba(0,0,0,1)] rotate-3"></div>
             <div className="absolute inset-0 bg-white border-4 border-black rounded-[3rem] shadow-[16px_16px_0px_0px_rgba(0,0,0,1)] -rotate-3 overflow-hidden p-12">
               <div className="relative w-full h-full">
@@ -98,13 +98,13 @@ export default async function LandingPage() {
         </section>
 
         {/* Featured Courses */}
-        <section id="courses" className="bg-[#4F7DF3] border-y-4 border-black py-24 relative overflow-hidden">
+        <section id="courses" className="bg-[#4F7DF3] border-y-4 border-black py-16 md:py-24 relative overflow-hidden">
           <div className="absolute top-0 left-0 w-full h-full bg-[url('https://patterns.dev/img/grid.svg')] opacity-[0.05] pointer-events-none"></div>
           <div className="max-w-7xl mx-auto px-4 relative z-10">
-            <div className="flex flex-col md:flex-row items-end justify-between mb-16 gap-6">
+            <div className="flex flex-col md:flex-row items-end justify-between mb-10 md:mb-16 gap-6">
               <div className="text-left">
-                <h3 className="text-6xl font-black text-white uppercase tracking-tighter">Popular Courses</h3>
-                <p className="text-white/80 font-bold text-xl mt-4">Join thousands of students in our top-rated programs.</p>
+                <h3 className="text-4xl md:text-6xl font-black text-white uppercase tracking-tighter">Popular Courses</h3>
+                <p className="text-white/80 font-bold text-lg md:text-xl mt-4">Join thousands of students in our top-rated programs.</p>
               </div>
               <Link href="/courses">
                 <Button className="bg-white text-black font-black border-4 border-black h-16 px-10 text-xl hover:bg-white/90">View All</Button>
@@ -136,10 +136,10 @@ export default async function LandingPage() {
         </section>
 
         {/* Features Preview */}
-        <section id="features" className="bg-white py-24">
+        <section id="features" className="bg-white py-16 md:py-24">
           <div className="max-w-7xl mx-auto px-4">
-            <div className="flex flex-col md:flex-row items-center justify-between mb-24 gap-8">
-              <h3 className="text-6xl font-black uppercase tracking-tighter">The Advantage</h3>
+            <div className="flex flex-col md:flex-row items-center justify-between mb-16 md:mb-24 gap-8">
+              <h3 className="text-4xl md:text-6xl font-black uppercase tracking-tighter">The Advantage</h3>
               <Link href="/features">
                 <Button className="bg-[#34D399] text-black font-black border-4 border-black h-14 px-8 text-lg">See All Features <ArrowRight className="ml-2" /></Button>
               </Link>
@@ -168,7 +168,7 @@ export default async function LandingPage() {
               <div className="inline-block bg-[#F5C84C] px-4 py-1.5 border-4 border-black font-black text-sm uppercase mb-6 shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]">
                 The Brains Behind
               </div>
-              <h3 className="text-6xl md:text-8xl font-black uppercase tracking-tighter">Meet Our <span className="text-[#34D399]">Team</span></h3>
+              <h3 className="text-5xl sm:text-6xl md:text-8xl font-black uppercase tracking-tighter">Meet Our <span className="text-[#34D399]">Team</span></h3>
               <p className="text-xl font-bold text-muted-foreground max-w-2xl mx-auto mt-8">
                 A dedicated group of educators, engineers, and visionaries working to redefine the future of e-learning.
               </p>

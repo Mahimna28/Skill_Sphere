@@ -88,7 +88,7 @@ export default function CoursePlayerClient({ course }: { course: any }) {
   }
 
   return (
-    <div className="flex flex-col lg:flex-row gap-8 h-[calc(100vh-160px)]">
+    <div className="flex flex-col lg:flex-row gap-8 lg:h-[calc(100vh-160px)]">
       {/* 1. Main Content Area */}
       <div className="flex-1 overflow-y-auto space-y-6 scrollbar-none pb-12">
         <div className="flex items-center justify-between mb-2">
@@ -195,7 +195,7 @@ export default function CoursePlayerClient({ course }: { course: any }) {
       </div>
 
       {/* 2. Sidebar - Course Content */}
-      <aside className="w-full lg:w-80 bg-white border-4 border-black shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] rounded-3xl flex flex-col overflow-hidden shrink-0">
+      <aside className="w-full lg:w-80 bg-white border-4 border-black shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] rounded-3xl flex flex-col overflow-hidden shrink-0 lg:max-h-full">
         <div className="p-6 border-b-4 border-black bg-primary text-white">
           <h3 className="text-xl font-black uppercase tracking-tight line-clamp-1">{course.title}</h3>
           <p className="text-xs font-bold opacity-80 mt-1 uppercase tracking-widest">{course.subject}</p>

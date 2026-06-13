@@ -36,15 +36,15 @@ export default function CourseDetailClient({ course, userRole, isEnrolled }: { c
   return (
     <div className="min-h-screen bg-[#f8f9fa] pb-24">
       {/* Hero Header */}
-      <div className="bg-[#4F7DF3] border-b-4 border-black pt-32 pb-24 px-4 relative overflow-hidden">
+      <div className="bg-[#4F7DF3] border-b-4 border-black pt-12 md:pt-32 pb-12 md:pb-24 px-4 relative overflow-hidden">
         <div className="absolute top-0 left-0 w-full h-full bg-[url('https://patterns.dev/img/grid.svg')] opacity-[0.05] pointer-events-none"></div>
-        <div className="max-w-5xl mx-auto relative z-10 flex flex-col md:flex-row gap-12 items-center">
+        <div className="max-w-5xl mx-auto relative z-10 flex flex-col md:flex-row gap-8 md:gap-12 items-center">
           
           <div className="flex-1 text-white">
             <div className="inline-block bg-[#F5C84C] text-black px-4 py-1.5 border-4 border-black font-black text-sm uppercase mb-6 shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]">
               {course.subject}
             </div>
-            <h1 className="text-5xl md:text-7xl font-black uppercase tracking-tighter mb-6 leading-[0.9]">
+            <h1 className="text-4xl md:text-7xl font-black uppercase tracking-tighter mb-6 leading-[0.9]">
               {course.title}
             </h1>
             <p className="text-xl font-bold opacity-90 max-w-2xl mb-8 leading-relaxed">
@@ -88,7 +88,7 @@ export default function CourseDetailClient({ course, userRole, isEnrolled }: { c
       </div>
 
       {/* Main Content */}
-      <div className="max-w-5xl mx-auto px-4 py-16 grid grid-cols-1 md:grid-cols-3 gap-12">
+      <div className="max-w-5xl mx-auto px-4 py-10 md:py-16 grid grid-cols-1 md:grid-cols-3 gap-8 md:gap-12">
         
         {/* Left Col: Details & Syllabus */}
         <div className="md:col-span-2 space-y-12">

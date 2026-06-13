@@ -43,13 +43,13 @@ export default function CoursesPageClient({ courses, userRole, initialEnrolledId
 
 
   return (
-    <div className="py-24 px-4 max-w-7xl mx-auto min-h-screen">
-      <div className="flex flex-col md:flex-row items-end justify-between mb-16 gap-8">
+    <div className="py-12 md:py-24 px-4 max-w-7xl mx-auto min-h-screen">
+      <div className="flex flex-col md:flex-row items-end justify-between mb-10 md:mb-16 gap-6 md:gap-8">
         <div className="text-left">
           <div className="inline-block bg-[#34D399] px-4 py-1.5 border-4 border-black font-black text-sm uppercase mb-6 shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]">
             Expand Your Horizon
           </div>
-          <h1 className="text-6xl md:text-8xl font-black uppercase tracking-tighter leading-[0.85]">
+          <h1 className="text-5xl md:text-8xl font-black uppercase tracking-tighter leading-[0.85]">
             Our <span className="text-[#4F7DF3]">Courses</span>
           </h1>
           <p className="text-xl font-bold text-muted-foreground mt-6 max-w-xl">
