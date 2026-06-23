@@ -31,7 +31,13 @@ interface Course {
   description: string;
   subject: string;
   thumbnail: string | null;
-  teacher: { name: string; image?: string | null; expertise?: string | null };
+  teacher: { 
+    name: string; 
+    image?: string | null; 
+    expertise?: string | null;
+    username?: string;
+    bio?: string | null;
+  };
   modules: Module[];
   _count: { enrollments: number };
 }
@@ -41,12 +47,6 @@ interface Props {
   userRole: string | null;
   isEnrolled: boolean;
 }
-
-const MOCK_REVIEWS = [
-  { id: 1, name: "Sarah J.", date: "2 weeks ago", rating: 5, text: "This course completely changed how I approach scalable architecture. The instructor explains complex patterns with incredible clarity.", avatar: "https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=150&auto=format&fit=crop&q=80" },
-  { id: 2, name: "Michael T.", date: "1 month ago", rating: 5, text: "Worth every penny. The curriculum is perfectly structured to build your understanding organically without feeling overwhelmed.", avatar: "https://images.unsplash.com/photo-1599566150163-29194dcaad36?w=150&auto=format&fit=crop&q=80" },
-  { id: 3, name: "Elena R.", date: "3 months ago", rating: 4, text: "Excellent material, though some of the later modules go very deep very quickly. The AI tutor feature was a lifesaver.", avatar: "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=150&auto=format&fit=crop&q=80" }
-];
 
 const MOCK_MODULES = [
   {
@@ -76,7 +76,7 @@ const MOCK_MODULES = [
 
 export default function CourseDetailClient({ course, userRole, isEnrolled }: Props) {
   const router = useRouter();
-  const [activeTab, setActiveTab] = useState<"overview" | "curriculum" | "reviews">("overview");
+  const [activeTab, setActiveTab] = useState<"overview" | "curriculum">("overview");
   const [expandedModules, setExpandedModules] = useState<Set<string>>(new Set(["m1", course.modules[0]?.id]));
   const [enrolled, setEnrolled] = useState(isEnrolled);
   const [isEnrolling, setIsEnrolling] = useState(false);
@@ -199,27 +199,32 @@ export default function CourseDetailClient({ course, userRole, isEnrolled }: Pro
 
               {/* CTA Row */}
               <div className="mt-8 flex flex-col sm:flex-row items-center gap-4">
-                <motion.button 
-                  whileHover={{ scale: 1.02, boxShadow: "0 8px 24px rgba(201,169,110,0.3)" }}
-                  whileTap={{ scale: 0.98 }}
-                  transition={{ type: "spring", stiffness: 400, damping: 25 }}
-                  className="w-full sm:w-auto bg-[#C9A96E] text-[#1E1B2E] font-sans font-medium text-[16px] rounded-full px-8 py-4 shadow-[0_4px_14px_rgba(201,169,110,0.2)]"
-                >
-                  Enroll Now
-                </motion.button>
-                <motion.button 
-                  whileHover={{ backgroundColor: "#FFFFFF", color: "#1E1B2E" }}
-                  whileTap={{ scale: 0.98 }}
-                  transition={{ duration: 0.2 }}
-                  className="w-full sm:w-auto bg-transparent border border-white text-white font-sans font-medium text-[16px] rounded-full px-8 py-4"
-                >
-                  Try for Free
-                </motion.button>
-              </div>
-
-              {/* Trust Badge */}
-              <div className="flex items-center gap-2 mt-6 text-[#8E8E93] font-sans text-[13px]">
-                <ShieldCheck size={16} /> 14-day money-back guarantee
+                {!userRole || (userRole === "student" && !isEnrolled) || userRole !== "student" ? (
+                  <motion.button 
+                    onClick={handleEnroll}
+                    disabled={isEnrolling}
+                    whileHover={{ scale: 1.02, boxShadow: "0 8px 24px rgba(201,169,110,0.3)" }}
+                    whileTap={{ scale: 0.98 }}
+                    transition={{ type: "spring", stiffness: 400, damping: 25 }}
+                    className="w-full sm:w-auto bg-[#C9A96E] text-[#1E1B2E] font-sans font-medium text-[16px] rounded-full px-8 py-4 shadow-[0_4px_14px_rgba(201,169,110,0.2)] disabled:opacity-70 flex items-center justify-center"
+                  >
+                    {isEnrolling ? (
+                      <div className="w-5 h-5 border-2 border-[#1E1B2E]/20 border-t-[#1E1B2E] rounded-full animate-spin" />
+                    ) : (
+                      "Enroll Now"
+                    )}
+                  </motion.button>
+                ) : (
+                  <motion.button 
+                    onClick={() => router.push(`/dashboard/student/courses/${course.id}`)}
+                    whileHover={{ scale: 1.02, boxShadow: "0 8px 24px rgba(201,169,110,0.3)" }}
+                    whileTap={{ scale: 0.98 }}
+                    transition={{ type: "spring", stiffness: 400, damping: 25 }}
+                    className="w-full sm:w-auto bg-[#C9A96E] text-[#1E1B2E] font-sans font-medium text-[16px] rounded-full px-8 py-4 shadow-[0_4px_14px_rgba(201,169,110,0.2)] flex items-center justify-center gap-2"
+                  >
+                    Continue Learning <ArrowRight size={18} />
+                  </motion.button>
+                )}
               </div>
             </motion.div>
 
@@ -259,7 +264,7 @@ export default function CourseDetailClient({ course, userRole, isEnrolled }: Pro
               transition={{ duration: 0.5, delay: 0.5 }}
               className="sticky top-[72px] z-40 bg-[#F5F1EB]/90 backdrop-blur-md border-b border-[rgba(30,27,46,0.08)] flex gap-8 pb-3 pt-4 mb-10 overflow-x-auto scrollbar-none"
             >
-              {(["overview", "curriculum", "reviews"] as const).map((tab) => (
+              {(["overview", "curriculum"] as const).map((tab) => (
                 <button
                   key={tab}
                   onClick={() => setActiveTab(tab)}
@@ -408,62 +413,6 @@ export default function CourseDetailClient({ course, userRole, isEnrolled }: Pro
                     </div>
                   </motion.div>
                 )}
-
-                {/* REVIEWS TAB */}
-                {activeTab === "reviews" && (
-                  <motion.div 
-                    key="reviews"
-                    initial={{ opacity: 0, y: 10 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    exit={{ opacity: 0, y: -10 }}
-                    transition={{ duration: 0.4, ease: appleEase }}
-                  >
-                    <div className="flex items-end gap-6 mb-10">
-                      <div className="font-heading text-[64px] text-[#1E1B2E] leading-none">4.8</div>
-                      <div className="pb-2 flex flex-col gap-1">
-                        <div className="flex gap-1 text-[#C9A96E]">
-                          {[1,2,3,4,5].map(i => <Star key={i} size={20} className="fill-current" />)}
-                        </div>
-                        <div className="font-sans text-[14px] text-[#8E8E93]">
-                          Based on 124 reviews
-                        </div>
-                      </div>
-                    </div>
-
-                    <div className="flex flex-col gap-4">
-                      {MOCK_REVIEWS.map((review, i) => (
-                        <motion.div 
-                          key={review.id}
-                          initial={{ opacity: 0, y: 10 }}
-                          whileInView={{ opacity: 1, y: 0 }}
-                          viewport={{ once: true }}
-                          transition={{ delay: i * 0.1, duration: 0.4 }}
-                          className="bg-white rounded-xl p-6 shadow-[0_2px_8px_rgba(30,27,46,0.04)]"
-                        >
-                          <div className="flex justify-between items-start mb-4">
-                            <div className="flex items-center gap-3">
-                              <div className="relative w-10 h-10 rounded-full overflow-hidden">
-                                <Image src={review.avatar} alt={review.name} fill className="object-cover" />
-                              </div>
-                              <div className="flex flex-col">
-                                <span className="font-sans font-medium text-[15px] text-[#1E1B2E]">{review.name}</span>
-                                <span className="font-sans text-[13px] text-[#8E8E93]">{review.date}</span>
-                              </div>
-                            </div>
-                            <div className="flex gap-0.5 text-[#C9A96E]">
-                              {[...Array(5)].map((_, i) => (
-                                <Star key={i} size={14} className={i < review.rating ? "fill-current" : "fill-transparent opacity-30"} />
-                              ))}
-                            </div>
-                          </div>
-                          <p className="font-sans text-[15px] text-[#8E8E93] leading-[1.6]">
-                            "{review.text}"
-                          </p>
-                        </motion.div>
-                      ))}
-                    </div>
-                  </motion.div>
-                )}
               </AnimatePresence>
             </div>
           </div>
@@ -539,16 +488,21 @@ export default function CourseDetailClient({ course, userRole, isEnrolled }: Pro
                     {course.teacher.expertise || "Senior Developer"}
                   </span>
                   <p className="font-sans text-[14px] text-[#8E8E93] line-clamp-2 leading-relaxed mb-3">
-                    A veteran engineer who has built systems for Fortune 500s. Passionate about teaching clean architecture.
+                    {course.teacher.bio || "An expert instructor sharing their knowledge."}
                   </p>
-                  <Link href="#" className="font-sans text-[13px] text-[#C9A96E] font-medium hover:text-[#1E1B2E] transition-colors inline-flex items-center">
-                    View Profile <ArrowRight size={14} className="ml-1" />
-                  </Link>
+                  {course.teacher.username && course.teacher.username !== "null" ? (
+                    <Link href={`/teacher/${course.teacher.username}`} className="inline-flex items-center text-[#C9A96E] font-sans font-medium text-[14px] hover:text-[#1E1B2E] transition-colors group">
+                      View Profile <ArrowRight size={14} className="ml-1 transition-transform group-hover:translate-x-1" />
+                    </Link>
+                  ) : (
+                    <span className="inline-flex items-center text-[#8E8E93] font-sans font-medium text-[14px]">
+                      Profile Unavailable
+                    </span>
+                  )}
                 </div>
               </div>
             </div>
 
-            {/* Certificate Card */}
             <div className="bg-white rounded-[16px] p-6 shadow-[0_4px_24px_rgba(30,27,46,0.04)] border-t-[3px] border-[#C9A96E]">
               <div className="flex items-center gap-3 mb-3">
                 <div className="w-10 h-10 rounded-full bg-[#C9A96E]/10 flex items-center justify-center">
