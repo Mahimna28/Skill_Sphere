@@ -3,26 +3,19 @@
 import { useState, useEffect, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
+import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import {
-  GraduationCap,
-  School,
-  Users,
-  Baby,
-  Loader2,
-  CheckCircle2,
-  XCircle,
-  AtSign,
-  ArrowRight,
-  Sparkles,
-} from "lucide-react";
+import { GraduationCap, School, Users, Baby, Loader2, CheckCircle2, XCircle, AtSign, ArrowLeft } from "lucide-react";
+import { motion, AnimatePresence } from "framer-motion";
+
+const appleEase = [0.4, 0, 0.2, 1];
 
 const roles = [
-  { id: "student", name: "Student", icon: GraduationCap, color: "bg-[#34D399]", desc: "I want to learn" },
-  { id: "teacher", name: "Teacher", icon: School, color: "bg-[#4F7DF3]", desc: "I want to teach" },
-  { id: "parent", name: "Parent", icon: Users, color: "bg-[#F9A8D4]", desc: "I monitor my child" },
+  { id: "student", name: "Student", desc: "Learn at your own pace", icon: GraduationCap },
+  { id: "teacher", name: "Teacher", desc: "Create and manage courses", icon: School },
+  { id: "parent", name: "Parent", desc: "Monitor your child's progress", icon: Users },
 ];
 
 export default function GoogleSetupPage() {
@@ -34,23 +27,21 @@ export default function GoogleSetupPage() {
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
   const [pageLoading, setPageLoading] = useState(true);
+  const [step, setStep] = useState<"role" | "details">("role");
 
   // Username availability state
   const [usernameStatus, setUsernameStatus] = useState<"idle" | "checking" | "available" | "taken" | "invalid">("idle");
 
-  // Load current user info
   useEffect(() => {
     const fetchUser = async () => {
       try {
         const res = await fetch("/api/auth/google/setup");
         const data = await res.json();
         if (!res.ok) {
-          // Not logged in or setup already done
           router.push("/login");
           return;
         }
         if (data.user?.role !== "pending") {
-          // Already completed setup — redirect to their dashboard
           const roleToPath: Record<string, string> = {
             student: "/dashboard/student",
             teacher: "/dashboard/teacher",
@@ -71,23 +62,18 @@ export default function GoogleSetupPage() {
     fetchUser();
   }, [router]);
 
-  // Debounced username availability check
   const checkUsername = useCallback(async (value: string) => {
     if (!value) { setUsernameStatus("idle"); return; }
     const usernameRegex = /^[a-z0-9_]{3,20}$/;
     if (!usernameRegex.test(value)) { setUsernameStatus("invalid"); return; }
     setUsernameStatus("checking");
     try {
-      const res = await fetch("/api/auth/google/setup");
-      // We check by attempting a search — for now just validate format
-      // The real uniqueness check happens on submit
-      // Use the existing username check endpoint
-      const checkRes = await fetch(`/api/users/check-username?username=${value}`);
-      if (checkRes.ok) {
-        const data = await checkRes.json();
+      const res = await fetch(`/api/users/check-username?username=${value}`);
+      if (res.ok) {
+        const data = await res.json();
         setUsernameStatus(data.available ? "available" : "taken");
       } else {
-        setUsernameStatus("available"); // fallback: let server validate
+        setUsernameStatus("available");
       }
     } catch {
       setUsernameStatus("available");
@@ -103,6 +89,18 @@ export default function GoogleSetupPage() {
     e.preventDefault();
     setLoading(true);
     setError("");
+
+    if (role === "parent" && !childEmail) {
+      setError("Child's Gmail is required for the Parent role.");
+      setLoading(false);
+      return;
+    }
+
+    if (usernameStatus !== "available") {
+      setError("Please choose a valid and available username.");
+      setLoading(false);
+      return;
+    }
 
     try {
       const res = await fetch("/api/auth/google/setup", {
@@ -124,148 +122,248 @@ export default function GoogleSetupPage() {
     }
   };
 
+  const Stepper = () => {
+    const steps = ["role", "details"];
+    const currentIndex = steps.indexOf(step);
+
+    return (
+      <div className="flex items-center justify-center mb-8 gap-2 sm:gap-3">
+        {steps.map((s, i) => {
+          const isActive = i === currentIndex;
+          const isCompleted = i < currentIndex;
+          const dotColor = isActive || isCompleted ? "bg-[#C9A96E]" : "bg-[#8E8E93] opacity-30";
+          const textColor = isActive || isCompleted ? "text-[#C9A96E]" : "text-[#8E8E93] opacity-50";
+          
+          return (
+            <div key={s} className="flex items-center gap-2 sm:gap-3">
+              <div className="flex items-center gap-1.5 sm:gap-2">
+                <div className={`w-1.5 h-1.5 sm:w-2 sm:h-2 rounded-full ${dotColor}`} />
+                <span className={`font-sans text-[10px] sm:text-[11px] uppercase tracking-[0.1em] font-medium ${textColor}`}>
+                  {s}
+                </span>
+              </div>
+              {i < steps.length - 1 && (
+                <div className={`w-4 sm:w-8 h-[1px] ${isCompleted ? "bg-[#C9A96E]" : "bg-[rgba(30,27,46,0.08)]"}`} />
+              )}
+            </div>
+          );
+        })}
+      </div>
+    );
+  };
+
   if (pageLoading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-white">
+      <div className="min-h-[100dvh] flex items-center justify-center bg-[#1E1B2E]">
         <div className="flex flex-col items-center gap-4">
-          <div className="w-16 h-16 border-4 border-black border-t-[#4F7DF3] rounded-full animate-spin" />
-          <p className="font-black text-lg uppercase">Loading...</p>
+          <Loader2 className="text-[#C9A96E] animate-spin" size={32} />
         </div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-[#f8f9fa] flex items-center justify-center px-4 py-16">
-      {/* Background grid */}
-      <div className="fixed inset-0 bg-[url('https://patterns.dev/img/grid.svg')] opacity-[0.04] pointer-events-none" />
+    <div className="relative min-h-[100dvh] flex flex-col lg:flex-row items-center justify-between p-6 lg:p-16 overflow-hidden">
+      
+      {/* Background Image with Dark Overlay */}
+      <motion.div 
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ duration: 0.5, ease: appleEase }}
+        className="absolute inset-0 z-0"
+      >
+        <div className="absolute inset-0 bg-[rgba(30,27,46,0.78)] z-10 backdrop-blur-[1px]" />
+        <div className="absolute inset-0 bg-[url('/images/about-origin.jpg')] bg-cover bg-center blur-[2px] scale-105" />
+      </motion.div>
 
-      <div className="relative z-10 w-full max-w-xl">
-        {/* Header card */}
-        <div className="bg-[#4F7DF3] border-4 border-black rounded-3xl p-8 shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] mb-8 text-white text-center">
-          <div className="flex items-center justify-center gap-3 mb-4">
-            <Sparkles size={32} />
-            <h1 className="text-4xl font-black uppercase tracking-tighter">Almost There!</h1>
-          </div>
-          {user?.image && (
-            <div className="w-20 h-20 rounded-full border-4 border-white mx-auto mb-4 overflow-hidden shadow-[4px_4px_0px_0px_rgba(0,0,0,0.3)] relative">
-              <Image src={user.image} alt="Profile" fill className="object-cover" />
-            </div>
-          )}
-          <p className="text-blue-100 font-bold text-lg">
-            Welcome, <span className="text-white">{user?.name?.split(" ")[0]}!</span> <br />
-            Google sign-in verified ✓ — Just complete your profile.
-          </p>
-        </div>
-
-        {/* Setup form */}
-        <form onSubmit={handleSubmit} className="bg-white border-4 border-black rounded-3xl p-8 shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] space-y-8">
-
-          {error && (
-            <div className="p-4 bg-red-50 border-2 border-red-500 rounded-xl text-red-700 font-bold flex items-center gap-2">
-              <XCircle size={18} className="shrink-0" />
-              {error}
-            </div>
-          )}
-
-          {/* Step 1 — Role */}
-          <div>
-            <Label className="font-black text-sm uppercase tracking-wider block mb-3">
-              ① Choose Your Role
-            </Label>
-            <div className="grid grid-cols-3 gap-3">
-              {roles.map((r) => {
-                const Icon = r.icon;
-                const isSelected = role === r.id;
-                return (
-                  <button
-                    key={r.id}
-                    type="button"
-                    onClick={() => setRole(r.id)}
-                    className={`p-4 rounded-2xl border-2 border-black flex flex-col items-center gap-2 transition-all duration-150 ${
-                      isSelected
-                        ? `${r.color} shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] -translate-y-1`
-                        : "bg-white hover:bg-gray-50 hover:-translate-y-0.5"
-                    }`}
-                  >
-                    <Icon size={28} />
-                    <span className="font-black text-sm">{r.name}</span>
-                    <span className="text-[10px] font-bold opacity-70">{r.desc}</span>
-                  </button>
-                );
-              })}
-            </div>
-          </div>
-
-          {/* Step 2 — Username */}
-          <div>
-            <Label className="font-black text-sm uppercase tracking-wider block mb-3">
-              ② Pick a Username
-              <span className="normal-case font-medium text-muted-foreground ml-2 text-xs">(used in chat & messages)</span>
-            </Label>
-            <div className="relative">
-              <AtSign size={18} className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" />
-              <Input
-                type="text"
-                placeholder="e.g. john_doe99"
-                value={username}
-                onChange={(e) => setUsername(e.target.value.toLowerCase())}
-                className="pl-9 pr-10 h-12 border-2 border-black font-bold text-base focus-visible:ring-[#4F7DF3]"
-                maxLength={20}
-                required
-              />
-              <div className="absolute right-3 top-1/2 -translate-y-1/2">
-                {usernameStatus === "checking" && <Loader2 size={18} className="animate-spin text-muted-foreground" />}
-                {usernameStatus === "available" && <CheckCircle2 size={18} className="text-[#34D399]" />}
-                {usernameStatus === "taken" && <XCircle size={18} className="text-red-500" />}
-                {usernameStatus === "invalid" && <XCircle size={18} className="text-orange-400" />}
-              </div>
-            </div>
-            <div className="mt-2 flex gap-4">
-              <p className={`text-[11px] font-bold ${username.length >= 3 ? "text-[#34D399]" : "text-muted-foreground opacity-50"}`}>• 3-20 characters</p>
-              <p className={`text-[11px] font-bold ${/^[a-z0-9_]*$/.test(username) && username ? "text-[#34D399]" : "text-muted-foreground opacity-50"}`}>• Lowercase, numbers, _</p>
-              {usernameStatus === "taken" && <p className="text-[11px] font-bold text-red-500">• Username taken!</p>}
-            </div>
-          </div>
-
-          {/* Step 3 — Child email (parent only) */}
-          {role === "parent" && (
-            <div className="animate-in fade-in slide-in-from-top-2 duration-300 p-5 bg-[#F9A8D4]/10 border-2 border-black border-dashed rounded-2xl space-y-3">
-              <Label className="font-black text-sm uppercase tracking-wider flex items-center gap-2">
-                <Baby size={16} /> ③ Link Your Child's Account
-              </Label>
-              <Input
-                type="email"
-                placeholder="Enter your child's Gmail"
-                value={childEmail}
-                onChange={(e) => setChildEmail(e.target.value)}
-                className="h-12 border-2 border-black font-bold bg-white"
-                required
-              />
-              <p className="text-[11px] font-bold text-muted-foreground">
-                Your child must already have a student account on Skill Sphere.
-              </p>
-            </div>
-          )}
-
-          {/* Submit */}
-          <Button
-            type="submit"
-            disabled={loading || usernameStatus === "taken" || usernameStatus === "invalid"}
-            className="w-full h-14 text-xl font-black bg-[#4F7DF3] text-white border-4 border-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:shadow-none hover:translate-x-1 hover:translate-y-1 transition-all uppercase"
-          >
-            {loading ? (
-              <><Loader2 className="mr-2 animate-spin" /> Setting up...</>
-            ) : (
-              <>Complete Setup <ArrowRight className="ml-2" /></>
-            )}
-          </Button>
-
-          <p className="text-center text-xs font-bold text-muted-foreground">
-            You can change these details anytime from your profile settings.
-          </p>
-        </form>
+      {/* TOP LEFT BACK BUTTON */}
+      <div className="absolute top-6 left-6 z-20">
+        <Link href="/" className="inline-flex items-center gap-2 font-sans text-[13px] text-white hover:text-[#C9A96E] transition-colors">
+          <ArrowLeft size={16} /> Back to Home
+        </Link>
       </div>
+
+      {/* LEFT SIDE - BRAND CONTENT */}
+      <motion.div 
+        initial={{ opacity: 0, x: -20 }}
+        animate={{ opacity: 1, x: 0 }}
+        transition={{ duration: 0.8, delay: 0.2, ease: appleEase }}
+        className="relative z-20 w-full lg:w-[45%] flex flex-col justify-center mt-12 lg:mt-0 mb-6 lg:mb-0"
+      >
+        <Link href="/" className="mb-4 lg:mb-8 w-max">
+          <span className="font-heading font-black text-[28px] tracking-tight text-white">
+            Skill Sphere.
+          </span>
+        </Link>
+        <motion.h1 
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.3 }}
+          className="font-heading text-[22px] lg:text-[32px] text-white leading-[1.1] mb-4 max-w-[400px]"
+        >
+          Education, crafted for how you think.
+        </motion.h1>
+        <motion.p
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.4 }}
+          className="font-sans text-[15px] text-[#F5F1EB] mb-8 lg:mb-12"
+        >
+          Join our community of learners shaping their future.
+        </motion.p>
+      </motion.div>
+
+      {/* RIGHT SIDE - FLOATING CARD */}
+      <motion.div 
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.6, delay: 0.3, ease: appleEase }}
+        className="relative z-20 w-full lg:w-[55%] max-w-[480px] bg-white rounded-[16px] shadow-[0_12px_40px_rgba(0,0,0,0.18)] p-[28px] flex flex-col mx-auto lg:mr-0 max-h-[85vh] overflow-y-auto"
+      >
+        <Stepper />
+
+        <AnimatePresence mode="wait">
+          {step === "role" && (
+            <motion.div 
+              key="role"
+              initial={{ opacity: 0, x: 20 }}
+              animate={{ opacity: 1, x: 0 }}
+              exit={{ opacity: 0, x: -20 }}
+              transition={{ duration: 0.3 }}
+              className="flex flex-col"
+            >
+              <div className="text-center mb-6">
+                {user?.image && (
+                  <div className="w-16 h-16 rounded-full border-2 border-white mx-auto mb-3 overflow-hidden shadow-[0_4px_14px_rgba(0,0,0,0.1)] relative">
+                    <Image src={user.image} alt="Profile" fill className="object-cover" />
+                  </div>
+                )}
+                <h2 className="font-heading text-[24px] text-[#1E1B2E] mb-1">Welcome, {user?.name?.split(" ")[0]}!</h2>
+                <p className="font-sans text-[14px] text-[#8E8E93]">Google verified ✓ Choose your path.</p>
+              </div>
+
+              <div className="space-y-3 mb-6">
+                {roles.map(r => {
+                  const isSelected = role === r.id;
+                  return (
+                    <motion.button
+                      key={r.id} type="button"
+                      whileHover={{ y: -2 }}
+                      onClick={() => setRole(r.id)}
+                      className={`w-full p-4 rounded-xl flex items-center gap-4 text-left transition-all ${
+                        isSelected 
+                          ? "border-2 border-[#C9A96E] bg-white shadow-[0_4px_14px_rgba(201,169,110,0.15)]" 
+                          : "border border-[rgba(30,27,46,0.08)] bg-white hover:border-[rgba(30,27,46,0.2)]"
+                      }`}
+                    >
+                      <div className={`w-10 h-10 rounded-full flex items-center justify-center shrink-0 transition-colors ${
+                        isSelected ? "bg-[#C9A96E] text-white" : "bg-[#F5F1EB] text-[#1E1B2E]"
+                      }`}>
+                        <r.icon size={20} />
+                      </div>
+                      <div>
+                        <h3 className="font-heading text-[18px] text-[#1E1B2E] mb-0.5">{r.name}</h3>
+                        <p className="font-sans text-[13px] text-[#8E8E93]">{r.desc}</p>
+                      </div>
+                    </motion.button>
+                  );
+                })}
+              </div>
+
+              <motion.button 
+                type="button" onClick={() => setStep("details")}
+                disabled={!role}
+                whileHover={role ? { scale: 1.01 } : {}}
+                whileTap={role ? { scale: 0.98 } : {}}
+                className={`w-full h-[48px] rounded-xl font-sans text-[16px] font-medium transition-colors ${
+                  role ? "bg-[#C9A96E] text-[#1E1B2E]" : "bg-[#F5F1EB] text-[#8E8E93] cursor-not-allowed"
+                }`}
+              >
+                Continue
+              </motion.button>
+            </motion.div>
+          )}
+
+          {step === "details" && (
+            <motion.div 
+              key="details"
+              initial={{ opacity: 0, x: 20 }}
+              animate={{ opacity: 1, x: 0 }}
+              exit={{ opacity: 0, x: -20 }}
+              transition={{ duration: 0.3 }}
+              className="flex flex-col"
+            >
+              <div className="text-center mb-6">
+                <h2 className="font-heading text-[24px] text-[#1E1B2E] mb-1">Final details</h2>
+                <p className="font-sans text-[14px] text-[#8E8E93]">Let's complete your profile.</p>
+              </div>
+
+              {error && <div className="p-2 mb-4 bg-red-50 text-red-600 border border-red-200 rounded-lg font-sans text-[13px] text-center">{error}</div>}
+
+              <form onSubmit={handleSubmit} className="space-y-5">
+                <div className="space-y-1">
+                  <Label className="font-sans text-[12px] uppercase tracking-[0.1em] text-[#8E8E93] flex items-center gap-1.5">
+                    Pick a Username <span className="normal-case tracking-normal text-[#C9A96E] ml-1">(used in chat)</span>
+                  </Label>
+                  <div className="relative">
+                    <AtSign size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-[#8E8E93]" />
+                    <Input
+                      type="text"
+                      placeholder="e.g. john_doe99"
+                      value={username}
+                      onChange={(e) => setUsername(e.target.value.toLowerCase())}
+                      className="pl-9 pr-10 h-[48px] bg-white border border-[rgba(30,27,46,0.08)] rounded-xl font-sans text-[15px] text-[#1E1B2E] placeholder:text-[#8E8E93] focus-visible:ring-0 focus-visible:border-[#C9A96E] focus-visible:shadow-[0_0_0_3px_rgba(201,169,110,0.15)] transition-all"
+                      maxLength={20}
+                      required
+                    />
+                    <div className="absolute right-3 top-1/2 -translate-y-1/2">
+                      {usernameStatus === "checking" && <Loader2 size={16} className="animate-spin text-[#8E8E93]" />}
+                      {usernameStatus === "available" && <CheckCircle2 size={16} className="text-green-500" />}
+                      {usernameStatus === "taken" && <XCircle size={16} className="text-red-500" />}
+                      {usernameStatus === "invalid" && <XCircle size={16} className="text-orange-400" />}
+                    </div>
+                  </div>
+                  <div className="flex gap-4 pt-1">
+                    <p className={`text-[10px] uppercase tracking-[0.05em] font-bold ${username.length >= 3 ? "text-green-500" : "text-[#8E8E93] opacity-50"}`}>• 3-20 chars</p>
+                    <p className={`text-[10px] uppercase tracking-[0.05em] font-bold ${/^[a-z0-9_]*$/.test(username) && username ? "text-green-500" : "text-[#8E8E93] opacity-50"}`}>• a-z, 0-9, _</p>
+                    {usernameStatus === "taken" && <p className="text-[10px] uppercase tracking-[0.05em] font-bold text-red-500">• Taken!</p>}
+                  </div>
+                </div>
+
+                {role === "parent" && (
+                  <div className="space-y-1 pt-2">
+                    <Label className="font-sans text-[12px] uppercase tracking-[0.1em] text-[#8E8E93] flex items-center gap-1.5">
+                      <Baby size={14} /> Link Your Child's Account
+                    </Label>
+                    <Input
+                      type="email"
+                      placeholder="Enter your child's Gmail"
+                      value={childEmail}
+                      onChange={(e) => setChildEmail(e.target.value)}
+                      className="h-[48px] bg-white border border-[rgba(30,27,46,0.08)] rounded-xl font-sans text-[15px] text-[#1E1B2E] placeholder:text-[#8E8E93] focus-visible:ring-0 focus-visible:border-[#C9A96E] focus-visible:shadow-[0_0_0_3px_rgba(201,169,110,0.15)] transition-all px-4"
+                      required
+                    />
+                    <p className="text-[11px] text-[#8E8E93] mt-1">Your child must already have a student account on Skill Sphere.</p>
+                  </div>
+                )}
+
+                <div className="flex gap-3 pt-4">
+                  <Button variant="ghost" type="button" onClick={() => setStep("role")} className="text-[#8E8E93] hover:text-[#1E1B2E]">Back</Button>
+                  <motion.button 
+                    type="submit" disabled={loading || usernameStatus === "taken" || usernameStatus === "invalid"}
+                    whileHover={{ scale: 1.01 }}
+                    whileTap={{ scale: 0.98 }}
+                    className="flex-1 h-[48px] bg-[#C9A96E] text-[#1E1B2E] rounded-xl font-sans text-[16px] font-medium flex items-center justify-center disabled:opacity-50 disabled:cursor-not-allowed"
+                  >
+                    {loading ? <Loader2 className="mr-2 animate-spin" size={16} /> : null}
+                    Complete Setup
+                  </motion.button>
+                </div>
+              </form>
+            </motion.div>
+          )}
+        </AnimatePresence>
+      </motion.div>
     </div>
   );
 }

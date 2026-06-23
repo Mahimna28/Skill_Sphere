@@ -8,16 +8,16 @@ const buttonVariants = cva(
   {
     variants: {
       variant: {
-        default: "bg-primary text-primary-foreground hover:bg-primary/90 neo-brutalism",
+        default: "bg-accent text-white hover:bg-[#b0935d] shadow-sm transition-colors",
         outline:
-          "border-2 border-black bg-background hover:bg-accent hover:text-accent-foreground aria-expanded:bg-muted aria-expanded:text-foreground dark:border-input dark:bg-input/30 dark:hover:bg-input/50 neo-brutalism",
+          "border-2 border-accent text-accent bg-transparent hover:bg-accent hover:text-white shadow-sm transition-colors",
         secondary:
-          "bg-secondary text-secondary-foreground hover:bg-secondary/80 aria-expanded:bg-secondary aria-expanded:text-secondary-foreground neo-brutalism",
+          "bg-primary text-white hover:bg-[#2a2640] shadow-sm transition-colors",
         ghost:
-          "hover:bg-muted hover:text-foreground aria-expanded:bg-muted aria-expanded:text-foreground dark:hover:bg-muted/50",
+          "hover:bg-muted hover:text-foreground aria-expanded:bg-muted aria-expanded:text-foreground",
         destructive:
-          "bg-destructive text-destructive-foreground hover:bg-destructive/90 focus-visible:border-destructive/40 focus-visible:ring-destructive/20 dark:bg-destructive/20 dark:hover:bg-destructive/30 dark:focus-visible:ring-destructive/40 neo-brutalism",
-        link: "text-primary underline-offset-4 hover:underline",
+          "bg-destructive text-destructive-foreground hover:bg-destructive/90 shadow-sm",
+        link: "text-accent underline-offset-4 hover:underline",
       },
       size: {
         default:

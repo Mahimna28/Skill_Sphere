@@ -1,0 +1,284 @@
+"use client";
+
+import { useState } from "react";
+import { motion, useScroll, useTransform } from "framer-motion";
+import { ArrowRight } from "lucide-react";
+import Image from "next/image";
+import Link from "next/link";
+import { cn } from "@/lib/utils";
+
+const appleEase = [0.4, 0, 0.2, 1];
+
+interface Article {
+  id: string;
+  title: string;
+  excerpt: string;
+  category: string;
+  thumbnail: string;
+  author: {
+    name: string;
+    avatar: string;
+  };
+  date: string;
+  readTime: string;
+}
+
+const MOCK_ARTICLES: Article[] = [];
+
+export default function BlogPageClient() {
+  const [selectedCategory, setSelectedCategory] = useState("All");
+  const { scrollY } = useScroll();
+  const yParallax = useTransform(scrollY, [0, 800], [0, 100]);
+
+  const categories = ["All", "Learning Science", "Product Updates", "Student Stories", "Industry Trends"];
+  const featuredArticle = MOCK_ARTICLES.length > 0 ? MOCK_ARTICLES[0] : null;
+  const gridArticles = MOCK_ARTICLES.length > 1 ? MOCK_ARTICLES.slice(1) : [];
+
+  const filteredArticles = selectedCategory === "All" 
+    ? gridArticles 
+    : gridArticles.filter(a => a.category === selectedCategory);
+
+  return (
+    <div className="flex flex-col bg-[#F5F1EB] min-h-screen">
+      
+      {/* 1. PAGE HEADER — EDITORIAL MASTHEAD */}
+      <section className="pt-[140px] pb-[60px] bg-[#F5F1EB]">
+        <div className="max-w-7xl mx-auto px-4 md:px-8 flex flex-col items-center text-center">
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ duration: 0.8, ease: appleEase }}
+            className="mb-6"
+          >
+            <span className="font-sans text-[12px] uppercase tracking-[0.2em] text-[#C9A96E]">
+              Insights
+            </span>
+          </motion.div>
+          
+          <motion.h1
+            initial={{ opacity: 0, y: 30 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8, delay: 0.1, ease: appleEase }}
+            className="font-heading font-bold text-[32px] md:text-[56px] text-[#1E1B2E] leading-[0.95] max-w-[700px] mb-4"
+          >
+            Thoughts on learning, teaching, and growth.
+          </motion.h1>
+
+          <motion.p
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8, delay: 0.15, ease: appleEase }}
+            className="font-sans text-[18px] text-[#8E8E93] leading-[1.5] max-w-[560px]"
+          >
+            Deep dives into pedagogical science, platform updates, and stories from our community.
+          </motion.p>
+        </div>
+      </section>
+
+      {/* 2. FEATURED ARTICLE — HERO POST */}
+      {featuredArticle && (
+      <section className="pb-[40px] bg-[#F5F1EB]">
+        <div className="max-w-7xl mx-auto px-4 md:px-8">
+          <div className="flex flex-col lg:flex-row gap-8 lg:gap-0 group cursor-pointer">
+            
+            {/* Left Image */}
+            <motion.div 
+              initial={{ opacity: 0, x: -40 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ duration: 0.8, ease: appleEase }}
+              className="w-full lg:w-[55%] relative rounded-[16px] overflow-hidden shadow-[0_8px_32px_rgba(30,27,46,0.08)] aspect-[16/9] lg:aspect-auto lg:h-[500px]"
+            >
+              <motion.div style={{ y: yParallax }} className="absolute inset-0 -top-[100px] -bottom-[100px]">
+                <Image 
+                  src={featuredArticle.thumbnail} 
+                  alt={featuredArticle.title} 
+                  fill 
+                  className="object-cover transition-transform duration-700 ease-out group-hover:scale-[1.03]"
+                  priority
+                />
+              </motion.div>
+            </motion.div>
+
+            {/* Right Content */}
+            <motion.div 
+              initial={{ opacity: 0, x: 40 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ duration: 0.8, delay: 0.2, ease: appleEase }}
+              className="w-full lg:w-[45%] flex flex-col justify-center lg:pl-12 py-6"
+            >
+              <span className="font-sans text-[11px] uppercase tracking-[0.1em] text-[#C9A96E] mb-4 block">
+                Featured Essay
+              </span>
+              <h2 className="font-heading text-[28px] md:text-[32px] text-[#1E1B2E] leading-[1.1] mb-4 group-hover:text-[#C9A96E] transition-colors duration-300">
+                {featuredArticle.title}
+              </h2>
+              <p className="font-sans text-[16px] text-[#8E8E93] leading-[1.6] mb-8 line-clamp-3">
+                {featuredArticle.excerpt}
+              </p>
+              
+              <div className="flex items-center gap-3 mb-8">
+                <div className="relative w-9 h-9 rounded-full overflow-hidden shrink-0">
+                  <Image src={featuredArticle.author.avatar} alt={featuredArticle.author.name} fill className="object-cover" />
+                </div>
+                <div className="flex items-center flex-wrap gap-2 font-sans text-[14px]">
+                  <span className="text-[#1E1B2E] font-medium">{featuredArticle.author.name}</span>
+                  <span className="text-[#8E8E93]">&middot;</span>
+                  <span className="text-[#8E8E93]">{featuredArticle.date}</span>
+                  <span className="text-[#8E8E93]">&middot;</span>
+                  <span className="text-[#8E8E93]">{featuredArticle.readTime}</span>
+                </div>
+              </div>
+
+              <div className="inline-flex items-center font-sans text-[14px] text-[#C9A96E] font-medium transition-colors group-hover:text-[#1E1B2E]">
+                Read Article <ArrowRight size={16} className="ml-1 transition-transform group-hover:translate-x-1.5" />
+              </div>
+            </motion.div>
+
+          </div>
+        </div>
+      </section>
+      )}
+
+      {/* 3. CATEGORY FILTERS */}
+      <motion.div 
+        initial={{ opacity: 0, y: -10 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.6, delay: 0.5, ease: appleEase }}
+        className="sticky top-[72px] z-40 bg-[#F5F1EB]/90 backdrop-blur-md border-b border-[rgba(30,27,46,0.08)] py-4"
+      >
+        <div className="max-w-7xl mx-auto px-4 md:px-8">
+          <div className="flex overflow-x-auto scrollbar-none gap-3 items-center pb-1">
+            {categories.map((cat) => (
+              <button
+                key={cat}
+                onClick={() => setSelectedCategory(cat)}
+                className={cn(
+                  "whitespace-nowrap px-5 py-2 rounded-full font-sans text-[14px] transition-all duration-300",
+                  selectedCategory === cat 
+                  ? "bg-[#1E1B2E] text-white shadow-md" 
+                  : "bg-white text-[#1E1B2E] border border-[rgba(30,27,46,0.08)] hover:shadow-[0_2px_8px_rgba(30,27,46,0.05)] hover:-translate-y-0.5"
+                )}
+              >
+                {cat}
+              </button>
+            ))}
+          </div>
+        </div>
+      </motion.div>
+
+      {/* 4. ARTICLE GRID */}
+      <section className="py-[60px] flex-1">
+        <div className="max-w-7xl mx-auto px-4 md:px-8">
+          {filteredArticles.length > 0 ? (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+              {filteredArticles.map((article, idx) => (
+                <motion.div
+                  key={article.id}
+                  initial={{ opacity: 0, y: 40 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true, margin: "-50px" }}
+                  transition={{ duration: 0.7, delay: idx * 0.1, ease: appleEase }}
+                >
+                  <Link href={`/blog/${article.id}`} className="block h-full group">
+                    <motion.div 
+                      whileHover={{ y: -6, boxShadow: "0 12px 40px rgba(30,27,46,0.12)" }}
+                      transition={{ type: "spring", stiffness: 300, damping: 20 }}
+                      className="bg-white rounded-[16px] overflow-hidden h-full flex flex-col shadow-[0_4px_20px_rgba(30,27,46,0.04)]"
+                    >
+                      {/* Image Top */}
+                      <div className="w-full aspect-[16/9] relative overflow-hidden bg-[#1E1B2E]">
+                        <Image 
+                          src={article.thumbnail} 
+                          alt={article.title} 
+                          fill 
+                          sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+                          className="object-cover transition-transform duration-700 ease-out group-hover:scale-105"
+                        />
+                        <div className="absolute top-4 right-4 bg-[#C9A96E] text-[#1E1B2E] px-3 py-1 rounded-full font-sans font-bold text-[11px] uppercase tracking-[0.1em] shadow-md">
+                          {article.category}
+                        </div>
+                      </div>
+
+                      {/* Content Bottom */}
+                      <div className="p-7 flex flex-col flex-1">
+                        <h3 className="font-heading text-[20px] text-[#1E1B2E] mb-3 leading-[1.2] group-hover:text-[#C9A96E] transition-colors line-clamp-2">
+                          {article.title}
+                        </h3>
+                        
+                        <p className="font-sans text-[14px] text-[#8E8E93] leading-[1.6] mb-6 line-clamp-2 flex-1">
+                          {article.excerpt}
+                        </p>
+
+                        <div className="flex items-center gap-3 mt-auto pt-5 border-t border-[rgba(30,27,46,0.06)]">
+                          <div className="relative w-7 h-7 rounded-full overflow-hidden shrink-0">
+                            <Image src={article.author.avatar} alt={article.author.name} fill className="object-cover" />
+                          </div>
+                          <div className="flex flex-col gap-0.5">
+                            <span className="font-sans text-[13px] text-[#1E1B2E] font-medium leading-none">{article.author.name}</span>
+                            <div className="flex items-center gap-1 font-sans text-[12px] text-[#8E8E93] leading-none">
+                              <span>{article.date}</span>
+                              <span>&middot;</span>
+                              <span>{article.readTime}</span>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </motion.div>
+                  </Link>
+                </motion.div>
+              ))}
+            </div>
+          ) : (
+            <div className="py-32 flex flex-col items-center text-center">
+              <h3 className="font-heading text-[24px] text-[#1E1B2E] mb-3">No articles found</h3>
+              <p className="font-sans text-[16px] text-[#8E8E93] mb-8">
+                We haven't published anything in this category yet.
+              </p>
+              <button 
+                onClick={() => setSelectedCategory("All")}
+                className="text-[#C9A96E] font-sans text-[15px] font-medium hover:text-[#1E1B2E] transition-colors duration-300 border-b border-transparent hover:border-[#1E1B2E]"
+              >
+                Clear filter
+              </button>
+            </div>
+          )}
+        </div>
+      </section>
+
+      {/* 5. NEWSLETTER CTA */}
+      <section className="py-[120px] bg-[#1E1B2E] text-center">
+        <div className="max-w-2xl mx-auto px-4">
+          <motion.div
+            initial={{ opacity: 0, y: 30 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.8, ease: appleEase }}
+          >
+            <h2 className="font-heading font-black text-[36px] text-white mb-4">
+              Stay curious.
+            </h2>
+            <p className="font-sans text-[16px] text-[#F5F1EB] mb-10 font-light opacity-90">
+              Join 40,000+ educators and learners receiving our weekly insights.
+            </p>
+            <div className="flex flex-col sm:flex-row gap-4 justify-center relative">
+              <input 
+                type="email" 
+                placeholder="Enter your email" 
+                className="w-full h-[56px] bg-transparent border-0 border-b border-white/20 px-4 font-sans text-[16px] text-white placeholder-white/50 focus:border-[#C9A96E] focus:ring-0 focus:outline-none transition-colors"
+              />
+              <motion.button 
+                whileHover={{ scale: 1.02 }}
+                whileTap={{ scale: 0.98 }}
+                transition={{ type: "spring", stiffness: 400, damping: 25 }}
+                className="w-full sm:w-auto shrink-0 bg-[#C9A96E] text-[#1E1B2E] font-sans font-medium text-[16px] rounded-full px-8 h-[56px]"
+              >
+                Subscribe
+              </motion.button>
+            </div>
+          </motion.div>
+        </div>
+      </section>
+
+    </div>
+  );
+}

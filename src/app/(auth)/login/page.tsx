@@ -6,7 +6,10 @@ import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Mail, Key, Loader2, ShieldCheck, ArrowLeft, Eye, EyeOff } from "lucide-react";
+import { Loader2, ArrowLeft, ShieldCheck, Eye, EyeOff } from "lucide-react";
+import { motion, AnimatePresence } from "framer-motion";
+
+const appleEase = [0.4, 0, 0.2, 1];
 
 function LoginContent() {
   const router = useRouter();
@@ -21,7 +24,6 @@ function LoginContent() {
   const [googleLoading, setGoogleLoading] = useState(false);
   const [step, setStep] = useState<"credentials" | "otp">("credentials");
 
-  // Show error from Google OAuth callback if any
   useEffect(() => {
     const oauthError = searchParams.get("error");
     const errorMessages: Record<string, string> = {
@@ -47,7 +49,6 @@ function LoginContent() {
     setMessage("");
 
     try {
-      // 1. Verify Credentials
       const res = await fetch("/api/auth/login", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -57,7 +58,6 @@ function LoginContent() {
       const data = await res.json();
 
       if (res.ok) {
-        // 2. Send OTP
         const otpRes = await fetch("/api/auth/otp/send", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
@@ -105,129 +105,193 @@ function LoginContent() {
     }
   };
 
-  const demoLogin = (role: string) => {
-    setEmail(`${role}@demo.com`);
-    setPassword("password123");
-  };
-
   return (
-    <div className="min-h-screen grid grid-cols-1 lg:grid-cols-2">
-      <div className="flex flex-col justify-center px-6 sm:px-10 lg:px-24 bg-white border-r-0 lg:border-r-4 border-black relative py-12">
-        <Link href="/" className="absolute top-6 left-6 text-base font-black">SKILL SPHERE</Link>
-        <div className="max-w-md w-full mx-auto mt-8">
-          {step === "credentials" ? (
-            <>
-              <h2 className="text-4xl font-black mb-2">Welcome Back</h2>
-              <p className="text-muted-foreground mb-8 font-medium">Enter your credentials to receive a login code.</p>
+    <div className="relative min-h-[100dvh] flex flex-col lg:flex-row items-center justify-between p-6 lg:p-16 overflow-hidden">
+      
+      {/* Background Image with Dark Overlay */}
+      <motion.div 
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ duration: 0.5, ease: appleEase }}
+        className="absolute inset-0 z-0"
+      >
+        <div className="absolute inset-0 bg-[rgba(30,27,46,0.75)] z-10 backdrop-blur-[1px]" />
+        <div className="absolute inset-0 bg-[url('/images/hero-workspace.jpg')] bg-cover bg-center blur-[2px] scale-105" />
+      </motion.div>
 
-              {error && <div className="p-3 mb-6 bg-red-100 border-2 border-red-500 rounded-lg text-red-700 font-bold">{error}</div>}
+      {/* TOP LEFT BACK BUTTON */}
+      <div className="absolute top-6 left-6 z-20">
+        <Link href="/" className="inline-flex items-center gap-2 font-sans text-[13px] text-white hover:text-[#C9A96E] transition-colors">
+          <ArrowLeft size={16} /> Back to Home
+        </Link>
+      </div>
 
-              {/* ── Google Sign In ── */}
-              <Button
-                type="button"
-                onClick={handleGoogleLogin}
-                disabled={googleLoading}
-                className="w-full h-12 mb-6 bg-white text-black border-4 border-black font-black text-base shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:shadow-none hover:translate-x-1 hover:translate-y-1 transition-all flex items-center justify-center gap-3"
+      {/* LEFT SIDE - BRAND CONTENT */}
+      <motion.div 
+        initial={{ opacity: 0, x: -20 }}
+        animate={{ opacity: 1, x: 0 }}
+        transition={{ duration: 0.8, delay: 0.2, ease: appleEase }}
+        className="relative z-20 w-full lg:w-[55%] flex flex-col justify-center mt-12 lg:mt-0 mb-6 lg:mb-0"
+      >
+        <Link href="/" className="mb-4 lg:mb-8 w-max">
+          <span className="font-heading font-black text-[28px] tracking-tight text-white">
+            Skill Sphere.
+          </span>
+        </Link>
+        <motion.h1 
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.3 }}
+          className="font-heading text-[22px] lg:text-[32px] text-white leading-[1.1] mb-4 max-w-[400px]"
+        >
+          Education, crafted for how you think.
+        </motion.h1>
+        <motion.p
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.4 }}
+          className="font-sans text-[15px] text-[#F5F1EB] mb-8 lg:mb-12"
+        >
+          Join our community of learners shaping their future.
+        </motion.p>
+      </motion.div>
+
+      {/* RIGHT SIDE - FLOATING CARD */}
+      <motion.div 
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.6, delay: 0.3, ease: appleEase }}
+        className="relative z-20 w-full lg:w-[45%] max-w-[420px] bg-white rounded-[16px] shadow-[0_12px_40px_rgba(0,0,0,0.2)] p-[32px] flex flex-col mx-auto lg:mr-0 max-h-[85vh] overflow-y-auto"
+      >
+        <AnimatePresence mode="wait">
+          {step === "credentials" && (
+            <motion.div 
+              key="credentials"
+              initial={{ opacity: 0, x: 20 }}
+              animate={{ opacity: 1, x: 0 }}
+              exit={{ opacity: 0, x: -20 }}
+              transition={{ duration: 0.3 }}
+              className="flex flex-col"
+            >
+              <div className="text-center mb-6">
+                <h2 className="font-heading text-[24px] text-[#1E1B2E] mb-1">Welcome back</h2>
+                <p className="font-sans text-[14px] text-[#8E8E93]">Enter your credentials to sign in.</p>
+              </div>
+
+              {error && <div className="p-2 mb-4 bg-red-50 text-red-600 border border-red-200 rounded-lg font-sans text-[13px] text-center">{error}</div>}
+
+              <form onSubmit={handleCredentialsSubmit} className="space-y-4">
+                <div className="space-y-1">
+                  <Label className="font-sans text-[12px] uppercase tracking-[0.1em] text-[#8E8E93]">Email Address</Label>
+                  <Input 
+                    type="email" required className="h-[48px] bg-white border border-[rgba(30,27,46,0.08)] rounded-xl font-sans text-[15px] text-[#1E1B2E] placeholder:text-[#8E8E93] focus-visible:ring-0 focus-visible:border-[#C9A96E] focus-visible:shadow-[0_0_0_3px_rgba(201,169,110,0.15)] transition-all px-4" 
+                    placeholder="you@example.com" value={email} onChange={e => setEmail(e.target.value)}
+                  />
+                </div>
+                
+                <div className="space-y-1">
+                  <div className="flex justify-between items-center">
+                    <Label className="font-sans text-[12px] uppercase tracking-[0.1em] text-[#8E8E93]">Password</Label>
+                    <Link href="/forgot-password" className="text-[11px] font-medium text-[#8E8E93] hover:text-[#1E1B2E] transition-colors">
+                      Forgot Password?
+                    </Link>
+                  </div>
+                  <div className="relative">
+                    <Input 
+                      type={showPassword ? "text" : "password"} required 
+                      className="h-[48px] bg-white border border-[rgba(30,27,46,0.08)] rounded-xl font-sans text-[15px] text-[#1E1B2E] placeholder:text-[#8E8E93] focus-visible:ring-0 focus-visible:border-[#C9A96E] focus-visible:shadow-[0_0_0_3px_rgba(201,169,110,0.15)] transition-all px-4 pr-10" 
+                      placeholder="••••••••" value={password} onChange={e => setPassword(e.target.value)}
+                    />
+                    <button 
+                      type="button" 
+                      onClick={() => setShowPassword(!showPassword)} 
+                      className="absolute right-3 top-1/2 -translate-y-1/2 text-[#8E8E93] hover:text-[#1E1B2E] transition-colors"
+                    >
+                      {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
+                    </button>
+                  </div>
+                </div>
+
+                <motion.button 
+                  type="submit" disabled={loading}
+                  whileHover={{ scale: 1.01 }}
+                  whileTap={{ scale: 0.98 }}
+                  className="w-full h-[48px] bg-[#C9A96E] text-[#1E1B2E] rounded-xl font-sans text-[16px] font-medium mt-4 flex items-center justify-center shadow-md hover:bg-[#b0935d] transition-colors"
+                >
+                  {loading ? <Loader2 className="mr-2 animate-spin" size={16} /> : null}
+                  Sign In
+                </motion.button>
+              </form>
+
+              {/* SOCIAL LOGINS */}
+              <div className="relative flex items-center gap-3 my-5">
+                <div className="flex-1 h-[1px] bg-[rgba(30,27,46,0.08)]" />
+                <span className="font-sans text-[12px] text-[#8E8E93]">or continue with</span>
+                <div className="flex-1 h-[1px] bg-[rgba(30,27,46,0.08)]" />
+              </div>
+
+              <button
+                type="button" onClick={handleGoogleLogin} disabled={googleLoading}
+                className="w-full h-[44px] bg-white border border-[rgba(30,27,46,0.08)] hover:border-[rgba(30,27,46,0.2)] rounded-xl font-sans text-[14px] text-[#1E1B2E] flex items-center justify-center gap-2 transition-colors"
               >
-                {googleLoading ? (
-                  <Loader2 size={20} className="animate-spin" />
-                ) : (
-                  <svg viewBox="0 0 24 24" width="20" height="20" xmlns="http://www.w3.org/2000/svg">
+                {googleLoading ? <Loader2 size={16} className="animate-spin text-[#8E8E93]" /> : (
+                  <svg viewBox="0 0 24 24" width="16" height="16" xmlns="http://www.w3.org/2000/svg">
                     <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/>
                     <path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/>
                     <path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l3.66-2.84z" fill="#FBBC05"/>
                     <path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/>
                   </svg>
                 )}
-                Continue with Google
-              </Button>
-
-              {/* ── Divider ── */}
-              <div className="relative flex items-center gap-3 mb-6">
-                <div className="flex-1 h-0.5 bg-black/10" />
-                <span className="text-xs font-black uppercase text-muted-foreground tracking-widest">or</span>
-                <div className="flex-1 h-0.5 bg-black/10" />
-              </div>
-
-              <form onSubmit={handleCredentialsSubmit} className="space-y-6">
-                <div className="space-y-2">
-                  <Label className="font-bold">Email</Label>
-                  <Input 
-                    type="email" required className="neo-brutalism-static h-11" 
-                    placeholder="name@example.com" value={email} onChange={e => setEmail(e.target.value)}
-                  />
-                </div>
-                <div className="space-y-2">
-                  <Label className="font-bold">Password</Label>
-                  <div className="relative">
-                    <Input 
-                      type={showPassword ? "text" : "password"} required className="neo-brutalism-static h-11 pr-10" 
-                      placeholder="••••••••" value={password} onChange={e => setPassword(e.target.value)}
-                    />
-                    <button 
-                      type="button" 
-                      onClick={() => setShowPassword(!showPassword)} 
-                      className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-black"
-                    >
-                      {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
-                    </button>
-                  </div>
-                  <div className="flex justify-end">
-                    <Link href="/forgot-password" className="text-[10px] font-black uppercase text-muted-foreground hover:text-primary transition-colors">
-                      Forgot Password?
-                    </Link>
-                  </div>
-                </div>
-                <Button type="submit" className="w-full h-12 text-lg font-bold neo-brutalism" disabled={loading}>
-                  {loading ? <><Loader2 className="mr-2 animate-spin" /> Verifying...</> : "Sign In & Send OTP"}
-                </Button>
-              </form>
-
-              {/* Demo access removed for production readiness */}
-            </>
-          ) : (
-            <div className="animate-in slide-in-from-right-4 duration-300">
-              <button onClick={() => setStep("credentials")} className="flex items-center gap-2 text-sm font-bold mb-6 hover:text-primary transition-colors">
-                <ArrowLeft size={16} /> Back to Login
+                Google
               </button>
-              <h2 className="text-4xl font-black mb-2">Check Your Email</h2>
-              <p className="text-muted-foreground mb-8 font-medium">We sent a 6-digit code to <b>{email}</b></p>
 
-              {error && <div className="p-3 mb-6 bg-red-100 border-2 border-red-500 rounded-lg text-red-700 font-bold">{error}</div>}
-              {message && <div className="p-3 mb-6 bg-green-100 border-2 border-green-500 rounded-lg text-green-700 font-bold">{message}</div>}
+              <p className="mt-8 text-center font-sans text-[14px] text-[#8E8E93]">
+                Don't have an account? <Link href="/register" className="text-[#C9A96E] hover:underline transition-colors font-medium">Join Free</Link>
+              </p>
+            </motion.div>
+          )}
+
+          {step === "otp" && (
+            <motion.div 
+              key="otp"
+              initial={{ opacity: 0, x: 20 }}
+              animate={{ opacity: 1, x: 0 }}
+              className="flex flex-col"
+            >
+              <button onClick={() => setStep("credentials")} className="inline-flex items-center gap-2 font-sans text-[13px] text-[#8E8E93] hover:text-[#C9A96E] transition-colors mb-6 self-start">
+                <ArrowLeft size={16} /> Back to Sign In
+              </button>
+              <h2 className="font-heading text-[28px] text-[#1E1B2E] leading-[0.95] mb-2 text-center">Check Your Email</h2>
+              <p className="font-sans text-[14px] text-[#8E8E93] mb-6 text-center">We sent a 6-digit code to <b>{email}</b></p>
+
+              {error && <div className="p-3 mb-5 bg-red-50 text-red-600 border border-red-200 rounded-xl font-sans text-sm text-center">{error}</div>}
+              {message && <div className="p-3 mb-5 bg-[#F5F1EB] text-[#C9A96E] border border-[#C9A96E]/30 rounded-xl font-sans text-sm text-center">{message}</div>}
 
               <form onSubmit={handleVerifyOtp} className="space-y-6">
                 <div className="space-y-2">
-                  <Label className="font-bold text-center block">Verification Code</Label>
+                  <Label className="font-sans text-[12px] uppercase tracking-[0.05em] text-[#1E1B2E] text-center block">6-Digit Code</Label>
                   <Input 
                     type="text" maxLength={6} required autoFocus
-                    className="neo-brutalism-static text-center text-3xl font-black tracking-[0.5em] h-14" 
+                    className="h-[56px] bg-white border border-[rgba(30,27,46,0.08)] rounded-xl text-center font-heading text-[28px] tracking-[0.2em] text-[#1E1B2E] focus-visible:ring-0 focus-visible:border-[#C9A96E] focus-visible:shadow-[0_0_0_3px_rgba(201,169,110,0.15)] transition-all duration-200" 
                     placeholder="000000" value={otpCode} onChange={e => setOtpCode(e.target.value)}
                   />
                 </div>
-                <Button type="submit" className="w-full h-12 text-lg font-bold neo-brutalism bg-secondary text-black" disabled={loading}>
-                  {loading ? <><Loader2 className="mr-2 animate-spin" /> Verifying...</> : <><ShieldCheck className="mr-2" /> Complete Login</>}
-                </Button>
+                
+                <motion.button 
+                  type="submit" disabled={loading}
+                  whileHover={{ scale: 1.01, boxShadow: "0 8px 24px rgba(30,27,46,0.12)" }}
+                  whileTap={{ scale: 0.98 }}
+                  transition={{ duration: 0.3 }}
+                  className="w-full h-[48px] bg-[#1E1B2E] text-white rounded-xl font-sans text-[15px] font-medium flex items-center justify-center shadow-[0_4px_14px_rgba(30,27,46,0.08)]"
+                >
+                  {loading ? <Loader2 className="mr-2 animate-spin" size={18} /> : <ShieldCheck className="mr-2" size={18} />}
+                  Complete Login
+                </motion.button>
               </form>
-            </div>
+            </motion.div>
           )}
-
-          <p className="mt-8 text-center text-sm font-medium">
-            Don't have an account? <Link href="/register" className="text-primary hover:underline font-bold">Sign up</Link>
-          </p>
-        </div>
-      </div>
-
-      <div className="hidden lg:flex flex-col justify-center items-center bg-primary p-12">
-        <div className="max-w-lg text-center text-white">
-          <div className="w-full aspect-square bg-white border-4 border-black rounded-3xl shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] mb-12 flex items-center justify-center relative">
-             <div className="absolute inset-0 bg-[url('https://patterns.dev/img/grid.svg')] opacity-20"></div>
-             <div className="bg-accent text-black font-black text-4xl p-6 border-4 border-black rounded-2xl shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] rotate-[-5deg] animate-pulse">2-Step Secure Login</div>
-          </div>
-          <h3 className="text-3xl font-black mb-4">Highly Secure Platform</h3>
-          <p className="text-lg font-medium text-blue-100">Your security is our priority. Every login is verified with a one-time code sent to your Gmail.</p>
-        </div>
-      </div>
+        </AnimatePresence>
+      </motion.div>
     </div>
   );
 }
@@ -235,10 +299,10 @@ function LoginContent() {
 export default function LoginPage() {
   return (
     <Suspense fallback={
-      <div className="min-h-screen flex items-center justify-center bg-white">
+      <div className="min-h-screen flex items-center justify-center bg-[#F5F1EB]">
         <div className="flex flex-col items-center gap-4">
-          <div className="w-12 h-12 border-4 border-black border-t-[#4F7DF3] rounded-full animate-spin" />
-          <p className="font-black text-sm uppercase">Loading...</p>
+          <div className="w-12 h-12 border-4 border-[rgba(30,27,46,0.1)] border-t-[#C9A96E] rounded-full animate-spin" />
+          <p className="font-sans font-medium text-[13px] uppercase tracking-[0.1em] text-[#1E1B2E]">Loading...</p>
         </div>
       </div>
     }>

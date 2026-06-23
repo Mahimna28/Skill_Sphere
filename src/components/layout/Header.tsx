@@ -1,15 +1,16 @@
 "use client";
 
 import Link from "next/link";
-import Image from "next/image";
 import { Button } from "@/components/ui/button";
-import { Home, Menu, X } from "lucide-react";
+import { Home, Menu, X, BookOpen, Sparkles, Newspaper, Info } from "lucide-react";
 import { useState, useEffect } from "react";
 import { usePathname } from "next/navigation";
+import { cn } from "@/lib/utils";
 
 export function Header() {
   const [userRole, setUserRole] = useState<string | null>(null);
   const [menuOpen, setMenuOpen] = useState(false);
+  const [scrolled, setScrolled] = useState(false);
   const pathname = usePathname();
 
   useEffect(() => { setMenuOpen(false); }, [pathname]);
@@ -27,89 +28,134 @@ export function Header() {
     fetchUser();
   }, []);
 
+  useEffect(() => {
+    const handleScroll = () => {
+      setScrolled(window.scrollY > 100);
+    };
+    window.addEventListener("scroll", handleScroll);
+    handleScroll();
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
+
   const dashboardPath = ["superadmin", "institute_admin"].includes(userRole ?? "")
     ? "/dashboard/admin"
     : `/dashboard/${userRole}`;
 
+  const isHome = pathname === "/";
+  const isTransparent = isHome && !scrolled && !menuOpen;
+
   return (
-    <header className="border-b-4 border-black bg-white sticky top-0 z-50">
-      <div className="max-w-7xl mx-auto px-4 h-16 md:h-20 flex items-center justify-between">
+    <header className={cn(
+      "fixed top-0 w-full z-50 transition-all duration-400 apple-ease",
+      isTransparent ? "bg-transparent py-6" : "bg-[#1E1B2E]/85 backdrop-blur-xl py-4 shadow-[0_4px_24px_rgba(30,27,46,0.08)] border-b border-white/5"
+    )}>
+      <div className="max-w-7xl mx-auto px-4 flex items-center justify-between">
         {/* Logo */}
         <Link href="/" className="flex items-center group shrink-0">
-          <div className="relative w-32 md:w-40 h-10 md:h-12 transition-transform group-hover:scale-105">
-            <Image
-              src="/images/logo-v2.png"
-              alt="Skill Sphere"
-              fill
-              sizes="(max-width: 768px) 128px, 160px"
-              className="object-contain"
-              priority
-            />
-          </div>
+          <span className="font-heading font-black text-2xl tracking-tight text-white transition-transform group-hover:scale-105">
+            Skill Sphere.
+          </span>
         </Link>
 
-        {/* Desktop Navigation — centered */}
-        <nav className="hidden md:flex items-center gap-10 font-black uppercase tracking-widest text-sm absolute left-1/2 -translate-x-1/2">
-          <Link href="/" className="flex items-center gap-1 hover:text-[#4F7DF3] transition-colors group">
-            <Home className="w-4 h-4 mb-0.5 group-hover:scale-110 transition-transform" />
+        {/* Desktop Navigation */}
+        <nav className="hidden md:flex items-center gap-10 font-sans font-medium text-sm absolute left-1/2 -translate-x-1/2">
+          <Link href="/" className={cn(
+            "flex items-center gap-1 transition-colors group",
+            isTransparent ? "text-white/90 hover:text-white" : "text-[#F5F1EB]/80 hover:text-[#C9A96E]"
+          )}>
             Home
           </Link>
-          <Link href="/features" className="hover:text-[#4F7DF3] transition-colors">Features</Link>
-          <Link href="/courses" className="hover:text-[#4F7DF3] transition-colors">Courses</Link>
+          <Link href="/features" className={cn(
+            "transition-colors",
+            isTransparent ? "text-white/90 hover:text-white" : "text-[#F5F1EB]/80 hover:text-[#C9A96E]"
+          )}>
+            Features
+          </Link>
+          <Link href="/courses" className={cn(
+            "transition-colors",
+            isTransparent ? "text-white/90 hover:text-white" : "text-[#F5F1EB]/80 hover:text-[#C9A96E]"
+          )}>
+            Courses
+          </Link>
+          <Link href="/blog" className={cn(
+            "transition-colors",
+            isTransparent ? "text-white/90 hover:text-white" : "text-[#F5F1EB]/80 hover:text-[#C9A96E]"
+          )}>
+            Blog
+          </Link>
+          <Link href="/about" className={cn(
+            "transition-colors",
+            isTransparent ? "text-white/90 hover:text-white" : "text-[#F5F1EB]/80 hover:text-[#C9A96E]"
+          )}>
+            About
+          </Link>
         </nav>
 
         {/* Desktop Auth Buttons */}
         <div className="hidden md:flex items-center gap-4">
           {userRole ? (
             <Link href={dashboardPath}>
-              <Button className="font-black neo-brutalism bg-[#34D399] h-10 px-6 text-white">Dashboard</Button>
+              <Button variant="default">Dashboard</Button>
             </Link>
           ) : (
             <>
               <Link href="/login">
-                <Button variant="outline" className="font-black border-4 border-black h-10 px-4 hover:bg-black hover:text-white transition-all">Login</Button>
+                <Button variant="ghost" className="text-white hover:bg-white/10 hover:text-white">Log in</Button>
               </Link>
               <Link href="/register">
-                <Button className="font-black neo-brutalism bg-[#4F7DF3] h-10 px-6 text-white">Join Free</Button>
+                <Button variant="default">Join Free</Button>
               </Link>
             </>
           )}
         </div>
 
-        {/* Mobile: auth button + hamburger */}
+        {/* Mobile menu button */}
         <div className="flex md:hidden items-center gap-3">
-          {userRole ? (
-            <Link href={dashboardPath}>
-              <Button size="sm" className="font-black neo-brutalism bg-[#34D399] text-white px-3 h-9 text-xs">Dashboard</Button>
-            </Link>
-          ) : (
-            <Link href="/login">
-              <Button size="sm" variant="outline" className="font-black border-2 border-black h-9 px-3 text-xs">Login</Button>
-            </Link>
-          )}
           <button
             onClick={() => setMenuOpen(!menuOpen)}
-            className="w-10 h-10 border-2 border-black rounded-xl flex items-center justify-center hover:bg-muted transition-colors"
+            className="text-white p-2"
             aria-label="Toggle menu"
           >
-            {menuOpen ? <X size={20} /> : <Menu size={20} />}
+            {menuOpen ? <X size={24} /> : <Menu size={24} />}
           </button>
         </div>
       </div>
 
       {/* Mobile Dropdown Menu */}
       {menuOpen && (
-        <div className="md:hidden border-t-4 border-black bg-white animate-in slide-in-from-top-2 duration-200">
-          <nav className="flex flex-col px-4 py-4 gap-1 font-black uppercase tracking-widest text-sm">
-            <Link href="/" className="flex items-center gap-2 p-3 rounded-xl hover:bg-muted transition-colors">
-              <Home size={16} /> Home
+        <div className="md:hidden bg-[#1E1B2E] border-t border-white/10 animate-in slide-in-from-top-2 duration-200 shadow-xl">
+          <nav className="flex flex-col px-4 py-6 gap-4 font-sans font-medium text-sm text-[#F5F1EB]">
+            <Link href="/" className="flex items-center gap-3 p-3 rounded-xl hover:bg-white/5 transition-colors">
+              <Home size={18} className="text-[#C9A96E]" /> Home
             </Link>
-            <Link href="/features" className="p-3 rounded-xl hover:bg-muted transition-colors">Features</Link>
-            <Link href="/courses" className="p-3 rounded-xl hover:bg-muted transition-colors">Courses</Link>
-            {!userRole && (
-              <Link href="/register" className="mt-2">
-                <Button className="w-full neo-brutalism bg-[#4F7DF3] text-white font-black">Join Free</Button>
+            <Link href="/features" className="flex items-center gap-3 p-3 rounded-xl hover:bg-white/5 transition-colors">
+              <Sparkles size={18} className="text-[#C9A96E]" /> Features
+            </Link>
+            <Link href="/courses" className="flex items-center gap-3 p-3 rounded-xl hover:bg-white/5 transition-colors">
+              <BookOpen size={18} className="text-[#C9A96E]" /> Courses
+            </Link>
+            <Link href="/blog" className="flex items-center gap-3 p-3 rounded-xl hover:bg-white/5 transition-colors">
+              <Newspaper size={18} className="text-[#C9A96E]" /> Blog
+            </Link>
+            <Link href="/about" className="flex items-center gap-3 p-3 rounded-xl hover:bg-white/5 transition-colors">
+              <Info size={18} className="text-[#C9A96E]" /> About
+            </Link>
+            
+            <div className="h-px bg-white/10 my-2" />
+            
+            {userRole ? (
+              <Link href={dashboardPath}>
+                <Button className="w-full">Dashboard</Button>
               </Link>
+            ) : (
+              <div className="flex flex-col gap-3">
+                <Link href="/login">
+                  <Button variant="outline" className="w-full">Log in</Button>
+                </Link>
+                <Link href="/register">
+                  <Button className="w-full">Join Free</Button>
+                </Link>
+              </div>
             )}
           </nav>
         </div>

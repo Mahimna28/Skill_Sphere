@@ -1,8 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import Image from "next/image";
-import { Globe, Code, Share2, Mail } from "lucide-react";
+import { MessageCircle, Camera, Mail, Globe } from "lucide-react";
 import { useState, useEffect } from "react";
 
 export function Footer() {
@@ -25,85 +24,84 @@ export function Footer() {
   }, []);
 
   return (
-    <footer className="border-t-4 border-black bg-white pt-16 pb-8">
+    <footer className="bg-[#1E1B2E] text-[#F5F1EB] pt-20 pb-8">
       <div className="max-w-7xl mx-auto px-4">
         <div className="grid grid-cols-1 md:grid-cols-4 gap-12 mb-16">
           {/* Brand Column */}
           <div className="col-span-1 md:col-span-1">
-            <div className="relative w-48 h-12 mb-6">
-              <Image src="/images/logo-v2.png" alt="Skill Sphere" fill className="object-contain" />
-            </div>
-            <p className="font-bold text-muted-foreground leading-relaxed mb-6">
-              AI-powered Learning Management System designed for the next generation of professionals.
+            <Link href="/" className="inline-block mb-6">
+              <span className="font-heading font-black text-3xl tracking-tight text-white">
+                Skill Sphere.
+              </span>
+            </Link>
+            <p className="font-sans text-[#F5F1EB]/70 leading-relaxed mb-8">
+              Education, crafted for how you think. An AI-powered learning platform designed for the next generation.
             </p>
-            <div className="flex gap-4">
-              <Link href="#" className="p-2 border-2 border-black rounded-lg hover:bg-[#F5C84C] transition-colors">
-                <Globe className="w-5 h-5" />
+            <div className="flex gap-5">
+              <Link href="#" className="text-white/60 hover:text-[#C9A96E] transition-colors duration-200">
+                <MessageCircle size={20} />
               </Link>
-              <Link href="#" className="p-2 border-2 border-black rounded-lg hover:bg-[#4F7DF3] hover:text-white transition-colors">
-                <Code className="w-5 h-5" />
+              <Link href="#" className="text-white/60 hover:text-[#C9A96E] transition-colors duration-200">
+                <Globe size={20} />
               </Link>
-              <Link href="#" className="p-2 border-2 border-black rounded-lg hover:bg-[#34D399] transition-colors">
-                <Share2 className="w-5 h-5" />
+              <Link href="#" className="text-white/60 hover:text-[#C9A96E] transition-colors duration-200">
+                <Camera size={20} />
+              </Link>
+              <Link href="#" className="text-white/60 hover:text-[#C9A96E] transition-colors duration-200">
+                <Mail size={20} />
               </Link>
             </div>
           </div>
 
-          {/* Quick Links */}
+          {/* Platform */}
           <div>
-            <h4 className="font-black uppercase tracking-tighter text-xl mb-6">Platform</h4>
-            <ul className="flex flex-col gap-4 font-bold">
-              <li><Link href="/" className="hover:text-[#4F7DF3] transition-colors">Home</Link></li>
-              <li><Link href="/features" className="hover:text-[#4F7DF3] transition-colors">Features</Link></li>
-              <li><Link href="/courses" className="hover:text-[#4F7DF3] transition-colors">All Courses</Link></li>
-              <li><Link href="/#team" className="hover:text-[#4F7DF3] transition-colors">About Team</Link></li>
+            <h4 className="font-heading font-bold text-white text-lg mb-6">Platform</h4>
+            <ul className="flex flex-col gap-4 font-sans text-[#F5F1EB]/70">
+              <li><Link href="/" className="hover:text-[#C9A96E] transition-colors">Home</Link></li>
+              <li><Link href="/features" className="hover:text-[#C9A96E] transition-colors">Features</Link></li>
+              <li><Link href="/courses" className="hover:text-[#C9A96E] transition-colors">All Courses</Link></li>
+              <li><Link href="/pricing" className="hover:text-[#C9A96E] transition-colors">Pricing</Link></li>
             </ul>
           </div>
 
-          {/* Account */}
+          {/* Resources */}
           <div>
-            <h4 className="font-black uppercase tracking-tighter text-xl mb-6">{userRole ? "My Account" : "Join Us"}</h4>
-            <ul className="flex flex-col gap-4 font-bold">
+            <h4 className="font-heading font-bold text-white text-lg mb-6">Resources</h4>
+            <ul className="flex flex-col gap-4 font-sans text-[#F5F1EB]/70">
+              <li><Link href="/blog" className="hover:text-[#C9A96E] transition-colors">Blog</Link></li>
+              <li><Link href="/help" className="hover:text-[#C9A96E] transition-colors">Help Center</Link></li>
+              <li><Link href="/guides" className="hover:text-[#C9A96E] transition-colors">Student Guides</Link></li>
+              <li><Link href="/contact" className="hover:text-[#C9A96E] transition-colors">Contact Us</Link></li>
+            </ul>
+          </div>
+
+          {/* Legal & Account */}
+          <div>
+            <h4 className="font-heading font-bold text-white text-lg mb-6">{userRole ? "Account" : "Legal"}</h4>
+            <ul className="flex flex-col gap-4 font-sans text-[#F5F1EB]/70">
               {userRole ? (
-                <li><Link href={["superadmin", "institute_admin"].includes(userRole) ? "/dashboard/admin" : `/dashboard/${userRole}`} className="hover:text-[#4F7DF3] transition-colors">Dashboard</Link></li>
+                <>
+                  <li><Link href={["superadmin", "institute_admin"].includes(userRole) ? "/dashboard/admin" : `/dashboard/${userRole}`} className="hover:text-[#C9A96E] transition-colors">Dashboard</Link></li>
+                  <li><Link href="/profile" className="hover:text-[#C9A96E] transition-colors">Profile</Link></li>
+                </>
               ) : (
                 <>
-                  <li><Link href="/login" className="hover:text-[#4F7DF3] transition-colors">Login</Link></li>
-                  <li><Link href="/register" className="hover:text-[#4F7DF3] transition-colors">Sign Up</Link></li>
+                  <li><Link href="/privacy" className="hover:text-[#C9A96E] transition-colors">Privacy Policy</Link></li>
+                  <li><Link href="/terms" className="hover:text-[#C9A96E] transition-colors">Terms of Service</Link></li>
                 </>
               )}
             </ul>
           </div>
-
-          {/* Contact */}
-          <div>
-            <h4 className="font-black uppercase tracking-tighter text-xl mb-6">Stay Connected</h4>
-            <p className="font-bold text-muted-foreground mb-4">Get the latest updates and course drops.</p>
-            <div className="flex flex-col gap-3">
-              <div className="flex items-center gap-2 font-bold">
-                <Mail className="w-5 h-5 text-[#4F7DF3]" />
-                <span>skillspheretest@gmail.com</span>
-              </div>
-              <div className="mt-4">
-                <Link href="/register">
-                  <div className="inline-block bg-[#F5C84C] border-2 border-black px-4 py-2 font-black text-xs uppercase shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:translate-x-0.5 hover:translate-y-0.5 hover:shadow-none transition-all">
-                    Subscribe Now
-                  </div>
-                </Link>
-              </div>
-            </div>
-          </div>
         </div>
 
         {/* Bottom Bar */}
-        <div className="border-t-2 border-black/10 pt-8 flex flex-col md:flex-row justify-between items-center gap-4">
-          <p className="font-black text-xs uppercase tracking-[0.2em] opacity-60 text-center md:text-left">
+        <div className="border-t border-white/10 pt-8 flex flex-col md:flex-row justify-between items-center gap-4">
+          <p className="font-sans text-sm text-[#F5F1EB]/50">
             &copy; {currentYear} Skill Sphere. All Rights Reserved.
           </p>
-          <div className="flex gap-8 font-bold text-xs uppercase opacity-60">
-            <Link href="#" className="hover:opacity-100 transition-opacity">Privacy Policy</Link>
-            <Link href="#" className="hover:opacity-100 transition-opacity">Terms of Service</Link>
-          </div>
+          <p className="font-heading italic text-[#C9A96E]">
+            Crafted with care
+          </p>
         </div>
       </div>
     </footer>
