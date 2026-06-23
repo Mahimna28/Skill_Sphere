@@ -419,10 +419,9 @@ export default function CourseDetailClient({ course, userRole, isEnrolled }: Pro
             {/* Pricing Card */}
             <div className="bg-white rounded-[16px] p-8 shadow-[0_4px_24px_rgba(30,27,46,0.08)]">
               <div className="flex items-end gap-3 mb-2">
-                <span className="font-heading text-[36px] text-[#1E1B2E] leading-none">$99</span>
-                <span className="font-sans text-[18px] text-[#8E8E93] line-through leading-none pb-1">$149</span>
+                <span className="font-heading text-[36px] text-[#1E1B2E] leading-none">Free</span>
               </div>
-              <p className="font-sans text-[13px] text-[#8E8E93] mb-8">One-time payment. Full lifetime access.</p>
+              <p className="font-sans text-[13px] text-[#8E8E93] mb-8">Enroll now. Full lifetime access.</p>
 
               <motion.button 
                 whileHover={{ scale: 1.02 }}
@@ -544,7 +543,7 @@ export default function CourseDetailClient({ course, userRole, isEnrolled }: Pro
                       <span>by David Chen</span>
                     </div>
                     <div className="flex items-end justify-between mt-auto">
-                      <span className="font-heading text-[20px] text-[#1E1B2E]">$89</span>
+                      <span className="font-heading text-[20px] text-[#1E1B2E]">Free</span>
                       <span className="font-sans text-[13px] text-[#C9A96E] font-medium group-hover:text-[#1E1B2E] transition-colors">
                         View Details →
                       </span>

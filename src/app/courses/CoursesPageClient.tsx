@@ -333,14 +333,9 @@ export default function CoursesPageClient({ courses, userRole, initialEnrolledId
                                 <span>{mockRating}</span>
                               </div>
                               <div className="flex items-end gap-2">
-                                <span className="font-heading text-[24px] text-[#1E1B2E] leading-none">
-                                  ${mockPrice}
+                                <span className="font-heading text-[18px] text-[#1E1B2E] leading-none">
+                                  Free
                                 </span>
-                                {course.originalPrice && (
-                                  <span className="font-sans text-[14px] text-[#8E8E93] line-through leading-none mb-1">
-                                    ${course.originalPrice}
-                                  </span>
-                                )}
                               </div>
                             </div>
 
