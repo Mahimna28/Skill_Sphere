@@ -45,7 +45,7 @@ export default async function ProfilePage() {
     roleData.recentActivity = await prisma.enrollment.findMany({
       where: { userId: user.id },
       take: 5,
-      orderBy: { createdAt: "desc" },
+      orderBy: { enrolledAt: "desc" },
       include: { course: { select: { title: true, subject: true } } }
     });
     

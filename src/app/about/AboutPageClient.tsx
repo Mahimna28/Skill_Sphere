@@ -24,8 +24,8 @@ const TEAM_MEMBERS = [
     bio: "Full-stack engineer with a passion for clean code and cleaner UX. Believes the best technology is the kind you don't notice.",
     image: "/images/team/dev.png",
     email: "cse.230840131066@gmail.com",
-    github: "#", // ADD GITHUB LINK HERE
-    linkedin: "#" // ADD LINKEDIN LINK HERE
+    github: "https://github.com/Dev-Patel1610", // ADD GITHUB LINK HERE
+    linkedin: "www.linkedin.com/in/dev-patel-a41853344" // ADD LINKEDIN LINK HERE
   },
   {
     name: "Swayam Chaudhari",
