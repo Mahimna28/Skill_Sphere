@@ -161,10 +161,16 @@ export default function CoursesPageClient({ courses, userRole, initialEnrolledId
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedCategory, setSelectedCategory] = useState("All");
   const [enrolledIds] = useState<Set<string>>(new Set(initialEnrolledIds));
+  const [currentPage, setCurrentPage] = useState(1);
+  const coursesPerPage = 6;
 
-  // Merge real courses from DB with mock courses to ensure we have exactly 9 beautiful items.
-  // In a real production environment, you'd only use DB courses.
-  const displayCourses = [...courses, ...MOCK_COURSES].slice(0, 9);
+  // Newsletter state
+  const [newsletterEmail, setNewsletterEmail] = useState("");
+  const [isSubscribing, setIsSubscribing] = useState(false);
+  const [subscribeMessage, setSubscribeMessage] = useState<{ text: string; type: "success" | "error" } | null>(null);
+
+  // Merge real courses from DB with mock courses
+  const displayCourses = [...courses, ...MOCK_COURSES];
 
   const filterCategories = ["All", "Web Development", "Data Science", "Design", "Business", "Marketing"];
 
@@ -174,6 +180,53 @@ export default function CoursesPageClient({ courses, userRole, initialEnrolledId
     const matchesCategory = selectedCategory === "All" || course.subject === selectedCategory;
     return matchesSearch && matchesCategory;
   });
+
+  const totalPages = Math.ceil(filteredCourses.length / coursesPerPage);
+  const indexOfLastCourse = currentPage * coursesPerPage;
+  const indexOfFirstCourse = indexOfLastCourse - coursesPerPage;
+  const currentCourses = filteredCourses.slice(indexOfFirstCourse, indexOfLastCourse);
+
+  // Reset to first page when filtering
+  const handleSearch = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setSearchQuery(e.target.value);
+    setCurrentPage(1);
+  };
+
+  const handleCategorySelect = (cat: string) => {
+    setSelectedCategory(cat);
+    setCurrentPage(1);
+  };
+
+  const handleSubscribe = async () => {
+    if (!newsletterEmail || !newsletterEmail.includes("@")) {
+      setSubscribeMessage({ text: "Please enter a valid email address.", type: "error" });
+      return;
+    }
+    
+    setIsSubscribing(true);
+    setSubscribeMessage(null);
+
+    try {
+      const res = await fetch("/api/newsletter", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email: newsletterEmail })
+      });
+
+      const data = await res.json();
+
+      if (res.ok) {
+        setSubscribeMessage({ text: data.message || "Subscribed successfully!", type: "success" });
+        setNewsletterEmail("");
+      } else {
+        setSubscribeMessage({ text: data.error || "Failed to subscribe.", type: "error" });
+      }
+    } catch (error) {
+      setSubscribeMessage({ text: "An error occurred. Please try again.", type: "error" });
+    } finally {
+      setIsSubscribing(false);
+    }
+  };
 
   return (
     <div className="flex flex-col bg-[#F5F1EB] min-h-screen">
@@ -215,12 +268,11 @@ export default function CoursesPageClient({ courses, userRole, initialEnrolledId
             transition={{ duration: 0.8, delay: 0.3, ease: appleEase }}
             className="relative max-w-[800px]"
           >
-            <input 
-              type="text" 
-              placeholder="Search courses or instructors..." 
-              className="w-full h-[56px] bg-white rounded-full px-6 pl-14 font-sans text-[16px] text-[#1E1B2E] placeholder-[#8E8E93] shadow-[0_2px_12px_rgba(30,27,46,0.06)] border-0 focus:ring-2 focus:ring-[#C9A96E] focus:outline-none transition-shadow"
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
+            <input                type="text" 
+                placeholder="Search courses, topics, or instructors..." 
+                value={searchQuery}
+                onChange={handleSearch}
+                className="w-full h-[56px] bg-white rounded-full px-6 pl-14 font-sans text-[16px] text-[#1E1B2E] placeholder-[#8E8E93] shadow-[0_2px_12px_rgba(30,27,46,0.06)] border-0 focus:ring-2 focus:ring-[#C9A96E] focus:outline-none transition-shadow"
             />
             <Search className="absolute left-5 top-1/2 -translate-y-1/2 text-[#8E8E93] w-5 h-5" />
           </motion.div>
@@ -236,10 +288,10 @@ export default function CoursesPageClient({ courses, userRole, initialEnrolledId
       >
         <div className="max-w-7xl mx-auto px-4 md:px-8 flex items-center justify-between gap-4">
           <div className="flex-1 overflow-x-auto scrollbar-none flex gap-3 items-center pb-1">
-            {filterCategories.map((cat) => (
-              <button
+            {filterCategories.map(cat => (
+              <button 
                 key={cat}
-                onClick={() => setSelectedCategory(cat)}
+                onClick={() => handleCategorySelect(cat)}
                 className={cn(
                   "whitespace-nowrap px-5 py-2 rounded-full font-sans text-[14px] transition-all duration-300",
                   selectedCategory === cat 
@@ -260,9 +312,9 @@ export default function CoursesPageClient({ courses, userRole, initialEnrolledId
       {/* 3. COURSE GRID */}
       <section className="py-[60px] flex-1">
         <div className="max-w-7xl mx-auto px-4 md:px-8">
-          {filteredCourses.length > 0 ? (
+          {currentCourses.length > 0 ? (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-              {filteredCourses.map((course, idx) => {
+              {currentCourses.map((course, idx) => {
                 const isEnrolled = enrolledIds.has(course.id);
                 const mockLessons = course.lessons || ((idx * 7) % 40) + 10;
                 const mockDuration = course.duration || `${(idx % 10) + 2}h 30m`;
@@ -379,22 +431,42 @@ export default function CoursesPageClient({ courses, userRole, initialEnrolledId
           )}
 
           {/* PAGINATION */}
-          {filteredCourses.length > 0 && (
+          {totalPages > 1 && (
             <motion.div 
               initial={{ opacity: 0 }}
               whileInView={{ opacity: 1 }}
               viewport={{ once: true }}
               className="mt-[60px] flex items-center justify-center gap-6"
             >
-              <button className="text-[#8E8E93] hover:text-[#1E1B2E] transition-colors" aria-label="Previous page">
+              <button 
+                onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
+                disabled={currentPage === 1}
+                className="text-[#8E8E93] hover:text-[#1E1B2E] transition-colors disabled:opacity-30 disabled:hover:text-[#8E8E93]" 
+                aria-label="Previous page"
+              >
                 <ChevronLeft size={20} />
               </button>
               <div className="flex gap-4 font-sans text-[16px]">
-                <button className="text-[#1E1B2E] border-b-2 border-[#C9A96E] font-medium px-1">1</button>
-                <button className="text-[#8E8E93] hover:text-[#1E1B2E] transition-colors px-1">2</button>
-                <button className="text-[#8E8E93] hover:text-[#1E1B2E] transition-colors px-1">3</button>
+                {[...Array(totalPages)].map((_, i) => (
+                  <button 
+                    key={i + 1}
+                    onClick={() => setCurrentPage(i + 1)}
+                    className={`px-1 font-medium transition-colors ${
+                      currentPage === i + 1 
+                        ? "text-[#1E1B2E] border-b-2 border-[#C9A96E]" 
+                        : "text-[#8E8E93] hover:text-[#1E1B2E]"
+                    }`}
+                  >
+                    {i + 1}
+                  </button>
+                ))}
               </div>
-              <button className="text-[#8E8E93] hover:text-[#1E1B2E] transition-colors" aria-label="Next page">
+              <button 
+                onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))}
+                disabled={currentPage === totalPages}
+                className="text-[#8E8E93] hover:text-[#1E1B2E] transition-colors disabled:opacity-30 disabled:hover:text-[#8E8E93]" 
+                aria-label="Next page"
+              >
                 <ChevronRight size={20} />
               </button>
             </motion.div>
@@ -421,17 +493,41 @@ export default function CoursesPageClient({ courses, userRole, initialEnrolledId
               <input 
                 type="email" 
                 placeholder="Enter your email" 
-                className="w-full h-[56px] bg-white/5 border border-white/10 rounded-full px-6 font-sans text-[16px] text-white placeholder-white/50 focus:ring-2 focus:ring-[#C9A96E] focus:outline-none transition-shadow"
+                value={newsletterEmail}
+                onChange={(e) => setNewsletterEmail(e.target.value)}
+                onKeyDown={(e) => e.key === "Enter" && handleSubscribe()}
+                disabled={isSubscribing}
+                className="w-full h-[56px] bg-white/5 border border-white/10 rounded-full px-6 font-sans text-[16px] text-white placeholder-white/50 focus:ring-2 focus:ring-[#C9A96E] focus:outline-none transition-shadow disabled:opacity-50"
               />
               <motion.button 
+                onClick={handleSubscribe}
+                disabled={isSubscribing}
                 whileHover={{ scale: 1.02 }}
                 whileTap={{ scale: 0.98 }}
                 transition={{ type: "spring", stiffness: 400, damping: 25 }}
-                className="w-full sm:w-auto shrink-0 bg-[#C9A96E] text-[#1E1B2E] font-sans font-medium text-[16px] rounded-full px-8 h-[56px]"
+                className="w-full sm:w-auto shrink-0 bg-[#C9A96E] text-[#1E1B2E] font-sans font-medium text-[16px] rounded-full px-8 h-[56px] disabled:opacity-70 flex items-center justify-center min-w-[140px]"
               >
-                Subscribe
+                {isSubscribing ? (
+                  <div className="w-5 h-5 border-2 border-[#1E1B2E]/20 border-t-[#1E1B2E] rounded-full animate-spin" />
+                ) : (
+                  "Subscribe"
+                )}
               </motion.button>
             </div>
+            
+            {/* Subscription Message */}
+            <AnimatePresence>
+              {subscribeMessage && (
+                <motion.div
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: -10 }}
+                  className={`mt-4 font-sans text-[14px] ${subscribeMessage.type === "success" ? "text-green-400" : "text-red-400"}`}
+                >
+                  {subscribeMessage.text}
+                </motion.div>
+              )}
+            </AnimatePresence>
           </motion.div>
         </div>
       </section>

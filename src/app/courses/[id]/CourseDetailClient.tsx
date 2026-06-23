@@ -4,7 +4,7 @@ import { useState } from "react";
 import { motion, useScroll, useTransform, AnimatePresence } from "framer-motion";
 import { 
   Play, FileText, HelpCircle, Star, Clock, BookOpen, 
-  BarChart, CheckCircle2, ChevronDown, Lock, ShieldCheck, Award, ArrowRight
+  BarChart, CheckCircle2, ChevronDown, Lock, ShieldCheck, Award, ArrowRight, ArrowLeft
 } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
@@ -163,6 +163,13 @@ export default function CourseDetailClient({ course, userRole, isEnrolled }: Pro
       {/* 1. HERO SECTION — PRODUCT HERO */}
       <section className="relative pt-[180px] pb-[80px] bg-[#1E1B2E] overflow-hidden">
         <div className="max-w-7xl mx-auto px-4 md:px-8">
+          <button 
+            onClick={() => router.back()} 
+            className="inline-flex items-center text-[#8E8E93] hover:text-white transition-colors font-sans text-[14px] mb-8 group"
+          >
+            <ArrowLeft size={16} className="mr-2 transition-transform group-hover:-translate-x-1" /> Back
+          </button>
+          
           <div className="flex flex-col lg:flex-row items-center gap-[60px] lg:gap-[100px]">
             {/* Left Content */}
             <motion.div 

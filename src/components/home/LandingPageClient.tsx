@@ -11,7 +11,7 @@ import { StatsBar } from "./StatsBar";
 // ---------------------------------------------------------
 // Easing
 // ---------------------------------------------------------
-const appleEase = [0.4, 0, 0.2, 1];
+const appleEase: any = [0.25, 0.1, 0.25, 1.0];
 
 // ---------------------------------------------------------
 // Testimonials (Client Component embedded for simplicity)

@@ -9,8 +9,8 @@ export default async function TeacherProfilePage({ params }: { params: Promise<{
     where: { username: resolvedParams.username }
   });
 
-  // If user not found, or they're not a teacher, throw 404
-  if (!teacher || teacher.role !== "teacher") {
+  // If user not found, or they're not a teacher/admin, throw 404
+  if (!teacher || !["teacher", "superadmin", "institute_admin"].includes(teacher.role)) {
     notFound();
   }
 

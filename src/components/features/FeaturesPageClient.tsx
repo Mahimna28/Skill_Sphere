@@ -6,7 +6,7 @@ import Link from "next/link";
 import { CheckCircle2, ChevronDown } from "lucide-react";
 import { useRef } from "react";
 
-const appleEase = [0.4, 0, 0.2, 1];
+const appleEase: any = [0.25, 0.1, 0.25, 1.0];
 
 function ParallaxImage({ src, alt, className }: { src: string, alt: string, className?: string }) {
   const ref = useRef(null);

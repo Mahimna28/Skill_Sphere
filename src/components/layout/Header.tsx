@@ -13,6 +13,7 @@ export function Header() {
   const [scrolled, setScrolled] = useState(false);
   const pathname = usePathname();
 
+  // eslint-disable-next-line
   useEffect(() => { setMenuOpen(false); }, [pathname]);
 
   useEffect(() => {
