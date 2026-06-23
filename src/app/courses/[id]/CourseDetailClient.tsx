@@ -78,6 +78,54 @@ export default function CourseDetailClient({ course, userRole, isEnrolled }: Pro
   const router = useRouter();
   const [activeTab, setActiveTab] = useState<"overview" | "curriculum" | "reviews">("overview");
   const [expandedModules, setExpandedModules] = useState<Set<string>>(new Set(["m1", course.modules[0]?.id]));
+  const [enrolled, setEnrolled] = useState(isEnrolled);
+  const [isEnrolling, setIsEnrolling] = useState(false);
+  const [toast, setToast] = useState<{ message: string; type: "success" | "error" } | null>(null);
+
+  const showToast = (message: string, type: "success" | "error") => {
+    setToast({ message, type });
+    setTimeout(() => setToast(null), 3000);
+  };
+
+  const handleEnroll = async () => {
+    if (!userRole) {
+      router.push(`/login?redirect=/courses/${course.id}`);
+      return;
+    }
+    if (userRole !== "student") {
+      showToast("Only students can enroll in courses.", "error");
+      return;
+    }
+    if (enrolled) {
+      router.push(`/dashboard/student/courses/${course.id}`);
+      return;
+    }
+
+    setIsEnrolling(true);
+    try {
+      const res = await fetch("/api/enrollments", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ courseId: course.id }),
+      });
+      const data = await res.json();
+
+      if (res.ok) {
+        showToast(data.message + " Redirecting...", "success");
+        setEnrolled(true);
+        setTimeout(() => {
+          router.push(`/dashboard/student/courses/${course.id}`);
+        }, 1200);
+      } else {
+        showToast(data.message || "Failed to enroll.", "error");
+      }
+    } catch (error) {
+      showToast("Network error. Please try again.", "error");
+    } finally {
+      setIsEnrolling(false);
+    }
+  };
+
   const { scrollY } = useScroll();
   const yImage = useTransform(scrollY, [0, 1000], [0, 200]);
   
@@ -104,6 +152,13 @@ export default function CourseDetailClient({ course, userRole, isEnrolled }: Pro
 
   return (
     <div className="flex flex-col bg-[#F5F1EB] min-h-screen">
+      {/* Toast Notification */}
+      {toast && (
+        <div className={`fixed top-6 right-6 z-50 px-6 py-4 rounded-[16px] font-medium text-[15px] font-sans shadow-[0_8px_30px_rgba(30,27,46,0.12)] border border-[rgba(30,27,46,0.06)] animate-in slide-in-from-top-4 duration-300 flex items-center gap-3 ${toast.type === "success" ? "bg-white text-[#1E1B2E]" : "bg-[#ef4444] text-white"}`}>
+          {toast.type === "success" && <CheckCircle2 className="w-5 h-5 text-[#34D399]" />}
+          {toast.message}
+        </div>
+      )}
       
       {/* 1. HERO SECTION — PRODUCT HERO */}
       <section className="relative pt-[180px] pb-[80px] bg-[#1E1B2E] overflow-hidden">
@@ -423,20 +478,26 @@ export default function CourseDetailClient({ course, userRole, isEnrolled }: Pro
               </div>
               <p className="font-sans text-[13px] text-[#8E8E93] mb-8">Enroll now. Full lifetime access.</p>
 
-              <motion.button 
-                whileHover={{ scale: 1.02 }}
-                whileTap={{ scale: 0.98 }}
-                className="w-full bg-[#C9A96E] text-[#1E1B2E] font-sans font-medium text-[16px] rounded-full py-4 mb-3 shadow-[0_4px_14px_rgba(201,169,110,0.2)]"
-              >
-                Enroll Now
-              </motion.button>
-              <motion.button 
-                whileHover={{ backgroundColor: "#1E1B2E", color: "#FFFFFF" }}
-                whileTap={{ scale: 0.98 }}
-                className="w-full bg-transparent border border-[#1E1B2E] text-[#1E1B2E] font-sans font-medium text-[16px] rounded-full py-4 transition-colors"
-              >
-                Try for Free
-              </motion.button>
+              {!userRole || (userRole === "student" && !enrolled) || userRole !== "student" ? (
+                <button 
+                  onClick={handleEnroll}
+                  disabled={isEnrolling}
+                  className="w-full h-[48px] bg-[#1E1B2E] text-white rounded-xl font-sans font-medium text-[16px] flex items-center justify-center transition-transform hover:scale-[1.02] shadow-[0_4px_14px_rgba(30,27,46,0.2)] disabled:opacity-70 disabled:hover:scale-100"
+                >
+                  {isEnrolling ? (
+                    <div className="w-5 h-5 border-2 border-white/20 border-t-white rounded-full animate-spin" />
+                  ) : (
+                    "Enroll Now"
+                  )}
+                </button>
+              ) : (
+                <button 
+                  onClick={handleEnroll}
+                  className="w-full h-[48px] bg-[#C9A96E] text-[#1E1B2E] rounded-xl font-sans font-medium text-[16px] flex items-center justify-center transition-transform hover:scale-[1.02] shadow-[0_4px_14px_rgba(201,169,110,0.2)]"
+                >
+                  Continue Learning <ArrowRight size={18} className="ml-2" />
+                </button>
+              )}
 
               <div className="my-6 border-t border-[rgba(30,27,46,0.08)]" />
 

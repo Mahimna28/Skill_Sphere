@@ -12,6 +12,10 @@ export default async function CoursePlayerPage({ params }: { params: Promise<{ i
 
   if (!decoded) redirect("/login");
 
+  if (decoded.role !== "student") {
+    redirect(`/dashboard/${decoded.role}`);
+  }
+
   // 1. Verify enrollment
   const enrollment = await prisma.enrollment.findUnique({
     where: {
@@ -23,8 +27,8 @@ export default async function CoursePlayerPage({ params }: { params: Promise<{ i
   });
 
   if (!enrollment) {
-    // If not enrolled, redirect back to course list
-    redirect("/dashboard/student/courses");
+    // If not enrolled, redirect back to course details page so they can enroll
+    redirect(`/courses/${id}`);
   }
 
   // 2. Fetch course with modules and lessons

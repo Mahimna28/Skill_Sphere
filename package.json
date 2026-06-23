@@ -7,7 +7,7 @@
   },
   "scripts": {
     "dev": "node server.js",
-    "build": "npx prisma db push --accept-data-loss && next build",
+    "build": "node prisma/set-postgres.js && npx prisma db push --accept-data-loss && next build",
     "start": "node server.js",
     "lint": "eslint",
     "seed": "node prisma/seed.js",

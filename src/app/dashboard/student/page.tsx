@@ -83,52 +83,72 @@ export default async function StudentDashboard() {
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
         {/* Courses */}
-        <div className="lg:col-span-2 space-y-4">
+        <div className="lg:col-span-2 space-y-6">
           <div className="flex items-center justify-between">
-            <h2 className="text-2xl font-black">My Courses</h2>
-            <Link href="/dashboard/student/courses">
-              <Button variant="outline" className="font-bold border-2 border-black">
-                View All <ArrowRight className="ml-2 h-4 w-4" />
-              </Button>
+            <h2 className="font-heading text-[28px] font-bold text-[#1E1B2E]">My Courses</h2>
+            <Link href="/courses">
+              <span className="font-sans text-[14px] font-medium text-[#C9A96E] hover:text-[#1E1B2E] transition-colors cursor-pointer">
+                Browse Courses →
+              </span>
             </Link>
           </div>
           {enrollments.length === 0 ? (
-            <Card className="neo-brutalism-static p-12 text-center bg-white">
-              <BookOpen className="h-16 w-16 mx-auto text-muted-foreground/30 mb-4" />
-              <h3 className="text-2xl font-black mb-2">No Courses Yet</h3>
-              <p className="text-muted-foreground font-medium mb-6">
-                You are not enrolled in any courses. Browse the available courses and start learning!
+            <div className="bg-white rounded-[24px] p-12 text-center shadow-[0_4px_24px_rgba(30,27,46,0.04)] border border-[rgba(30,27,46,0.04)]">
+              <div className="w-20 h-20 bg-[#F5F1EB] rounded-full flex items-center justify-center mx-auto mb-6">
+                <BookOpen className="w-10 h-10 text-[#C9A96E]" />
+              </div>
+              <h3 className="font-heading text-[24px] text-[#1E1B2E] mb-3">No Courses Yet</h3>
+              <p className="font-sans text-[15px] text-[#8E8E93] max-w-md mx-auto mb-8 leading-relaxed">
+                You haven't enrolled in any courses yet. Discover our premium curriculum and start your journey today.
               </p>
-              <Link href="/dashboard/student/courses">
-                <Button className="neo-brutalism font-bold">Browse Courses</Button>
+              <Link href="/courses">
+                <button className="bg-[#1E1B2E] text-white px-8 py-3.5 rounded-xl font-sans text-[15px] font-medium hover:bg-[#C9A96E] hover:text-[#1E1B2E] transition-all shadow-md">
+                  Explore Courses
+                </button>
               </Link>
-            </Card>
+            </div>
           ) : (
-            <div className="grid sm:grid-cols-2 gap-4">
+            <div className="grid sm:grid-cols-2 gap-6">
               {enrollments.slice(0, 4).map((enr) => (
-                <Card
+                <div
                   key={enr.id}
-                  className="neo-brutalism bg-white hover:translate-x-1 hover:-translate-y-1 transition-transform cursor-pointer overflow-hidden"
+                  className="bg-white rounded-[24px] p-5 shadow-[0_8px_30px_rgba(30,27,46,0.04)] hover:shadow-[0_12px_40px_rgba(30,27,46,0.08)] border border-[rgba(30,27,46,0.04)] transition-all duration-300 group flex flex-col"
                 >
-                  <div className="h-28 bg-primary/20 border-b-2 border-black flex items-center justify-center">
-                    <BookOpen className="h-10 w-10 text-primary opacity-40" />
+                  <div className="relative w-full h-[140px] rounded-[16px] overflow-hidden mb-5 bg-[#F5F1EB]">
+                    {enr.course.thumbnail ? (
+                      /* eslint-disable-next-line @next/next/no-img-element */
+                      <img src={enr.course.thumbnail} alt={enr.course.title} className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105" />
+                    ) : (
+                      <div className="w-full h-full flex items-center justify-center bg-[rgba(201,169,110,0.1)]">
+                        <BookOpen className="w-10 h-10 text-[#C9A96E] opacity-50" />
+                      </div>
+                    )}
                   </div>
-                  <CardHeader className="pb-2">
-                    <CardTitle className="text-lg font-black leading-tight">
-                      {enr.course.title}
-                    </CardTitle>
-                    <p className="text-sm text-muted-foreground font-medium">
-                      {enr.course.teacher.name}
-                    </p>
-                  </CardHeader>
-                  <CardContent>
-                    <Link href={`/dashboard/student/courses/${enr.course.id}`}>
-                      <Button variant="outline" className="w-full border-2 border-black font-bold">
-                        Continue
-                      </Button>
+                  <h3 className="font-heading text-[18px] text-[#1E1B2E] leading-[1.2] mb-1 line-clamp-2">
+                    {enr.course.title}
+                  </h3>
+                  <p className="font-sans text-[13px] text-[#8E8E93] mb-5">
+                    {enr.course.teacher.name}
+                  </p>
+                  
+                  <div className="mt-auto">
+                    <div className="flex items-center justify-between font-sans text-[12px] font-medium text-[#1E1B2E] mb-2">
+                      <span>Progress</span>
+                      <span>{enr.progress}%</span>
+                    </div>
+                    <div className="w-full h-2 bg-[#F5F1EB] rounded-full overflow-hidden mb-5">
+                      <div 
+                        className="h-full bg-[#C9A96E] rounded-full transition-all duration-1000 ease-out" 
+                        style={{ width: `${enr.progress}%` }} 
+                      />
+                    </div>
+                    <Link href={`/dashboard/student/courses/${enr.course.id}`} className="block">
+                      <button className="w-full h-[44px] bg-[#C9A96E] text-[#1E1B2E] rounded-xl font-sans font-medium text-[14px] flex items-center justify-center transition-transform hover:scale-[1.02] shadow-[0_4px_14px_rgba(201,169,110,0.15)]">
+                        Continue Learning
+                      </button>
                     </Link>
-                  </CardContent>
-                </Card>
+                  </div>
+                </div>
               ))}
             </div>
           )}
