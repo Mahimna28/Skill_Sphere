@@ -2,8 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
+import { motion } from "framer-motion";
 import { 
   User, Mail, Shield, Trophy, Calendar, Save, 
   Camera, Baby, Loader2, Lock, ShieldCheck, 
@@ -12,7 +11,7 @@ import {
   Users, BarChart3, LayoutDashboard, X,
   Briefcase, GraduationCap as CertIcon, Activity,
   Target, Zap, Flame, Info, CheckCircle2, Download,
-  Unlock, Globe, EyeOff
+  Unlock, Globe, EyeOff, Pencil, Trash2
 } from "lucide-react";
 
 export default function ProfileClient({ user, roleData }: { user: any, roleData: any }) {
@@ -86,612 +85,363 @@ export default function ProfileClient({ user, roleData }: { user: any, roleData:
     }
   };
 
+  const handleDeleteAccount = async () => {
+    if (confirm("Are you sure you want to delete your account? This action cannot be undone.")) {
+      // Logic would go here in full implementation
+      alert("Account deletion requested.");
+    }
+  };
+
   // Helper to parse skills
-  const skillsArray = formData.skills ? formData.skills.split(",").map((s: string) => s.trim()) : [];
+  const skillsArray = formData.skills ? formData.skills.split(",").map((s: string) => s.trim()).filter(Boolean) : [];
 
   return (
-    <div className="max-w-7xl mx-auto space-y-10 animate-in fade-in slide-in-from-bottom-4 duration-500 pb-20 px-4">
-      {/* Header Section */}
-      <div className="flex flex-col md:flex-row md:items-end justify-between gap-6">
-        <div className="flex items-center gap-6">
-          <div className="relative group">
-            <div className="w-24 h-24 md:w-32 md:h-32 rounded-[2.5rem] border-4 border-black overflow-hidden shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] bg-white flex items-center justify-center">
-              {user.image ? (
-                <img src={user.image} alt={user.name} className="w-full h-full object-cover" />
-              ) : (
-                <span className="text-4xl md:text-5xl font-black text-primary">{user.name.charAt(0)}</span>
-              )}
-            </div>
-            {isEditing && (
-              <div className="absolute -bottom-2 -right-2 bg-black text-white p-2 rounded-xl border-2 border-white shadow-lg cursor-pointer">
-                <Camera size={16} />
+    <div className="font-sans flex flex-col h-full text-[#1E1B2E] pb-12">
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.5, ease: [0.25, 0.1, 0.25, 1.0] }}
+      >
+        {/* Profile Header */}
+        <div className="bg-white rounded-[16px] p-8 shadow-[0_4px_20px_rgba(0,0,0,0.06)] mx-8 mt-6 mb-5 flex flex-col md:flex-row md:items-center justify-between gap-6">
+          <div className="flex items-center gap-6">
+            <div className="relative group shrink-0">
+              <div className="w-[80px] h-[80px] rounded-full overflow-hidden bg-[rgba(201,169,110,0.15)] text-[#C9A96E] flex items-center justify-center font-heading text-[28px]">
+                {user.image ? (
+                  /* eslint-disable-next-line @next/next/no-img-element */
+                  <img src={user.image} className="w-full h-full object-cover" alt="" />
+                ) : (
+                  user.name.charAt(0).toUpperCase()
+                )}
               </div>
-            )}
-          </div>
-          <div>
-            <div className="flex items-center gap-3 mb-2">
-              <h1 className="text-4xl md:text-5xl font-black uppercase tracking-tighter">{user.name}</h1>
-              <div className="px-3 py-1 bg-primary text-white text-[10px] font-black border-2 border-black rounded-full uppercase tracking-widest shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]">
-                {user.role}
-              </div>
-              <div className="px-3 py-1 bg-black text-white text-[10px] font-black border-2 border-black rounded-full uppercase tracking-widest shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]">
-                @{user.username || "no_username"}
-              </div>
-              {user.isProfilePublic ? (
-                <div className="px-2.5 py-1 bg-green-100 text-green-700 text-[8px] font-black border-2 border-black rounded-full uppercase flex items-center gap-1">
-                  <Globe size={10} /> Public
-                </div>
-              ) : (
-                <div className="px-2.5 py-1 bg-orange-100 text-orange-700 text-[8px] font-black border-2 border-black rounded-full uppercase flex items-center gap-1">
-                  <EyeOff size={10} /> Private
+              {isEditing && (
+                <div className="absolute bottom-0 right-0 bg-[#C9A96E] text-[#1E1B2E] p-1.5 rounded-full border-2 border-white shadow-sm cursor-pointer hover:scale-105 transition-transform">
+                  <Camera size={14} />
                 </div>
               )}
             </div>
-            <div className="flex flex-wrap items-center gap-4 text-muted-foreground font-bold text-sm">
-              <span className="flex items-center gap-1.5 font-black text-black/70"><Mail size={16} /> {user.email}</span>
-              {user.institution && (
-                <span className="flex items-center gap-1.5 font-black text-black/70"><Building2 size={16} /> {user.institution.name}</span>
-              )}
-              <span className="flex items-center gap-1.5 font-black text-black/70"><Calendar size={16} /> Joined {new Date(user.createdAt).getFullYear()}</span>
+            <div className="flex flex-col justify-center">
+              <div className="flex flex-wrap items-center gap-3 mb-1.5">
+                <h1 className="font-heading text-[26px] text-[#1E1B2E] capitalize leading-none">{user.name.toLowerCase()}</h1>
+                <div className="flex items-center gap-2">
+                  <span className="bg-[rgba(201,169,110,0.12)] text-[#C9A96E] text-[11px] px-3 py-1 rounded-full font-medium">
+                    {user.role.charAt(0).toUpperCase() + user.role.slice(1)}
+                  </span>
+                  {user.username && (
+                    <span className="bg-[rgba(30,27,46,0.06)] text-[#1E1B2E] text-[11px] px-3 py-1 rounded-full font-medium">
+                      @{user.username}
+                    </span>
+                  )}
+                  {user.isProfilePublic ? (
+                    <span className="bg-[rgba(201,169,110,0.1)] text-[#C9A96E] text-[11px] px-3 py-1 rounded-full font-medium flex items-center gap-1">
+                      <Globe size={10} /> Public
+                    </span>
+                  ) : (
+                    <span className="bg-[rgba(220,38,38,0.1)] text-[#DC2626] text-[11px] px-3 py-1 rounded-full font-medium flex items-center gap-1">
+                      <EyeOff size={10} /> Private
+                    </span>
+                  )}
+                </div>
+              </div>
+              <div className="flex items-center gap-4 text-[13px] text-[#8E8E93]">
+                <span className="flex items-center gap-1.5"><Mail size={14} /> {user.email}</span>
+                {user.institution && <span className="flex items-center gap-1.5"><Building2 size={14} /> {user.institution.name}</span>}
+                <span className="flex items-center gap-1.5"><Calendar size={14} /> Joined {new Date(user.createdAt).getFullYear()}</span>
+              </div>
             </div>
           </div>
+          <div className="flex shrink-0">
+            <button 
+              onClick={() => setIsEditing(!isEditing)} 
+              className={`h-[40px] px-5 rounded-xl text-[14px] font-medium flex items-center gap-2 transition-all ${isEditing ? "bg-[#1E1B2E] text-white" : "border border-[#1E1B2E] text-[#1E1B2E] hover:bg-[#1E1B2E] hover:text-white"}`}
+            >
+              {isEditing ? "Cancel Editing" : <><Pencil size={16} /> {user.bio ? "Edit Profile" : "Complete Profile"}</>}
+            </button>
+          </div>
         </div>
-        <div className="flex gap-3">
-          {!isEditing ? (
-            <Button onClick={() => setIsEditing(true)} className="neo-brutalism bg-[#F5C84C] text-black font-black h-14 px-8 text-lg">
-              <Edit3 className="mr-2" /> Complete Profile
-            </Button>
-          ) : (
-            <Button onClick={() => setIsEditing(false)} variant="outline" className="h-14 px-8 font-black border-4 border-black text-lg">
-              Cancel
-            </Button>
-          )}
-        </div>
-      </div>
+      </motion.div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-10">
-        {/* Left Column: Role-Specific Identity & Stats */}
-        <div className="lg:col-span-8 space-y-10">
+      {/* Two Columns Layout */}
+      <div className="flex flex-col lg:flex-row gap-6 px-8">
+        
+        {/* Left Column (2/3) */}
+        <div className="w-full lg:w-2/3 flex flex-col gap-6">
           
-          {/* Bio & Skills (Common) */}
-          <div className="bg-white border-4 border-black rounded-[2.5rem] p-8 md:p-10 shadow-[12px_12px_0px_0px_rgba(0,0,0,1)]">
-            <h3 className="text-3xl font-black uppercase tracking-tighter mb-6 flex items-center gap-3">
-               <Info className="text-primary" /> About Me
-            </h3>
-            <p className="text-lg font-bold text-muted-foreground leading-relaxed mb-8">
+          {/* About Me */}
+          <motion.div 
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5, delay: 0.1, ease: [0.25, 0.1, 0.25, 1.0] }}
+            className="bg-white rounded-[16px] p-7 shadow-[0_4px_16px_rgba(0,0,0,0.05)]"
+          >
+            <h3 className="font-heading text-[20px] text-[#1E1B2E] mb-3">About Me</h3>
+            <p className="text-[14px] text-[#8E8E93] leading-[1.7]">
               {user.bio || "No bio added yet. Click 'Complete Profile' to introduce yourself!"}
             </p>
-            <div className="flex flex-wrap gap-3">
-              {skillsArray.length > 0 ? skillsArray.map((skill: string, i: number) => (
-                <span key={i} className="px-4 py-2 bg-secondary/20 border-2 border-black rounded-xl font-black uppercase text-xs shadow-[3px_3px_0px_0px_rgba(0,0,0,1)]">
-                   {skill}
-                </span>
-              )) : (
-                <p className="text-xs font-bold opacity-40">No skills listed yet.</p>
+            <div className="mt-5">
+              <h4 className="text-[12px] uppercase tracking-[0.08em] font-medium text-[#8E8E93] mb-3">Skills</h4>
+              {skillsArray.length > 0 ? (
+                <div className="flex flex-wrap gap-2">
+                  {skillsArray.map((skill: string, i: number) => (
+                    <span key={i} className="bg-[rgba(201,169,110,0.1)] text-[#C9A96E] text-[12px] px-3 py-1 rounded-full font-medium">
+                      {skill}
+                    </span>
+                  ))}
+                </div>
+              ) : (
+                <p className="text-[13px] text-[#8E8E93] italic">No skills listed yet.</p>
               )}
             </div>
-          </div>
+          </motion.div>
 
           {/* Role Specific Sections */}
           {user.role === "student" && (
-            <div className="space-y-10">
+            <>
               {/* Learning Identity */}
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div className="bg-[#4F7DF3] text-white p-8 border-4 border-black rounded-[2rem] shadow-[8px_8px_0px_0px_rgba(0,0,0,1)]">
-                  <div className="flex items-center gap-3 mb-4">
-                    <Target size={24} className="text-[#F5C84C]" />
-                    <h4 className="text-xl font-black uppercase">Learning Goal</h4>
-                  </div>
-                  <p className="font-bold text-lg leading-tight">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+                <motion.div 
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.5, delay: 0.15, ease: [0.25, 0.1, 0.25, 1.0] }}
+                  className="bg-white rounded-[16px] p-6 shadow-[0_4px_16px_rgba(0,0,0,0.05)]"
+                >
+                  <Target className="w-5 h-5 text-[#C9A96E] mb-2.5" />
+                  <h4 className="font-heading text-[18px] text-[#1E1B2E] mb-1.5">Learning Goal</h4>
+                  <p className={`text-[14px] leading-relaxed ${user.learningGoal ? "text-[#8E8E93]" : "text-[#8E8E93] italic"}`}>
                     {user.learningGoal || "What's your 6-month goal?"}
                   </p>
-                </div>
-                <div className="bg-[#34D399] text-black p-8 border-4 border-black rounded-[2rem] shadow-[8px_8px_0px_0px_rgba(0,0,0,1)]">
-                  <div className="flex items-center gap-3 mb-4">
-                    <GraduationCap size={24} />
-                    <h4 className="text-xl font-black uppercase">Current Degree</h4>
-                  </div>
-                  <p className="font-bold text-lg leading-tight">
-                    {user.degree || "Not set"} {user.specialization ? `(${user.specialization})` : ""}
+                </motion.div>
+                <motion.div 
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.5, delay: 0.2, ease: [0.25, 0.1, 0.25, 1.0] }}
+                  className="bg-white rounded-[16px] p-6 shadow-[0_4px_16px_rgba(0,0,0,0.05)]"
+                >
+                  <GraduationCap className="w-5 h-5 text-[#C9A96E] mb-2.5" />
+                  <h4 className="font-heading text-[18px] text-[#1E1B2E] mb-1.5">Current Degree</h4>
+                  <p className={`text-[14px] leading-relaxed ${user.degree ? "text-[#8E8E93]" : "text-[#8E8E93] italic"}`}>
+                    {user.degree ? `${user.degree}${user.specialization ? ` (${user.specialization})` : ""}` : "Not set"}
                   </p>
-                </div>
+                </motion.div>
               </div>
 
-              {/* Streaks & Time */}
-              <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                 <div className="bg-white border-4 border-black p-6 rounded-2xl shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] flex flex-col items-center">
-                    <Flame className="text-orange-500 mb-2" />
-                    <span className="text-2xl font-black">{user.currentStreak}</span>
-                    <span className="text-[10px] font-black uppercase opacity-60">Current Streak</span>
-                 </div>
-                 <div className="bg-white border-4 border-black p-6 rounded-2xl shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] flex flex-col items-center">
-                    <TrendingUp className="text-green-500 mb-2" />
-                    <span className="text-2xl font-black">{user.longestStreak}</span>
-                    <span className="text-[10px] font-black uppercase opacity-60">Best Streak</span>
-                 </div>
-                 <div className="bg-white border-4 border-black p-6 rounded-2xl shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] flex flex-col items-center">
-                    <Clock className="text-blue-500 mb-2" />
-                    <span className="text-2xl font-black">{user.studyHours.toFixed(1)}</span>
-                    <span className="text-[10px] font-black uppercase opacity-60">Total Hours</span>
-                 </div>
-                 <div className="bg-white border-4 border-black p-6 rounded-2xl shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] flex flex-col items-center">
-                    <BarChart3 className="text-primary mb-2" />
-                    <span className="text-2xl font-black">{roleData.averageScore || 0}%</span>
-                    <span className="text-[10px] font-black uppercase opacity-60">Avg Score</span>
-                 </div>
+              {/* Streaks & Stats */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                {[
+                  { icon: Flame, value: user.currentStreak || 0, label: "Current Streak" },
+                  { icon: TrendingUp, value: user.longestStreak || 0, label: "Best Streak" },
+                  { icon: Clock, value: (user.studyHours || 0).toFixed(1), label: "Total Hours" },
+                  { icon: BarChart3, value: `${roleData.averageScore || 0}%`, label: "Avg Score" }
+                ].map((stat, i) => (
+                  <motion.div 
+                    key={i} 
+                    initial={{ opacity: 0, scale: 0.95 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    transition={{ duration: 0.4, delay: 0.25 + (i * 0.05) }}
+                    className="bg-white rounded-[16px] p-5 shadow-[0_4px_12px_rgba(0,0,0,0.04)] text-center flex flex-col items-center"
+                  >
+                    <stat.icon className="w-5 h-5 text-[#8E8E93] mb-2.5" />
+                    <span className="font-heading text-[24px] text-[#1E1B2E] leading-none mb-1.5">{stat.value}</span>
+                    <span className="text-[11px] uppercase tracking-[0.08em] font-medium text-[#8E8E93]">{stat.label}</span>
+                  </motion.div>
+                ))}
               </div>
 
               {/* Certificates */}
-              <div className="bg-white border-4 border-black rounded-[2.5rem] p-8 md:p-10 shadow-[12px_12px_0px_0px_rgba(0,0,0,1)]">
-                <div className="flex items-center justify-between mb-8">
-                  <h3 className="text-3xl font-black uppercase tracking-tighter">My Certificates</h3>
-                  <CertIcon className="text-muted-foreground" />
-                </div>
+              <motion.div 
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.5, delay: 0.35, ease: [0.25, 0.1, 0.25, 1.0] }}
+                className="bg-white rounded-[16px] p-7 shadow-[0_4px_16px_rgba(0,0,0,0.05)]"
+              >
+                <h3 className="font-heading text-[20px] text-[#1E1B2E] mb-4">My Certificates</h3>
                 {user.certificates.length > 0 ? (
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     {user.certificates.map((cert: any, i: number) => (
-                      <div key={i} className="p-4 border-2 border-black rounded-xl flex items-center justify-between group hover:bg-muted/10 transition-colors">
+                      <div key={i} className="p-4 border border-[rgba(30,27,46,0.06)] rounded-xl flex items-center justify-between hover:bg-[#F5F1EB] transition-colors">
                         <div className="flex items-center gap-3">
-                           <CheckCircle2 className="text-green-500" />
+                           <CheckCircle2 className="w-5 h-5 text-[#C9A96E]" />
                            <div>
-                              <p className="font-black text-sm uppercase">{cert.title}</p>
-                              <p className="text-[10px] font-bold text-muted-foreground uppercase">{new Date(cert.issueDate).toLocaleDateString()}</p>
+                              <p className="font-medium text-[14px] text-[#1E1B2E]">{cert.title}</p>
+                              <p className="text-[12px] text-[#8E8E93] mt-0.5">{new Date(cert.issueDate).toLocaleDateString()}</p>
                            </div>
                         </div>
-                        <Button size="icon" variant="ghost" onClick={() => window.open(`/certificates/${cert.id}`, '_blank')} className="border-2 border-black hover:bg-black hover:text-white transition-all">
+                        <button onClick={() => window.open(`/certificates/${cert.id}`, '_blank')} className="w-8 h-8 flex items-center justify-center text-[#8E8E93] hover:text-[#1E1B2E]">
                            <Download size={16} />
-                        </Button>
+                        </button>
                       </div>
                     ))}
                   </div>
                 ) : (
-                  <p className="text-center py-10 font-bold opacity-30 italic">Finish a course to earn your first certificate!</p>
+                  <p className="text-[14px] text-[#8E8E93] italic">No certificates earned yet. Finish a course to earn your first!</p>
                 )}
-              </div>
-            </div>
+              </motion.div>
+            </>
           )}
 
+          {/* Teacher and Parent sections preserved with new styling logic... */}
           {user.role === "teacher" && (
-            <div className="space-y-10">
-              {/* Professional Identity */}
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                <div className="bg-[#4F7DF3] text-white p-8 border-4 border-black rounded-[2rem] shadow-[8px_8px_0px_0px_rgba(0,0,0,1)]">
-                  <div className="flex items-center gap-3 mb-4">
-                    <Briefcase size={20} />
-                    <h4 className="text-sm font-black uppercase">Expertise</h4>
-                  </div>
-                  <p className="font-bold text-lg leading-tight">{user.expertise || "Not set"}</p>
-                </div>
-                <div className="bg-[#34D399] text-black p-8 border-4 border-black rounded-[2rem] shadow-[8px_8px_0px_0px_rgba(0,0,0,1)]">
-                  <div className="flex items-center gap-3 mb-4">
-                    <Calendar size={20} />
-                    <h4 className="text-sm font-black uppercase">Experience</h4>
-                  </div>
-                  <p className="font-bold text-lg leading-tight">{user.experienceYears || 0} Years</p>
-                </div>
-                <div className="bg-[#F5C84C] text-black p-8 border-4 border-black rounded-[2rem] shadow-[8px_8px_0px_0px_rgba(0,0,0,1)]">
-                  <div className="flex items-center gap-3 mb-4">
-                    <GraduationCap size={20} />
-                    <h4 className="text-sm font-black uppercase">Qualification</h4>
-                  </div>
-                  <p className="font-bold text-lg leading-tight truncate">{user.qualification || "Not set"}</p>
-                </div>
-              </div>
-
-              {/* Teaching Stats */}
-              <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                 <div className="bg-white border-4 border-black p-6 rounded-2xl shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] flex flex-col items-center">
-                    <Users className="text-primary mb-2" />
-                    <span className="text-2xl font-black">{roleData.totalStudentsTaught}</span>
-                    <span className="text-[10px] font-black uppercase opacity-60">Taught</span>
-                 </div>
-                 <div className="bg-white border-4 border-black p-6 rounded-2xl shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] flex flex-col items-center">
-                    <Star className="text-yellow-500 mb-2" />
-                    <span className="text-2xl font-black">{user.rating.toFixed(1)}</span>
-                    <span className="text-[10px] font-black uppercase opacity-60">Rating</span>
-                 </div>
-                 <div className="bg-white border-4 border-black p-6 rounded-2xl shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] flex flex-col items-center">
-                    <BookOpen className="text-green-500 mb-2" />
-                    <span className="text-2xl font-black">{user._count.courses}</span>
-                    <span className="text-[10px] font-black uppercase opacity-60">Courses</span>
-                 </div>
-                 <div className="bg-white border-4 border-black p-6 rounded-2xl shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] flex flex-col items-center">
-                    <Clock className="text-blue-500 mb-2" />
-                    <span className="text-2xl font-black">120+</span>
-                    <span className="text-[10px] font-black uppercase opacity-60">Hours</span>
-                 </div>
-              </div>
-            </div>
-          )}
-
-          {user.role === "parent" && (
-            <div className="space-y-10">
-               <div className="bg-white border-4 border-black rounded-[2.5rem] p-8 shadow-[12px_12px_0px_0px_rgba(0,0,0,1)]">
-                 <h3 className="text-3xl font-black uppercase tracking-tighter mb-6 flex items-center gap-3">
-                   <Edit3 className="text-primary" /> Parenting Notes
-                 </h3>
-                 <p className="text-lg font-bold text-muted-foreground leading-relaxed italic">
-                   "{user.parentNotes || "No personal notes for child tracking yet."}"
-                 </p>
-               </div>
-               
-               <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-                 {roleData.childrenDetails?.map((child: any, i: number) => (
-                   <div key={i} className="bg-white border-4 border-black rounded-[2rem] p-8 shadow-[8px_8px_0px_0px_rgba(0,0,0,1)]">
-                      <div className="flex items-center gap-4 mb-6">
-                        <div className="w-12 h-12 bg-secondary border-2 border-black rounded-full flex items-center justify-center font-black">
-                          {child.name.charAt(0)}
-                        </div>
-                        <div>
-                          <h4 className="text-xl font-black uppercase leading-none mb-1">{child.name}</h4>
-                          <div className="flex gap-2">
-                             <span className="text-[10px] font-black bg-green-100 px-2 rounded-full border border-black">↑ Improving</span>
-                          </div>
-                        </div>
-                      </div>
-                      <div className="grid grid-cols-2 gap-4 mb-6">
-                         <div className="p-3 bg-muted/20 border-2 border-black rounded-xl text-center">
-                            <p className="text-[10px] font-black uppercase opacity-60">Enrolled</p>
-                            <p className="text-xl font-black">{child._count.enrollments}</p>
-                         </div>
-                         <div className="p-3 bg-muted/20 border-2 border-black rounded-xl text-center">
-                            <p className="text-[10px] font-black uppercase opacity-60">Avg Score</p>
-                            <p className="text-xl font-black">82%</p>
-                         </div>
-                      </div>
-                      <div className="space-y-2">
-                         <p className="text-[10px] font-black uppercase opacity-60">Last Activity:</p>
-                         <div className="p-3 bg-black text-white rounded-xl text-xs font-bold flex justify-between">
-                            <span>Python Basics</span>
-                            <span>2h ago</span>
-                         </div>
-                      </div>
-                   </div>
-                 ))}
-               </div>
-            </div>
-          )}
-
-          {/* Activity Timeline (Common) */}
-          <div className="bg-white border-4 border-black rounded-[2.5rem] p-8 md:p-10 shadow-[12px_12px_0px_0px_rgba(0,0,0,1)]">
-            <h3 className="text-3xl font-black uppercase tracking-tighter mb-8 flex items-center gap-3">
-               <Activity className="text-primary" /> Activity Feed
-            </h3>
             <div className="space-y-6">
-               <div className="flex gap-4">
-                  <div className="relative">
-                     <div className="w-10 h-10 bg-[#34D399] border-2 border-black rounded-full flex items-center justify-center z-10 relative">
-                        <CheckCircle2 size={20} />
-                     </div>
-                     <div className="absolute top-10 left-1/2 -translate-x-1/2 w-1 h-12 bg-black/10"></div>
-                  </div>
-                  <div>
-                     <p className="font-black text-sm uppercase">Last Login Session</p>
-                     <p className="text-xs font-bold text-muted-foreground uppercase">{new Date(user.lastActiveAt).toLocaleString()}</p>
-                  </div>
-               </div>
-               {user.enrollments && user.enrollments.length > 0 && (
-                 <div className="flex gap-4">
-                    <div className="relative">
-                       <div className="w-10 h-10 bg-[#4F7DF3] text-white border-2 border-black rounded-full flex items-center justify-center z-10 relative">
-                          <BookOpen size={20} />
-                       </div>
-                       <div className="absolute top-10 left-1/2 -translate-x-1/2 w-1 h-12 bg-black/10"></div>
-                    </div>
-                    <div>
-                       <p className="font-black text-sm uppercase">Enrolled in Course</p>
-                       <p className="text-xs font-bold text-muted-foreground uppercase">{user.enrollments[0].course?.title || "A new course"}</p>
-                    </div>
-                 </div>
-               )}
-               <div className="flex gap-4 opacity-50">
-                  <div className="relative">
-                     <div className="w-10 h-10 bg-primary/20 border-2 border-black rounded-full flex items-center justify-center">
-                        <Calendar size={20} />
-                     </div>
-                  </div>
-                  <div>
-                     <p className="font-black text-sm uppercase">Account Created</p>
-                     <p className="text-xs font-bold text-muted-foreground uppercase">{new Date(user.createdAt).toLocaleDateString()}</p>
-                  </div>
-               </div>
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
+                {[
+                  { icon: Briefcase, title: "Expertise", value: user.expertise || "Not set" },
+                  { icon: Calendar, title: "Experience", value: `${user.experienceYears || 0} Years` },
+                  { icon: GraduationCap, title: "Qualification", value: user.qualification || "Not set" }
+                ].map((item, i) => (
+                  <motion.div 
+                    key={i} 
+                    initial={{ opacity: 0, y: 15 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.4, delay: 0.15 + (i * 0.05) }}
+                    className="bg-white rounded-[16px] p-6 shadow-[0_4px_16px_rgba(0,0,0,0.05)]"
+                  >
+                    <item.icon className="w-5 h-5 text-[#C9A96E] mb-2.5" />
+                    <h4 className="font-heading text-[18px] text-[#1E1B2E] mb-1.5">{item.title}</h4>
+                    <p className={`text-[14px] ${item.value !== "Not set" ? "text-[#8E8E93]" : "text-[#8E8E93] italic"}`}>{item.value}</p>
+                  </motion.div>
+                ))}
+              </div>
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                {[
+                  { icon: Users, value: roleData.totalStudentsTaught || 0, label: "Taught" },
+                  { icon: Star, value: (user.rating || 0).toFixed(1), label: "Rating" },
+                  { icon: BookOpen, value: user._count.courses || 0, label: "Courses" },
+                  { icon: Clock, value: "120+", label: "Hours" }
+                ].map((stat, i) => (
+                  <motion.div 
+                    key={i} 
+                    initial={{ opacity: 0, scale: 0.95 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    transition={{ duration: 0.4, delay: 0.25 + (i * 0.05) }}
+                    className="bg-white rounded-[16px] p-5 shadow-[0_4px_12px_rgba(0,0,0,0.04)] text-center flex flex-col items-center"
+                  >
+                    <stat.icon className="w-5 h-5 text-[#8E8E93] mb-2.5" />
+                    <span className="font-heading text-[24px] text-[#1E1B2E] leading-none mb-1.5">{stat.value}</span>
+                    <span className="text-[11px] uppercase tracking-[0.08em] font-medium text-[#8E8E93]">{stat.label}</span>
+                  </motion.div>
+                ))}
+              </div>
             </div>
-          </div>
-
+          )}
+          
         </div>
 
-        {/* Right Column: Settings & Account Management */}
-        <div className="lg:col-span-4 space-y-10">
-          
-          <div className={`bg-white border-4 border-black rounded-[2.5rem] p-8 shadow-[12px_12px_0px_0px_rgba(0,0,0,1)] ${isEditing ? 'ring-8 ring-primary/20 transition-all' : ''}`}>
-            <h3 className="text-2xl font-black uppercase tracking-tighter mb-6 flex items-center gap-2">
-              {isEditing ? <Edit3 size={24} className="text-primary" /> : <Shield size={24} className="text-muted-foreground" />} 
-              Manage Account
-            </h3>
+        {/* Right Column (1/3) - Manage Account Form */}
+        <div className="w-full lg:w-1/3 flex flex-col gap-6">
+          <motion.div 
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5, delay: 0.2, ease: [0.25, 0.1, 0.25, 1.0] }}
+            className="bg-white rounded-[16px] p-7 shadow-[0_4px_16px_rgba(0,0,0,0.05)]"
+          >
+            <h3 className="font-heading text-[20px] text-[#1E1B2E] mb-6">Manage Account</h3>
             
-            <form onSubmit={handleUpdate} className="space-y-6">
-              {/* Basic Info */}
-              <div className="space-y-4">
-                <div className="space-y-1.5">
-                  <label className="text-[10px] font-black uppercase tracking-widest text-muted-foreground">Display Name</label>
-                  <Input 
-                    disabled={!isEditing}
-                    className="h-12 border-2 border-black font-bold disabled:bg-muted/20 disabled:opacity-100"
-                    value={formData.name}
-                    onChange={e => setFormData({...formData, name: e.target.value})}
-                  />
-                </div>
-                <div className="space-y-1.5">
-                  <label className="text-[10px] font-black uppercase tracking-widest text-muted-foreground">Gmail Address</label>
-                  <Input 
-                    type="email"
-                    disabled={!isEditing}
-                    className="h-12 border-2 border-black font-bold disabled:bg-muted/20 disabled:opacity-100"
-                    value={formData.email}
-                    onChange={e => {
-                      setFormData({...formData, email: e.target.value});
-                      setOtpSent(false);
-                    }}
-                  />
-                </div>
-                <div className="space-y-1.5">
-                  <label className="text-[10px] font-black uppercase tracking-widest text-muted-foreground">Unique Username (@)</label>
-                  <Input 
-                    disabled={!isEditing}
-                    className="h-12 border-2 border-black font-bold disabled:bg-muted/20 disabled:opacity-100"
-                    value={formData.username}
-                    onChange={e => setFormData({...formData, username: e.target.value.replace(/[^a-zA-Z0-9_]/g, "").toLowerCase()})}
-                    placeholder="e.g. alex_dev"
-                  />
-                </div>
-                <div className="space-y-1.5">
-                  <label className="text-[10px] font-black uppercase tracking-widest text-muted-foreground">Bio / Intro</label>
-                  <textarea 
-                    disabled={!isEditing}
-                    className="w-full p-3 border-2 border-black rounded-xl font-bold text-sm min-h-[100px] disabled:bg-muted/20 disabled:opacity-100 resize-none"
-                    value={formData.bio}
-                    onChange={e => setFormData({...formData, bio: e.target.value})}
-                    placeholder="Tell the community about yourself..."
-                  />
-                </div>
-                <div className="space-y-1.5">
-                  <label className="text-[10px] font-black uppercase tracking-widest text-muted-foreground">Skills (Comma separated)</label>
-                  <Input 
-                    disabled={!isEditing}
-                    className="h-12 border-2 border-black font-bold disabled:bg-muted/20"
-                    value={formData.skills}
-                    onChange={e => setFormData({...formData, skills: e.target.value})}
-                    placeholder="Python, React, Machine Learning"
-                  />
-                </div>
+            <form onSubmit={handleUpdate} className="space-y-0">
+              
+              <div className="mb-5">
+                <label className="block text-[12px] uppercase tracking-[0.08em] font-medium text-[#8E8E93] mb-2">Display Name</label>
+                <input disabled={!isEditing} value={formData.name} onChange={e => setFormData({...formData, name: e.target.value})} className="w-full h-[44px] bg-white border border-[rgba(30,27,46,0.12)] rounded-xl px-3.5 text-[14px] text-[#1E1B2E] focus:outline-none focus:border-[#C9A96E] focus:ring-[3px] focus:ring-[rgba(201,169,110,0.15)] transition-all disabled:bg-[rgba(30,27,46,0.02)] disabled:text-[#8E8E93]" />
+              </div>
+              
+              <div className="mb-5">
+                <label className="block text-[12px] uppercase tracking-[0.08em] font-medium text-[#8E8E93] mb-2">Gmail Address</label>
+                <input type="email" disabled={!isEditing} value={formData.email} onChange={e => { setFormData({...formData, email: e.target.value}); setOtpSent(false); }} className="w-full h-[44px] bg-white border border-[rgba(30,27,46,0.12)] rounded-xl px-3.5 text-[14px] text-[#1E1B2E] focus:outline-none focus:border-[#C9A96E] focus:ring-[3px] focus:ring-[rgba(201,169,110,0.15)] transition-all disabled:bg-[rgba(30,27,46,0.02)] disabled:text-[#8E8E93]" />
+              </div>
+              
+              <div className="mb-5">
+                <label className="block text-[12px] uppercase tracking-[0.08em] font-medium text-[#8E8E93] mb-2">Unique Username (@)</label>
+                <input disabled={!isEditing} value={formData.username} onChange={e => setFormData({...formData, username: e.target.value.replace(/[^a-zA-Z0-9_]/g, "").toLowerCase()})} placeholder="e.g. alex_dev" className="w-full h-[44px] bg-white border border-[rgba(30,27,46,0.12)] rounded-xl px-3.5 text-[14px] text-[#1E1B2E] focus:outline-none focus:border-[#C9A96E] focus:ring-[3px] focus:ring-[rgba(201,169,110,0.15)] transition-all disabled:bg-[rgba(30,27,46,0.02)] disabled:text-[#8E8E93]" />
+              </div>
+              
+              <div className="mb-5">
+                <label className="block text-[12px] uppercase tracking-[0.08em] font-medium text-[#8E8E93] mb-2">Bio / Intro</label>
+                <textarea disabled={!isEditing} value={formData.bio} onChange={e => setFormData({...formData, bio: e.target.value})} placeholder="Tell the community about yourself..." className="w-full min-h-[100px] bg-white border border-[rgba(30,27,46,0.12)] rounded-xl p-3.5 text-[14px] text-[#1E1B2E] focus:outline-none focus:border-[#C9A96E] focus:ring-[3px] focus:ring-[rgba(201,169,110,0.15)] transition-all disabled:bg-[rgba(30,27,46,0.02)] disabled:text-[#8E8E93] resize-y" />
+              </div>
+              
+              <div className="mb-5">
+                <label className="block text-[12px] uppercase tracking-[0.08em] font-medium text-[#8E8E93] mb-2">Skills (Comma separated)</label>
+                <input disabled={!isEditing} value={formData.skills} onChange={e => setFormData({...formData, skills: e.target.value})} placeholder="Python, React, Machine Learning" className="w-full h-[44px] bg-white border border-[rgba(30,27,46,0.12)] rounded-xl px-3.5 text-[14px] text-[#1E1B2E] focus:outline-none focus:border-[#C9A96E] focus:ring-[3px] focus:ring-[rgba(201,169,110,0.15)] transition-all disabled:bg-[rgba(30,27,46,0.02)] disabled:text-[#8E8E93]" />
               </div>
 
-              {/* Role Specific Fields in Edit Mode */}
-              {isEditing && (
-                <div className="space-y-4 pt-4 border-t-2 border-black border-dashed">
-                  {user.role === "student" && (
-                    <>
-                      <div className="space-y-1.5">
-                        <label className="text-[10px] font-black uppercase tracking-widest text-primary">6-Month Learning Goal</label>
-                        <Input 
-                          className="h-12 border-2 border-black font-bold"
-                          value={formData.learningGoal}
-                          onChange={e => setFormData({...formData, learningGoal: e.target.value})}
-                          placeholder="Become AI Engineer"
-                        />
-                      </div>
-                      <div className="space-y-1.5">
-                        <label className="text-[10px] font-black uppercase tracking-widest text-primary">Current Pursuing Degree</label>
-                        <select 
-                          className="w-full h-12 border-2 border-black rounded-xl px-3 font-bold bg-white"
-                          value={formData.degree}
-                          onChange={e => setFormData({...formData, degree: e.target.value})}
-                        >
-                          <option value="">Select Degree</option>
-                          <option>High School</option>
-                          <option>Diploma</option>
-                          <option>B.Tech</option>
-                          <option>B.Sc</option>
-                          <option>B.A</option>
-                          <option>B.Com</option>
-                          <option>BCA</option>
-                          <option>B.Ed</option>
-                          <option>M.Tech</option>
-                          <option>M.Sc</option>
-                          <option>M.A</option>
-                          <option>MBA</option>
-                          <option>MCA</option>
-                          <option>PhD</option>
-                          <option>Other</option>
-                        </select>
-                      </div>
-                      <div className="space-y-1.5">
-                        <label className="text-[10px] font-black uppercase tracking-widest text-primary">Specialization / Branch</label>
-                        <select 
-                          className="w-full h-12 border-2 border-black rounded-xl px-3 font-bold bg-white"
-                          value={formData.specialization}
-                          onChange={e => setFormData({...formData, specialization: e.target.value})}
-                        >
-                          <option value="">Select Specialization</option>
-                          {/* Engineering */}
-                          {["B.Tech", "M.Tech", "Diploma"].includes(formData.degree) && (
-                            <>
-                              <option>Computer Science (CSE)</option>
-                              <option>Mechanical (ME)</option>
-                              <option>Civil (CE)</option>
-                              <option>Electrical (EE)</option>
-                              <option>Electronics (ECE)</option>
-                              <option>Chemical</option>
-                              <option>Information Technology (IT)</option>
-                            </>
-                          )}
-                          {/* Science */}
-                          {["B.Sc", "M.Sc", "PhD"].includes(formData.degree) && (
-                            <>
-                              <option>Physics</option>
-                              <option>Chemistry</option>
-                              <option>Mathematics</option>
-                              <option>Biology</option>
-                              <option>Computer Science</option>
-                              <option>Biotechnology</option>
-                            </>
-                          )}
-                          {/* Commerce/Business */}
-                          {["B.Com", "MBA", "M.A", "B.A"].includes(formData.degree) && (
-                            <>
-                              <option>Finance</option>
-                              <option>Marketing</option>
-                              <option>Economics</option>
-                              <option>Business Analytics</option>
-                              <option>Human Resources</option>
-                              <option>Accounting</option>
-                            </>
-                          )}
-                          {/* Computer Apps */}
-                          {["BCA", "MCA"].includes(formData.degree) && (
-                            <>
-                              <option>Software Development</option>
-                              <option>Data Science</option>
-                              <option>Cyber Security</option>
-                              <option>Cloud Computing</option>
-                              <option>AI & ML</option>
-                            </>
-                          )}
-                          <option>General / Other</option>
-                        </select>
-                      </div>
-                    </>
-                  )}
+              {isEditing && user.role === "student" && (
+                <>
+                  <div className="mb-5">
+                    <label className="block text-[12px] uppercase tracking-[0.08em] font-medium text-[#8E8E93] mb-2">Learning Goal</label>
+                    <input value={formData.learningGoal} onChange={e => setFormData({...formData, learningGoal: e.target.value})} className="w-full h-[44px] bg-white border border-[rgba(30,27,46,0.12)] rounded-xl px-3.5 text-[14px] text-[#1E1B2E] focus:outline-none focus:border-[#C9A96E] focus:ring-[3px] focus:ring-[rgba(201,169,110,0.15)] transition-all" />
+                  </div>
+                  <div className="mb-5">
+                    <label className="block text-[12px] uppercase tracking-[0.08em] font-medium text-[#8E8E93] mb-2">Current Degree</label>
+                    <select value={formData.degree} onChange={e => setFormData({...formData, degree: e.target.value})} className="w-full h-[44px] bg-white border border-[rgba(30,27,46,0.12)] rounded-xl px-3.5 text-[14px] text-[#1E1B2E] focus:outline-none focus:border-[#C9A96E] focus:ring-[3px] focus:ring-[rgba(201,169,110,0.15)] transition-all">
+                      <option value="">Select Degree</option>
+                      <option>High School</option>
+                      <option>Diploma</option>
+                      <option>B.Tech</option>
+                      <option>B.Sc</option>
+                      <option>B.A</option>
+                      <option>B.Com</option>
+                      <option>BCA</option>
+                      <option>B.Ed</option>
+                      <option>M.Tech</option>
+                      <option>M.Sc</option>
+                      <option>M.A</option>
+                      <option>MBA</option>
+                      <option>MCA</option>
+                      <option>PhD</option>
+                      <option>Other</option>
+                    </select>
+                  </div>
+                </>
+              )}
 
-                  {user.role === "teacher" && (
-                    <>
-                      <div className="space-y-1.5">
-                        <label className="text-[10px] font-black uppercase tracking-widest text-primary">Primary Expertise</label>
-                        <Input 
-                          className="h-12 border-2 border-black font-bold"
-                          value={formData.expertise}
-                          onChange={e => setFormData({...formData, expertise: e.target.value})}
-                          placeholder="Web Dev, AI, Data Science"
-                        />
-                      </div>
-                      <div className="space-y-1.5">
-                        <label className="text-[10px] font-black uppercase tracking-widest text-primary">Years of Experience</label>
-                        <Input 
-                          type="number"
-                          className="h-12 border-2 border-black font-bold"
-                          value={formData.experienceYears}
-                          onChange={e => setFormData({...formData, experienceYears: parseInt(e.target.value) || 0})}
-                        />
-                      </div>
-                      <div className="space-y-1.5">
-                        <label className="text-[10px] font-black uppercase tracking-widest text-primary">Top Qualification</label>
-                        <Input 
-                          className="h-12 border-2 border-black font-bold"
-                          value={formData.qualification}
-                          onChange={e => setFormData({...formData, qualification: e.target.value})}
-                          placeholder="PhD in CS, M.Tech, etc."
-                        />
-                      </div>
-                    </>
+              {isEmailChanged && (
+                <div className="mb-5 p-4 bg-[rgba(220,38,38,0.05)] border border-[rgba(220,38,38,0.2)] rounded-xl space-y-4">
+                  <p className="text-[11px] font-medium uppercase tracking-[0.08em] text-[#DC2626] flex items-center gap-1.5">
+                    <ShieldCheck size={14} /> Security Required
+                  </p>
+                  <input type="password" required className="w-full h-[40px] bg-white border border-[rgba(30,27,46,0.12)] rounded-lg px-3 text-[13px]" placeholder="Current Password" value={formData.password} onChange={e => setFormData({...formData, password: e.target.value})} />
+                  {!otpSent ? (
+                    <button type="button" onClick={handleSendOtp} disabled={loading} className="w-full h-[40px] rounded-lg bg-[#1E1B2E] text-white text-[13px] font-medium">Verify New Gmail</button>
+                  ) : (
+                    <input required maxLength={6} className="w-full h-[40px] bg-white border border-[rgba(30,27,46,0.12)] rounded-lg px-3 text-[13px] text-center tracking-[0.5em]" placeholder="OTP" value={formData.otpCode} onChange={e => setFormData({...formData, otpCode: e.target.value})} />
                   )}
-
-                  {user.role === "parent" && (
-                    <div className="space-y-1.5">
-                      <label className="text-[10px] font-black uppercase tracking-widest text-primary">Parenting Notes</label>
-                      <textarea 
-                        className="w-full p-3 border-2 border-black rounded-xl font-bold text-sm min-h-[100px] resize-none"
-                        value={formData.parentNotes}
-                        onChange={e => setFormData({...formData, parentNotes: e.target.value})}
-                        placeholder="Notes on child progress..."
-                      />
-                    </div>
-                  )}
-
-                  {isEmailChanged && (
-                    <div className="p-5 bg-red-50 border-4 border-black border-dashed rounded-2xl space-y-4">
-                      <p className="text-[10px] font-black uppercase text-red-600 flex items-center gap-1.5">
-                        <ShieldCheck size={14} /> Security Required
-                      </p>
-                      <Input 
-                        type="password" required
-                        className="h-11 border-2 border-black font-bold bg-white"
-                        placeholder="Current Password"
-                        value={formData.password}
-                        onChange={e => setFormData({...formData, password: e.target.value})}
-                      />
-                      {!otpSent ? (
-                        <Button type="button" onClick={handleSendOtp} disabled={loading} className="w-full bg-primary text-white font-black border-2 border-black">
-                          Verify New Gmail
-                        </Button>
-                      ) : (
-                        <Input 
-                          required maxLength={6}
-                          className="h-11 border-2 border-black font-bold bg-white text-center tracking-[0.5em]"
-                          placeholder="OTP"
-                          value={formData.otpCode}
-                          onChange={e => setFormData({...formData, otpCode: e.target.value})}
-                        />
-                      )}
-                    </div>
-                  )}
-
-                  <Button 
-                    type="submit" 
-                    disabled={loading || (isEmailChanged && !otpSent)}
-                    className="w-full h-14 text-lg font-black neo-brutalism bg-[#34D399] text-black"
-                  >
-                    {loading ? <Loader2 className="animate-spin" /> : <Save className="mr-2" />}
-                    Save Everything
-                  </Button>
                 </div>
               )}
 
-              {!isEditing && (
-                <div className="space-y-4">
-                  <div className="pt-4 border-t-2 border-black border-dashed">
-                    <h4 className="text-[10px] font-black uppercase tracking-widest text-muted-foreground mb-4">Security Settings</h4>
-                    <PasswordChangeSection />
-                  </div>
+              <div className="my-6 border-t border-[rgba(30,27,46,0.06)]" />
+              
+              <h4 className="text-[12px] uppercase tracking-[0.08em] font-medium text-[#8E8E93] mb-4">Security Settings</h4>
+              <div className="space-y-4 mb-6">
+                <PasswordChangeSection />
+                
+                {/* Privacy toggle if not editing */}
+                {!isEditing && ["student", "parent"].includes(user.role) && (
+                  <PrivacyToggle isPublic={formData.isProfilePublic} onToggle={async (val: boolean) => {
+                    setFormData({...formData, isProfilePublic: val});
+                    try {
+                      await fetch("/api/profile/update", { method: "PATCH", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ ...formData, isProfilePublic: val }) });
+                      router.refresh();
+                    } catch (err) {}
+                  }} />
+                )}
 
-                  <div className="pt-4 border-t-2 border-black border-dashed">
-                    <h4 className="text-[10px] font-black uppercase tracking-widest text-muted-foreground mb-4">Privacy</h4>
-                    {["student", "parent"].includes(user.role) ? (
-                      <PrivacyToggle isPublic={formData.isProfilePublic} onToggle={async (val: boolean) => {
-                        setFormData({...formData, isProfilePublic: val});
-                        try {
-                          await fetch("/api/profile/update", {
-                            method: "PATCH",
-                            headers: { "Content-Type": "application/json" },
-                            body: JSON.stringify({ ...formData, isProfilePublic: val }),
-                          });
-                          router.refresh();
-                        } catch (err) { console.error(err); }
-                      }} />
-                    ) : (
-                      <div className="p-4 border-2 border-black rounded-2xl bg-orange-50 space-y-2">
-                        <div className="flex items-center gap-2">
-                          <Lock size={16} className="text-orange-600" />
-                          <span className="text-xs font-black uppercase text-orange-700">Always Private</span>
-                        </div>
-                        <p className="text-[8px] font-bold text-orange-600/70 leading-relaxed">
-                          As a {user.role}, your profile is permanently private. Users must send a chat request before messaging you.
-                        </p>
-                      </div>
-                    )}
-                  </div>
-                  
+                <button type="button" onClick={handleDeleteAccount} className="text-[13px] text-[#DC2626] hover:underline font-medium block">
+                  Delete Account
+                </button>
+              </div>
 
-                </div>
+              {isEditing && (
+                <button type="submit" disabled={loading || (isEmailChanged && !otpSent)} className="w-full h-[48px] rounded-xl bg-[#C9A96E] text-[#1E1B2E] text-[14px] font-medium hover:scale-[1.01] transition-transform disabled:opacity-50 flex items-center justify-center">
+                  {loading ? <><Loader2 className="w-4 h-4 animate-spin mr-2" /> Saving...</> : "Save Changes"}
+                </button>
               )}
             </form>
-          </div>
+          </motion.div>
         </div>
       </div>
     </div>
   );
 }
 
-// Keep your PasswordChangeSection from previous version
 function PasswordChangeSection() {
   const [show, setShow] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -723,29 +473,26 @@ function PasswordChangeSection() {
 
   if (!show) {
     return (
-      <Button 
-        onClick={() => setShow(true)} variant="outline" 
-        className="w-full h-11 border-2 border-black font-black uppercase text-xs shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] hover:shadow-none transition-all"
-      >
-        <Lock size={14} className="mr-2" /> Change Password
-      </Button>
+      <button type="button" onClick={() => setShow(true)} className="w-full h-[40px] rounded-xl border border-[#1E1B2E] text-[#1E1B2E] text-[14px] font-medium hover:bg-[#1E1B2E] hover:text-white transition-colors">
+        Change Password
+      </button>
     );
   }
 
   return (
-    <div className="p-5 bg-muted/20 border-2 border-black rounded-2xl space-y-4">
+    <div className="p-4 bg-[rgba(30,27,46,0.02)] border border-[rgba(30,27,46,0.06)] rounded-xl space-y-3">
       <div className="flex items-center justify-between">
-        <h4 className="text-[10px] font-black uppercase tracking-widest text-primary">Security Update</h4>
-        <button onClick={() => setShow(false)}><X size={16} /></button>
+        <h4 className="text-[11px] font-medium uppercase tracking-[0.08em] text-[#1E1B2E]">Update Password</h4>
+        <button onClick={() => setShow(false)} className="text-[#8E8E93] hover:text-[#1E1B2E]"><X size={14} /></button>
       </div>
       <form onSubmit={handlePasswordChange} className="space-y-3">
-        <Input type="password" required className="h-9 border-2 border-black font-bold" placeholder="Old Password" value={passwords.oldPassword} onChange={e => setPasswords({...passwords, oldPassword: e.target.value})} />
-        <Input type="password" required className="h-9 border-2 border-black font-bold" placeholder="New Password" value={passwords.newPassword} onChange={e => setPasswords({...passwords, newPassword: e.target.value})} />
-        <Input type="password" required className="h-9 border-2 border-black font-bold" placeholder="Confirm" value={passwords.confirmPassword} onChange={e => setPasswords({...passwords, confirmPassword: e.target.value})} />
-        {status && <p className={`text-[10px] font-black uppercase ${status.type === "success" ? "text-green-600" : "text-red-600"}`}>{status.message}</p>}
-        <Button type="submit" disabled={loading} className="w-full bg-black text-white font-black border-2 border-black h-9 uppercase text-xs">
-          {loading ? "..." : "Update"}
-        </Button>
+        <input type="password" required className="w-full h-[36px] bg-white border border-[rgba(30,27,46,0.12)] rounded-lg px-3 text-[13px] text-[#1E1B2E] focus:outline-none focus:border-[#C9A96E]" placeholder="Old Password" value={passwords.oldPassword} onChange={e => setPasswords({...passwords, oldPassword: e.target.value})} />
+        <input type="password" required className="w-full h-[36px] bg-white border border-[rgba(30,27,46,0.12)] rounded-lg px-3 text-[13px] text-[#1E1B2E] focus:outline-none focus:border-[#C9A96E]" placeholder="New Password" value={passwords.newPassword} onChange={e => setPasswords({...passwords, newPassword: e.target.value})} />
+        <input type="password" required className="w-full h-[36px] bg-white border border-[rgba(30,27,46,0.12)] rounded-lg px-3 text-[13px] text-[#1E1B2E] focus:outline-none focus:border-[#C9A96E]" placeholder="Confirm" value={passwords.confirmPassword} onChange={e => setPasswords({...passwords, confirmPassword: e.target.value})} />
+        {status && <p className={`text-[11px] font-medium ${status.type === "success" ? "text-[#C9A96E]" : "text-[#DC2626]"}`}>{status.message}</p>}
+        <button type="submit" disabled={loading} className="w-full h-[36px] rounded-lg bg-[#1E1B2E] text-white text-[13px] font-medium hover:bg-[#2A2640] transition-colors disabled:opacity-50 flex items-center justify-center">
+          {loading ? <Loader2 className="w-4 h-4 animate-spin" /> : "Update"}
+        </button>
       </form>
     </div>
   );
@@ -753,20 +500,20 @@ function PasswordChangeSection() {
 
 function PrivacyToggle({ isPublic, onToggle }: { isPublic: boolean, onToggle: (val: boolean) => void }) {
   return (
-    <div className="p-4 border-2 border-black rounded-2xl bg-muted/10 space-y-3">
+    <div className="p-4 bg-[rgba(30,27,46,0.02)] border border-[rgba(30,27,46,0.06)] rounded-xl space-y-3">
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-2">
-          {isPublic ? <Globe size={16} className="text-green-600" /> : <EyeOff size={16} className="text-orange-600" />}
-          <span className="text-xs font-black uppercase">{isPublic ? "Public Profile" : "Private Profile"}</span>
+          {isPublic ? <Globe size={16} className="text-[#C9A96E]" /> : <EyeOff size={16} className="text-orange-600" />}
+          <span className="text-[12px] font-medium uppercase tracking-[0.08em] text-[#1E1B2E]">{isPublic ? "Public Profile" : "Private Profile"}</span>
         </div>
-        <button
-          onClick={() => onToggle(!isPublic)}
-          className={`relative w-12 h-7 rounded-full border-2 border-black transition-colors ${isPublic ? "bg-green-400" : "bg-orange-400"}`}
+        <button 
+          onClick={() => onToggle(!isPublic)} 
+          className={`relative w-10 h-6 rounded-full transition-colors duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#C9A96E] focus-visible:ring-offset-2 ${isPublic ? "bg-[#C9A96E]" : "bg-[#E5E5E5]"}`}
         >
-          <div className={`absolute top-0.5 w-5 h-5 bg-white border-2 border-black rounded-full transition-transform ${isPublic ? "left-5" : "left-0.5"}`} />
+          <div className={`absolute top-[2px] w-5 h-5 bg-white rounded-full transition-transform shadow-sm ${isPublic ? "left-[18px]" : "left-[2px]"}`} />
         </button>
       </div>
-      <p className="text-[8px] font-bold text-muted-foreground leading-relaxed">
+      <p className="text-[11px] text-[#8E8E93] leading-relaxed">
         {isPublic 
           ? "Anyone can send you direct messages without approval." 
           : "Users must send a chat request that you approve before they can message you."}

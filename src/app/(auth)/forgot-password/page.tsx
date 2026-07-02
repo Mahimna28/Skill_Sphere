@@ -83,7 +83,7 @@ export default function ForgotPasswordPage() {
         </p>
 
         {error && <div className="p-3 mb-6 bg-red-100 border-2 border-red-500 rounded-lg text-red-700 font-bold text-xs uppercase">{error}</div>}
-        {message && <div className="p-3 mb-6 bg-green-100 border-2 border-green-500 rounded-lg text-green-700 font-bold text-xs uppercase">{message}</div>}
+        {message && <div className="p-3 mb-6 bg-[#C9A96E]/10 border-2 border-[#C9A96E] rounded-lg text-[#C9A96E] font-bold text-xs uppercase">{message}</div>}
 
         {step === "email" ? (
           <form onSubmit={handleEmailSubmit} className="space-y-6">

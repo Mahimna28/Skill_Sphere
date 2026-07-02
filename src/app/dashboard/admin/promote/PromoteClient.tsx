@@ -1,10 +1,10 @@
 "use client";
 
 import { useState } from "react";
+import { motion, AnimatePresence } from "framer-motion";
 import { useRouter } from "next/navigation";
-import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Shield, Users, ArrowUp, ArrowDown, Loader2, Crown, Search, MessageSquareQuote, CheckCircle, XCircle } from "lucide-react";
+import { Shield, Users, ArrowUp, ArrowDown, Loader2, Search, MessageSquare, CheckCircle, XCircle } from "lucide-react";
 
 export default function PromoteClient({ users, initialRequests }: { users: any[], initialRequests: any[] }) {
   const router = useRouter();
@@ -45,7 +45,7 @@ export default function PromoteClient({ users, initialRequests }: { users: any[]
         body: JSON.stringify({ reqId, userId, action }),
       });
       if (res.ok) {
-        setRequests(prev => prev.filter(r => r.id !== reqId));
+        setRequests((prev: any[]) => prev.filter(r => r.id !== reqId));
         router.refresh();
       } else {
         const d = await res.json();
@@ -62,140 +62,194 @@ export default function PromoteClient({ users, initialRequests }: { users: any[]
     u.email.toLowerCase().includes(searchQuery.toLowerCase())
   ));
 
+  const getInitials = (name: string) => {
+    return name.charAt(0).toUpperCase();
+  };
+
   return (
-    <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500 pb-20">
-      <div>
-        <h1 className="text-4xl font-black uppercase tracking-tight flex items-center gap-3">
-           <div className="bg-red-500 text-white p-2 rounded-xl border-4 border-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]">
-              <Crown size={32} />
-           </div>
-           Promote Institute Admins
-        </h1>
-        <p className="text-muted-foreground font-medium text-lg mt-1">
-          Exclusive Super Admin control — only you can manage admin roles.
-        </p>
+    <div
+      className="flex flex-col bg-[#F5F1EB] min-h-screen w-full font-sans pb-20 overflow-x-hidden min-w-0"
+    >
+      {/* PAGE HEADER */}
+      <div className="pt-[8px] px-[32px] mb-[24px]">
+        <p className="font-sans text-[14px] text-[#8E8E93]">Exclusive Super Admin control — only you can manage admin roles.</p>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-        {/* Current Institute Admins */}
-        <div className="neo-brutalism bg-white border-4 border-black overflow-hidden">
-          <div className="p-6 bg-[#F5C84C] border-b-4 border-black">
-            <h3 className="text-xl font-black uppercase flex items-center gap-2">
-              <Shield size={24} /> Institute Admins ({admins.length})
-            </h3>
-            <p className="text-xs font-bold mt-1 opacity-70">These users manage their respective institutions.</p>
+      <div className="flex flex-col lg:flex-row gap-[24px] px-[32px] mb-[32px]">
+        {/* LEFT COLUMN: INSTITUTE ADMINS */}
+        <div
+          className="bg-white rounded-[16px] shadow-[0_4px_20px_rgba(0,0,0,0.06)] overflow-hidden flex-1 flex flex-col"
+        >
+          <div className="p-[20px_24px]">
+            <div className="flex flex-row items-center gap-[12px]">
+              <Shield size={18} className="text-[#C9A96E]" />
+              <h3 className="font-heading text-[18px] text-[#1E1B2E] m-0 leading-none">Institute Admins</h3>
+              <span className="bg-[rgba(30,27,46,0.06)] text-[#1E1B2E] font-sans text-[12px] px-[10px] py-[4px] rounded-full">
+                ({admins.length})
+              </span>
+            </div>
+            <p className="font-sans text-[13px] text-[#8E8E93] mt-[4px]">These users manage their respective institutions.</p>
           </div>
-          <div className="p-0">
+          <div className="h-[1px] w-full bg-[rgba(30,27,46,0.06)]" />
+          
+          <div className="px-[24px] flex-1">
             {admins.length === 0 ? (
-              <div className="p-12 text-center opacity-30 italic font-bold">No institute admins yet.</div>
+              <div className="py-[40px] text-center font-sans text-[14px] text-[#8E8E93] italic">
+                No institute admins yet.
+              </div>
             ) : (
-              <div className="divide-y-2 divide-black">
-                {admins.map((u) => (
-                  <div key={u.id} className="p-5 flex items-center justify-between hover:bg-muted/10 transition-colors">
-                    <div>
-                      <p className="font-black uppercase">{u.name}</p>
-                      <p className="text-xs font-bold opacity-60">{u.email}</p>
-                      {u.institution && (
-                        <p className="text-[10px] font-black mt-1 text-primary uppercase">{u.institution.name}</p>
-                      )}
-                    </div>
-                    <Button
-                      onClick={() => handleToggle(u.id, u.role)}
-                      disabled={loading === u.id}
-                      className="bg-red-100 text-red-700 border-2 border-red-600 font-black text-xs h-9 px-3 hover:bg-red-200"
+              <div className="flex flex-col divide-y divide-[rgba(30,27,46,0.04)]">
+                <AnimatePresence>
+                  {admins.map((u, i) => (
+                    <div 
+                      key={u.id}
+                      className="py-[16px] flex flex-row items-center gap-[12px]"
                     >
-                      {loading === u.id ? <Loader2 className="animate-spin" size={14} /> : <><ArrowDown size={14} className="mr-1" /> Demote</>}
-                    </Button>
-                  </div>
-                ))}
+                      <div className="w-[36px] h-[36px] rounded-full bg-[rgba(30,27,46,0.04)] flex items-center justify-center font-sans text-[14px] font-medium text-[#1E1B2E] shrink-0">
+                        {getInitials(u.name)}
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <p className="font-sans text-[14px] font-medium text-[#1E1B2E] truncate">{u.name}</p>
+                        <p className="font-sans text-[12px] text-[#8E8E93] truncate">{u.email}</p>
+                        {u.institution && (
+                          <div className="mt-[4px]">
+                            <span className="inline-flex items-center bg-[rgba(201,169,110,0.1)] text-[#C9A96E] font-sans text-[11px] px-[10px] py-[2px] rounded-full truncate max-w-full">
+                              {u.institution.name}
+                            </span>
+                          </div>
+                        )}
+                      </div>
+                      <button
+                        onClick={() => handleToggle(u.id, u.role)}
+                        disabled={loading === u.id}
+                        className="flex items-center h-[32px] px-[14px] rounded-lg text-[#DC2626] font-sans text-[13px] font-medium hover:underline disabled:opacity-50 shrink-0"
+                      >
+                        {loading === u.id ? <Loader2 className="animate-spin" size={14} /> : <><ArrowDown size={14} className="mr-[6px]" /> Demote</>}
+                      </button>
+                    </div>
+                  ))}
+                </AnimatePresence>
               </div>
             )}
           </div>
         </div>
 
-        {/* Eligible Teachers */}
-        <div className="neo-brutalism bg-white border-4 border-black overflow-hidden flex flex-col">
-          <div className="p-6 bg-muted border-b-4 border-black">
-            <h3 className="text-xl font-black uppercase flex items-center gap-2">
-              <Users size={24} /> Eligible Teachers ({teachers.length})
-            </h3>
-            <p className="text-xs font-bold mt-1 opacity-70">Search and promote a teacher to give them institute admin powers.</p>
-            <div className="mt-4 relative">
-               <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" size={16} />
-               <Input 
-                 placeholder="Search teacher name or email..." 
-                 className="pl-10 border-2 border-black font-bold h-10 w-full bg-white"
-                 value={searchQuery}
-                 onChange={(e) => setSearchQuery(e.target.value)}
-               />
+        {/* RIGHT COLUMN: ELIGIBLE TEACHERS */}
+        <div
+          className="bg-white rounded-[16px] shadow-[0_4px_20px_rgba(0,0,0,0.06)] overflow-hidden flex-1 flex flex-col"
+        >
+          <div className="p-[20px_24px]">
+            <div className="flex flex-row items-center gap-[12px]">
+              <Users size={18} className="text-[#C9A96E]" />
+              <h3 className="font-heading text-[18px] text-[#1E1B2E] m-0 leading-none">Eligible Teachers</h3>
+              <span className="bg-[rgba(30,27,46,0.06)] text-[#1E1B2E] font-sans text-[12px] px-[10px] py-[4px] rounded-full">
+                ({teachers.length})
+              </span>
+            </div>
+            <p className="font-sans text-[13px] text-[#8E8E93] mt-[4px]">Search and promote a teacher to give them institute admin powers.</p>
+          </div>
+          <div className="px-[24px] pb-[16px]">
+            <div className="relative w-full">
+              <Search size={16} className="absolute left-[14px] top-1/2 -translate-y-1/2 text-[#8E8E93]" />
+              <input 
+                type="text"
+                placeholder="Search teacher name or email..." 
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className="w-full h-[40px] bg-white border border-[rgba(30,27,46,0.12)] rounded-full pl-[40px] pr-[16px] font-sans text-[14px] text-[#1E1B2E] placeholder:text-[#8E8E93] focus:outline-none focus:border-[#C9A96E] transition-colors"
+              />
             </div>
           </div>
-          <div className="p-0">
+          <div className="h-[1px] w-full bg-[rgba(30,27,46,0.06)]" />
+          
+          <div className="px-[24px] flex-1">
             {teachers.length === 0 ? (
-              <div className="p-12 text-center opacity-30 italic font-bold">No teachers available to promote.</div>
+              <div className="py-[40px] text-center font-sans text-[14px] text-[#8E8E93] italic">
+                No teachers found.
+              </div>
             ) : (
-              <div className="divide-y-2 divide-black">
-                {teachers.map((u) => (
-                  <div key={u.id} className="p-5 flex items-center justify-between hover:bg-muted/10 transition-colors">
-                    <div>
-                      <p className="font-black uppercase">{u.name}</p>
-                      <p className="text-xs font-bold opacity-60">{u.email}</p>
-                    </div>
-                    <Button
-                      onClick={() => handleToggle(u.id, u.role)}
-                      disabled={loading === u.id}
-                      className="bg-[#34D399] text-black border-2 border-black font-black text-xs h-9 px-3"
+              <div className="flex flex-col divide-y divide-[rgba(30,27,46,0.04)]">
+                <AnimatePresence>
+                  {teachers.map((u, i) => (
+                    <div 
+                      key={u.id}
+                      className="py-[16px] flex flex-row justify-between items-center"
                     >
-                      {loading === u.id ? <Loader2 className="animate-spin" size={14} /> : <><ArrowUp size={14} className="mr-1" /> Promote</>}
-                    </Button>
-                  </div>
-                ))}
+                      <div className="flex-1 min-w-0 pr-[16px]">
+                        <p className="font-sans text-[14px] font-medium text-[#1E1B2E] truncate">{u.name}</p>
+                        <p className="font-sans text-[12px] text-[#8E8E93] mt-[2px] truncate">{u.email}</p>
+                      </div>
+                      <button
+                        onClick={() => handleToggle(u.id, u.role)}
+                        disabled={loading === u.id}
+                        className="flex items-center h-[32px] px-[14px] rounded-lg bg-[#C9A96E] text-white font-sans text-[13px] font-medium hover:bg-[#B8956A] hover:scale-[1.02] transition-all disabled:opacity-50 shrink-0"
+                      >
+                        {loading === u.id ? <Loader2 className="animate-spin" size={14} /> : <><ArrowUp size={14} className="mr-[6px]" /> Promote</>}
+                      </button>
+                    </div>
+                  ))}
+                </AnimatePresence>
               </div>
             )}
           </div>
         </div>
       </div>
 
-      {/* Promotion Requests Section */}
-      <div className="neo-brutalism bg-white border-4 border-black overflow-hidden mt-8">
-        <div className="p-6 bg-[#34D399] border-b-4 border-black">
-          <h3 className="text-xl font-black uppercase flex items-center gap-2">
-            <MessageSquareQuote size={24} /> Promotion Requests ({requests.length})
-          </h3>
-          <p className="text-xs font-bold mt-1 opacity-80">Teachers requesting to become Institute Admins.</p>
+      {/* FULL WIDTH: PROMOTION REQUESTS */}
+      <div
+        className="bg-white rounded-[16px] shadow-[0_4px_20px_rgba(0,0,0,0.06)] overflow-hidden mx-[32px] mb-[32px] flex flex-col"
+      >
+        <div className="p-[20px_24px]">
+          <div className="flex flex-row items-center gap-[12px]">
+            <MessageSquare size={18} className="text-[#C9A96E]" />
+            <h3 className="font-heading text-[18px] text-[#1E1B2E] m-0 leading-none">Promotion Requests</h3>
+            <span className="bg-[rgba(30,27,46,0.06)] text-[#1E1B2E] font-sans text-[12px] px-[10px] py-[4px] rounded-full">
+              ({requests.length})
+            </span>
+          </div>
+          <p className="font-sans text-[13px] text-[#8E8E93] mt-[4px]">Teachers requesting to become Institute Admins.</p>
         </div>
-        <div className="p-0">
+        <div className="h-[1px] w-full bg-[rgba(30,27,46,0.06)]" />
+        
+        <div className="px-[24px]">
           {requests.length === 0 ? (
-            <div className="p-12 text-center opacity-30 italic font-bold">No pending promotion requests.</div>
+            <div className="py-[40px] text-center font-sans text-[14px] text-[#8E8E93] italic">
+              No pending promotion requests.
+            </div>
           ) : (
-            <div className="divide-y-2 divide-black">
-              {requests.map((r: any) => (
-                <div key={r.id} className="p-5 flex flex-col md:flex-row items-start md:items-center justify-between hover:bg-muted/10 transition-colors gap-4">
-                  <div className="flex-1">
-                    <p className="font-black uppercase">{r.user.name}</p>
-                    <p className="text-xs font-bold opacity-60 mb-2">{r.user.email}</p>
-                    <div className="bg-accent/30 border-l-4 border-black p-3 text-sm font-medium italic">
-                      "{r.reason}"
+            <div className="flex flex-col divide-y divide-[rgba(30,27,46,0.04)]">
+              <AnimatePresence>
+                {requests.map((r: any, i) => (
+                  <div 
+                    key={r.id}
+                    className="py-[16px] flex flex-col md:flex-row justify-between items-start md:items-center gap-[16px]"
+                  >
+                    <div className="flex-1 min-w-0">
+                      <p className="font-sans text-[14px] font-medium text-[#1E1B2E] truncate">{r.user.name}</p>
+                      <p className="font-sans text-[12px] text-[#8E8E93] mt-[2px] truncate mb-[8px]">{r.user.email}</p>
+                      <div className="bg-[rgba(245,241,235,0.6)] border-l-2 border-[#C9A96E] px-[12px] py-[8px] rounded-r-lg font-sans text-[13px] text-[#1E1B2E] italic break-words">
+                        "{r.reason}"
+                      </div>
+                    </div>
+                    <div className="flex items-center gap-[12px] shrink-0 self-end md:self-center">
+                      <button
+                        onClick={() => handleRequestAction(r.id, r.userId, "rejected")}
+                        disabled={loading === r.id}
+                        className="flex items-center h-[32px] px-[14px] text-[#DC2626] font-sans text-[13px] font-medium hover:underline transition-all disabled:opacity-50"
+                      >
+                        {loading === r.id ? <Loader2 className="animate-spin" size={14} /> : <><XCircle size={14} className="mr-[6px]" /> Reject</>}
+                      </button>
+                      <button
+                        onClick={() => handleRequestAction(r.id, r.userId, "approved")}
+                        disabled={loading === r.id}
+                        className="flex items-center h-[32px] px-[14px] rounded-lg bg-[#1E1B2E] text-white font-sans text-[13px] font-medium hover:bg-[#2A263F] hover:scale-[1.02] transition-all disabled:opacity-50"
+                      >
+                        {loading === r.id ? <Loader2 className="animate-spin" size={14} /> : <><CheckCircle size={14} className="mr-[6px]" /> Approve</>}
+                      </button>
                     </div>
                   </div>
-                  <div className="flex gap-2">
-                    <Button
-                      onClick={() => handleRequestAction(r.id, r.userId, "rejected")}
-                      disabled={loading === r.id}
-                      className="bg-red-100 text-red-700 border-2 border-red-600 font-black text-xs h-9 px-3 hover:bg-red-200"
-                    >
-                      {loading === r.id ? <Loader2 className="animate-spin" size={14} /> : <><XCircle size={14} className="mr-1" /> Reject</>}
-                    </Button>
-                    <Button
-                      onClick={() => handleRequestAction(r.id, r.userId, "approved")}
-                      disabled={loading === r.id}
-                      className="bg-[#34D399] text-black border-2 border-black font-black text-xs h-9 px-3"
-                    >
-                      {loading === r.id ? <Loader2 className="animate-spin" size={14} /> : <><CheckCircle size={14} className="mr-1" /> Approve</>}
-                    </Button>
-                  </div>
-                </div>
-              ))}
+                ))}
+              </AnimatePresence>
             </div>
           )}
         </div>

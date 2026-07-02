@@ -1,7 +1,6 @@
 "use client";
 
 import { useRef, useEffect, useState, useMemo } from "react";
-import { motion, useInView, useSpring } from "framer-motion";
 
 function StatItem({ stat }: { stat: { label: string, value: number, prefix: string, suffix: string } }) {
   const ref = useRef(null);
@@ -31,11 +30,9 @@ function StatItem({ stat }: { stat: { label: string, value: number, prefix: stri
   }, [springValue]);
 
   return (
-    <motion.div 
+    <div 
       ref={ref}
-      initial={{ opacity: 0, y: 30 }}
       animate={isInView ? { opacity: 1, y: 0 } : {}}
-      transition={{ duration: 0.8, ease: [0.4, 0, 0.2, 1] }}
       className="text-center flex flex-col items-center relative"
     >
       <div className="font-heading font-light text-[64px] text-[#1E1B2E] mb-2 leading-none">
@@ -44,7 +41,7 @@ function StatItem({ stat }: { stat: { label: string, value: number, prefix: stri
       <div className="font-sans text-[13px] font-medium text-[#8E8E93] uppercase tracking-[0.1em]">
         {stat.label}
       </div>
-    </motion.div>
+    </div>
   );
 }
 

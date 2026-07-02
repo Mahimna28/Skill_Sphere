@@ -1,7 +1,6 @@
 "use client";
 
 import { useState } from "react";
-import { motion, useScroll, useTransform, AnimatePresence } from "framer-motion";
 import { 
   Play, FileText, HelpCircle, Star, Clock, BookOpen, 
   BarChart, CheckCircle2, ChevronDown, Lock, ShieldCheck, Award, ArrowRight, ArrowLeft
@@ -10,6 +9,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { cn } from "@/lib/utils";
+import { motion, AnimatePresence, useScroll, useTransform } from "framer-motion";
 
 const appleEase = [0.4, 0, 0.2, 1];
 
@@ -172,10 +172,7 @@ export default function CourseDetailClient({ course, userRole, isEnrolled }: Pro
           
           <div className="flex flex-col lg:flex-row items-center gap-[60px] lg:gap-[100px]">
             {/* Left Content */}
-            <motion.div 
-              initial={{ opacity: 0, x: -40 }}
-              animate={{ opacity: 1, x: 0 }}
-              transition={{ duration: 0.8, ease: appleEase }}
+            <div
               className="w-full lg:w-[55%] z-10"
             >
               <div className="inline-block bg-[#C9A96E] text-[#1E1B2E] px-3 py-1 rounded-full font-sans font-bold text-[11px] uppercase tracking-[0.1em] mb-6">
@@ -207,12 +204,9 @@ export default function CourseDetailClient({ course, userRole, isEnrolled }: Pro
               {/* CTA Row */}
               <div className="mt-8 flex flex-col sm:flex-row items-center gap-4">
                 {!userRole || (userRole === "student" && !isEnrolled) || userRole !== "student" ? (
-                  <motion.button 
+                  <button 
                     onClick={handleEnroll}
                     disabled={isEnrolling}
-                    whileHover={{ scale: 1.02, boxShadow: "0 8px 24px rgba(201,169,110,0.3)" }}
-                    whileTap={{ scale: 0.98 }}
-                    transition={{ type: "spring", stiffness: 400, damping: 25 }}
                     className="w-full sm:w-auto bg-[#C9A96E] text-[#1E1B2E] font-sans font-medium text-[16px] rounded-full px-8 py-4 shadow-[0_4px_14px_rgba(201,169,110,0.2)] disabled:opacity-70 flex items-center justify-center"
                   >
                     {isEnrolling ? (
@@ -220,29 +214,23 @@ export default function CourseDetailClient({ course, userRole, isEnrolled }: Pro
                     ) : (
                       "Enroll Now"
                     )}
-                  </motion.button>
+                  </button>
                 ) : (
-                  <motion.button 
+                  <button 
                     onClick={() => router.push(`/dashboard/student/courses/${course.id}`)}
-                    whileHover={{ scale: 1.02, boxShadow: "0 8px 24px rgba(201,169,110,0.3)" }}
-                    whileTap={{ scale: 0.98 }}
-                    transition={{ type: "spring", stiffness: 400, damping: 25 }}
                     className="w-full sm:w-auto bg-[#C9A96E] text-[#1E1B2E] font-sans font-medium text-[16px] rounded-full px-8 py-4 shadow-[0_4px_14px_rgba(201,169,110,0.2)] flex items-center justify-center gap-2"
                   >
                     Continue Learning <ArrowRight size={18} />
-                  </motion.button>
+                  </button>
                 )}
               </div>
-            </motion.div>
+            </div>
 
             {/* Right Image */}
-            <motion.div 
-              initial={{ opacity: 0, x: 40, rotate: -6 }}
-              animate={{ opacity: 1, x: 0, rotate: -2 }}
-              transition={{ duration: 0.8, delay: 0.2, ease: appleEase }}
+            <div
               className="w-full lg:w-[45%] hidden md:block"
             >
-              <motion.div 
+              <div 
                 style={{ y: yImage }}
                 className="relative w-full aspect-[4/3] rounded-[16px] overflow-hidden shadow-[0_8px_32px_rgba(0,0,0,0.3)]"
               >
@@ -251,8 +239,8 @@ export default function CourseDetailClient({ course, userRole, isEnrolled }: Pro
                 ) : (
                   <Image src="https://images.unsplash.com/photo-1555066931-4365d14bab8c?auto=format&fit=crop&q=80&w=1200" alt="Code Background" fill className="object-cover" priority />
                 )}
-              </motion.div>
-            </motion.div>
+              </div>
+            </div>
           </div>
         </div>
       </section>
@@ -265,10 +253,7 @@ export default function CourseDetailClient({ course, userRole, isEnrolled }: Pro
           <div className="w-full lg:w-[60%] flex flex-col">
             
             {/* TAB NAVIGATION — STICKY */}
-            <motion.div 
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              transition={{ duration: 0.5, delay: 0.5 }}
+            <div
               className="sticky top-[72px] z-40 bg-[#F5F1EB]/90 backdrop-blur-md border-b border-[rgba(30,27,46,0.08)] flex gap-8 pb-3 pt-4 mb-10 overflow-x-auto scrollbar-none"
             >
               {(["overview", "curriculum"] as const).map((tab) => (
@@ -289,7 +274,7 @@ export default function CourseDetailClient({ course, userRole, isEnrolled }: Pro
                   )}
                 </button>
               ))}
-            </motion.div>
+            </div>
 
             {/* TAB CONTENT */}
             <div className="min-h-[500px]">
@@ -297,12 +282,8 @@ export default function CourseDetailClient({ course, userRole, isEnrolled }: Pro
                 
                 {/* OVERVIEW TAB */}
                 {activeTab === "overview" && (
-                  <motion.div 
+                  <div 
                     key="overview"
-                    initial={{ opacity: 0, y: 10 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    exit={{ opacity: 0, y: -10 }}
-                    transition={{ duration: 0.4, ease: appleEase }}
                   >
                     <h2 className="font-heading text-[28px] text-[#1E1B2E] mb-4">About This Course</h2>
                     <p className="font-sans text-[17px] text-[#8E8E93] leading-[1.7] mb-10 whitespace-pre-wrap">
@@ -319,42 +300,29 @@ export default function CourseDetailClient({ course, userRole, isEnrolled }: Pro
                         "Set up robust CI/CD pipelines",
                         "Write maintainable end-to-end tests"
                       ].map((item, i) => (
-                        <motion.div 
+                        <div 
                           key={i}
-                          initial={{ opacity: 0, y: 10 }}
-                          whileInView={{ opacity: 1, y: 0 }}
-                          viewport={{ once: true }}
-                          transition={{ delay: i * 0.1, duration: 0.4 }}
-                          whileHover={{ y: -2 }}
                           className="bg-white rounded-xl p-5 shadow-[0_2px_8px_rgba(30,27,46,0.04)] flex gap-3"
                         >
                           <CheckCircle2 size={20} className="text-[#C9A96E] shrink-0" />
                           <span className="font-sans text-[15px] text-[#1E1B2E] leading-snug">{item}</span>
-                        </motion.div>
+                        </div>
                       ))}
                     </div>
-                  </motion.div>
+                  </div>
                 )}
 
                 {/* CURRICULUM TAB */}
                 {activeTab === "curriculum" && (
-                  <motion.div 
+                  <div 
                     key="curriculum"
-                    initial={{ opacity: 0, y: 10 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    exit={{ opacity: 0, y: -10 }}
-                    transition={{ duration: 0.4, ease: appleEase }}
                   >
                     <div className="flex flex-col gap-2">
                       {displayModules.map((module: any, i: number) => {
                         const isExpanded = expandedModules.has(module.id);
                         return (
-                          <motion.div 
+                          <div 
                             key={module.id}
-                            initial={{ opacity: 0, y: 10 }}
-                            whileInView={{ opacity: 1, y: 0 }}
-                            viewport={{ once: true }}
-                            transition={{ delay: i * 0.1, duration: 0.4 }}
                             className="bg-transparent border-b border-[rgba(30,27,46,0.08)] last:border-0"
                           >
                             {/* Module Header */}
@@ -382,10 +350,7 @@ export default function CourseDetailClient({ course, userRole, isEnrolled }: Pro
                             {/* Lesson List */}
                             <AnimatePresence>
                               {isExpanded && (
-                                <motion.div 
-                                  initial={{ height: 0, opacity: 0 }}
-                                  animate={{ height: "auto", opacity: 1 }}
-                                  exit={{ height: 0, opacity: 0 }}
+                                <div
                                   className="overflow-hidden"
                                 >
                                   <div className="pb-5 pl-4 flex flex-col gap-1">
@@ -411,14 +376,14 @@ export default function CourseDetailClient({ course, userRole, isEnrolled }: Pro
                                       </div>
                                     ))}
                                   </div>
-                                </motion.div>
+                                </div>
                               )}
                             </AnimatePresence>
-                          </motion.div>
+                          </div>
                         );
                       })}
                     </div>
-                  </motion.div>
+                  </div>
                 )}
               </AnimatePresence>
             </div>
@@ -548,12 +513,8 @@ export default function CourseDetailClient({ course, userRole, isEnrolled }: Pro
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
             {[1, 2, 3].map((item, idx) => (
-              <motion.div
+              <div
                 key={item}
-                initial={{ opacity: 0, y: 30 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ duration: 0.6, delay: idx * 0.1, ease: appleEase }}
               >
                 <div className="bg-white rounded-[16px] overflow-hidden flex flex-col shadow-[0_4px_20px_rgba(30,27,46,0.04)] hover:shadow-[0_12px_40px_rgba(30,27,46,0.08)] hover:-translate-y-2 transition-all duration-300 group cursor-pointer">
                   <div className="w-full aspect-[16/9] bg-[#1E1B2E] relative overflow-hidden">
@@ -572,7 +533,7 @@ export default function CourseDetailClient({ course, userRole, isEnrolled }: Pro
                     </div>
                   </div>
                 </div>
-              </motion.div>
+              </div>
             ))}
           </div>
         </div>
@@ -581,34 +542,26 @@ export default function CourseDetailClient({ course, userRole, isEnrolled }: Pro
       {/* 4. FINAL CTA */}
       <section className="py-[160px] bg-[#1E1B2E] text-center">
         <div className="max-w-2xl mx-auto px-4">
-          <motion.div
-            initial={{ opacity: 0, y: 30 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.8, ease: appleEase }}
+          <div
           >
             <h2 className="font-heading font-black text-[36px] text-white mb-10">
               Ready to start learning?
             </h2>
             <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
-              <motion.button 
-                whileHover={{ scale: 1.02 }}
-                whileTap={{ scale: 0.98 }}
+              <button
                 className="w-full sm:w-auto bg-[#C9A96E] text-[#1E1B2E] font-sans font-medium text-[16px] rounded-full px-10 py-4"
               >
                 Enroll Now
-              </motion.button>
+              </button>
               <Link href="/courses">
-                <motion.button 
-                  whileHover={{ backgroundColor: "rgba(255,255,255,0.1)" }}
-                  whileTap={{ scale: 0.98 }}
+                <button
                   className="w-full sm:w-auto bg-transparent border border-white text-white font-sans font-medium text-[16px] rounded-full px-10 py-4"
                 >
                   View All Courses
-                </motion.button>
+                </button>
               </Link>
             </div>
-          </motion.div>
+          </div>
         </div>
       </section>
 

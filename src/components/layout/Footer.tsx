@@ -1,108 +1,189 @@
 "use client";
 
 import Link from "next/link";
-import { MessageCircle, Camera, Mail, Globe } from "lucide-react";
-import { useState, useEffect } from "react";
+import { Code, MessageCircle, Briefcase, Camera, Mail, ArrowUp } from "lucide-react";
+import { useState } from "react";
 
 export function Footer() {
-  const currentYear = new Date().getFullYear();
-  const [userRole, setUserRole] = useState<string | null>(null);
+  const [email, setEmail] = useState("");
+  const [subscribed, setSubscribed] = useState(false);
 
-  useEffect(() => {
-    const fetchUser = async () => {
-      try {
-        const res = await fetch("/api/auth/me");
-        if (res.ok) {
-          const data = await res.json();
-          setUserRole(data.user.role);
-        }
-      } catch (err) {
-        console.error("Failed to fetch user role");
-      }
-    };
-    fetchUser();
-  }, []);
+  const handleSubscribe = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (email && email.includes("@")) {
+      setSubscribed(true);
+      setEmail("");
+      // Real app: submit to API
+    }
+  };
+
+  const scrollToTop = () => {
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  };
 
   return (
-    <footer className="bg-[#1E1B2E] text-[#F5F1EB] pt-20 pb-8">
-      <div className="max-w-7xl mx-auto px-4">
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-12 mb-16">
-          {/* Brand Column */}
-          <div className="col-span-1 md:col-span-1">
-            <Link href="/" className="inline-block mb-6">
-              <span className="font-heading font-black text-3xl tracking-tight text-white">
-                Skill Sphere.
-              </span>
-            </Link>
-            <p className="font-sans text-[#F5F1EB]/70 leading-relaxed mb-8">
-              Education, crafted for how you think. An AI-powered learning platform designed for the next generation.
+    <footer className="bg-[#1E1B2E] pt-[80px] pb-[40px]">
+      <div className="max-w-[1200px] mx-auto px-[32px]">
+
+        {/* ROW 1: NEWSLETTER + BRAND */}
+        <div className="flex flex-col md:flex-row justify-between pb-[48px] border-b border-[rgba(255,255,255,0.08)] gap-10 md:gap-0">
+          {/* Brand */}
+          <div className="w-full md:w-[40%] flex flex-col justify-center">
+            <span className="font-heading font-black text-[24px] text-white tracking-tight">
+              Skill Sphere.
+            </span>
+            <p className="font-sans text-[14px] text-[rgba(255,255,255,0.5)] mt-[8px] max-w-[280px] leading-[1.5]">
+              Education, crafted for how you think.
             </p>
-            <div className="flex gap-5">
-              <Link href="#" className="text-white/60 hover:text-[#C9A96E] transition-colors duration-200">
-                <MessageCircle size={20} />
-              </Link>
-              <Link href="#" className="text-white/60 hover:text-[#C9A96E] transition-colors duration-200">
-                <Globe size={20} />
-              </Link>
-              <Link href="#" className="text-white/60 hover:text-[#C9A96E] transition-colors duration-200">
-                <Camera size={20} />
-              </Link>
-              <Link href="#" className="text-white/60 hover:text-[#C9A96E] transition-colors duration-200">
-                <Mail size={20} />
-              </Link>
+          </div>
+
+          {/* Newsletter */}
+          <div className="w-full md:w-[60%]">
+            <h3 className="font-heading text-[20px] text-white">Stay in the loop.</h3>
+            <p className="font-sans text-[14px] text-[rgba(255,255,255,0.6)] mt-[6px]">
+              Get updates on new courses, features, and learning tips — no spam, ever.
+            </p>
+            <form onSubmit={handleSubscribe} className="mt-[16px] flex flex-row gap-[12px]">
+              <input
+                type="email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                placeholder="Enter your email"
+                className="flex-1 h-[48px] bg-[rgba(255,255,255,0.05)] border border-[rgba(255,255,255,0.15)] rounded-xl px-[16px] text-white placeholder-[rgba(255,255,255,0.6)] font-sans text-[14px] focus:outline-none focus:border-[#C9A96E] focus:shadow-[0_0_0_3px_rgba(201,169,110,0.15)] transition-all"
+                required
+              />
+              <button
+                type="submit"
+                className="h-[48px] px-[24px] bg-[#C9A96E] text-[#1E1B2E] font-sans font-semibold text-[14px] rounded-xl hover:bg-[#B8956A] hover:scale-[1.02] active:scale-[0.98] transition-all whitespace-nowrap"
+              >
+                Subscribe
+              </button>
+            </form>
+            {subscribed && (
+              <p className="text-[#C9A96E] font-sans text-[13px] mt-2">Thanks for subscribing!</p>
+            )}
+          </div>
+        </div>
+
+        {/* ROW 2: LINK COLUMNS */}
+        <div className="py-[48px] border-b border-[rgba(255,255,255,0.08)] grid grid-cols-2 md:grid-cols-4 gap-[24px]">
+          {[
+            {
+              title: "Platform",
+              links: [
+                { name: "All Courses", url: "/courses" },
+                { name: "Features", url: "/features" },
+                { name: "Pricing", url: "/#pricing" },
+                { name: "Institutions", url: "/#institutions" }
+              ]
+            },
+            {
+              title: "Company",
+              links: [
+                { name: "About Us", url: "/about" },
+                { name: "Our Team", url: "/about#team" },
+                { name: "Careers", url: "#" },
+                { name: "Blog", url: "/blog" }
+              ]
+            },
+            {
+              title: "Support",
+              links: [
+                { name: "Help Center / FAQs", url: "/faq" },
+                { name: "Contact Us", url: "mailto:hello@skillsphere.com" },
+                { name: "Feedback", url: "/dashboard/feedback" },
+                { name: "System Status", url: "#" }
+              ]
+            },
+            {
+              title: "Legal",
+              links: [
+                { name: "Privacy Policy", url: "/privacy" },
+                { name: "Terms of Service", url: "/terms" },
+                { name: "Cookie Policy", url: "/cookies" },
+                { name: "Accessibility", url: "#" }
+              ]
+            }
+          ].map((col) => (
+            <div key={col.title}>
+              <h4 className="font-sans font-semibold text-[14px] text-white mb-[16px]">{col.title}</h4>
+              <ul className="flex flex-col">
+                {col.links.map(link => (
+                  <li key={link.name}>
+                    <Link href={link.url} className="inline-block font-sans text-[14px] text-[rgba(255,255,255,0.6)] hover:text-[#C9A96E] hover:translate-x-1 transition-all duration-200 leading-[2.2]">
+                      {link.name}
+                    </Link>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          ))}
+        </div>
+
+        {/* ROW 3: SOCIAL + GITHUB */}
+        <div className="py-[32px] border-b border-[rgba(255,255,255,0.08)] flex flex-col md:flex-row justify-between items-center gap-[24px]">
+          <div className="flex items-center">
+            <span className="font-sans text-[12px] uppercase text-[rgba(255,255,255,0.6)] tracking-[0.08em] mr-[16px]">
+              Follow us
+            </span>
+            <div className="flex gap-[16px]">
+              {[
+                { icon: Code, url: "https://github.com/Mahimna28/Skill_Sphere" },
+                { icon: Briefcase, url: "#" },
+                { icon: MessageCircle, url: "#" },
+                { icon: Camera, url: "#" },
+                { icon: Mail, url: "#" }
+              ].map((social, i) => (
+                <a 
+                  key={i}
+                  href={social.url} 
+                  target="_blank" 
+                  rel="noopener noreferrer"
+                  className="w-[40px] h-[40px] rounded-full border border-[rgba(255,255,255,0.1)] flex items-center justify-center text-[rgba(255,255,255,0.6)] hover:text-[#C9A96E] hover:border-[#C9A96E] hover:bg-[rgba(201,169,110,0.1)] transition-all duration-200"
+                >
+                  <social.icon size={20} />
+                </a>
+              ))}
             </div>
           </div>
 
-          {/* Platform */}
           <div>
-            <h4 className="font-heading font-bold text-white text-lg mb-6">Platform</h4>
-            <ul className="flex flex-col gap-4 font-sans text-[#F5F1EB]/70">
-              <li><Link href="/" className="hover:text-[#C9A96E] transition-colors">Home</Link></li>
-              <li><Link href="/features" className="hover:text-[#C9A96E] transition-colors">Features</Link></li>
-              <li><Link href="/courses" className="hover:text-[#C9A96E] transition-colors">All Courses</Link></li>
-              <li><Link href="/pricing" className="hover:text-[#C9A96E] transition-colors">Pricing</Link></li>
-            </ul>
-          </div>
-
-          {/* Resources */}
-          <div>
-            <h4 className="font-heading font-bold text-white text-lg mb-6">Resources</h4>
-            <ul className="flex flex-col gap-4 font-sans text-[#F5F1EB]/70">
-              <li><Link href="/blog" className="hover:text-[#C9A96E] transition-colors">Blog</Link></li>
-              <li><Link href="/help" className="hover:text-[#C9A96E] transition-colors">Help Center</Link></li>
-              <li><Link href="/guides" className="hover:text-[#C9A96E] transition-colors">Student Guides</Link></li>
-              <li><Link href="/contact" className="hover:text-[#C9A96E] transition-colors">Contact Us</Link></li>
-            </ul>
-          </div>
-
-          {/* Legal & Account */}
-          <div>
-            <h4 className="font-heading font-bold text-white text-lg mb-6">{userRole ? "Account" : "Legal"}</h4>
-            <ul className="flex flex-col gap-4 font-sans text-[#F5F1EB]/70">
-              {userRole ? (
-                <>
-                  <li><Link href={["superadmin", "institute_admin"].includes(userRole) ? "/dashboard/admin" : `/dashboard/${userRole}`} className="hover:text-[#C9A96E] transition-colors">Dashboard</Link></li>
-                  <li><Link href="/profile" className="hover:text-[#C9A96E] transition-colors">Profile</Link></li>
-                </>
-              ) : (
-                <>
-                  <li><Link href="/privacy" className="hover:text-[#C9A96E] transition-colors">Privacy Policy</Link></li>
-                  <li><Link href="/terms" className="hover:text-[#C9A96E] transition-colors">Terms of Service</Link></li>
-                </>
-              )}
-            </ul>
+            <a 
+              href="https://github.com/Mahimna28/Skill_Sphere" 
+              target="_blank" 
+              rel="noopener noreferrer"
+              className="inline-flex items-center gap-[6px] bg-[rgba(255,255,255,0.05)] border border-[rgba(255,255,255,0.1)] rounded-full px-[14px] py-[6px] hover:bg-[rgba(255,255,255,0.08)] transition-colors group"
+            >
+              <Code size={14} className="text-[rgba(255,255,255,0.6)] group-hover:text-[#C9A96E] transition-colors" />
+              <span className="font-sans text-[13px] text-[rgba(255,255,255,0.6)] group-hover:text-white transition-colors">
+                Open Source on GitHub
+              </span>
+            </a>
           </div>
         </div>
 
-        {/* Bottom Bar */}
-        <div className="border-t border-white/10 pt-8 flex flex-col md:flex-row justify-between items-center gap-4">
-          <p className="font-sans text-sm text-[#F5F1EB]/50">
-            &copy; {currentYear} Skill Sphere. All Rights Reserved.
-          </p>
-          <p className="font-heading italic text-[#C9A96E]">
-            Crafted with care
-          </p>
+        {/* ROW 4: BOTTOM BAR */}
+        <div className="pt-[24px] flex flex-col md:flex-row justify-between items-center gap-[16px] md:gap-0">
+          <div className="flex flex-col md:flex-row items-center text-center md:text-left gap-0 md:gap-[16px]">
+            <span className="font-sans text-[13px] text-[rgba(255,255,255,0.4)]">
+              © 2026 Skill Sphere. All rights reserved.
+            </span>
+            <span className="hidden md:inline font-sans text-[13px] text-[rgba(255,255,255,0.6)] border-l border-[rgba(255,255,255,0.1)] pl-[16px]">
+              Made with care for students everywhere.
+            </span>
+            <span className="md:hidden font-sans text-[13px] text-[rgba(255,255,255,0.6)] mt-[8px]">
+              Made with care for students everywhere.
+            </span>
+          </div>
+
+          <button 
+            onClick={scrollToTop}
+            className="font-sans text-[13px] text-[rgba(255,255,255,0.6)] hover:text-[#C9A96E] transition-colors flex items-center gap-1 cursor-pointer"
+          >
+            Back to top <ArrowUp size={14} />
+          </button>
         </div>
+
       </div>
     </footer>
   );

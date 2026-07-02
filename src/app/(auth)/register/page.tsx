@@ -166,15 +166,12 @@ export default function RegisterPage() {
     <div className="relative min-h-[100dvh] flex flex-col lg:flex-row items-center justify-between p-6 lg:p-16 overflow-hidden">
       
       {/* Background Image with Dark Overlay */}
-      <motion.div 
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        transition={{ duration: 0.5, ease: appleEase }}
+      <div
         className="absolute inset-0 z-0"
       >
         <div className="absolute inset-0 bg-[rgba(30,27,46,0.78)] z-10 backdrop-blur-[1px]" />
         <div className="absolute inset-0 bg-[url('/images/about-origin.jpg')] bg-cover bg-center blur-[2px] scale-105" />
-      </motion.div>
+      </div>
 
       {/* TOP LEFT BACK BUTTON */}
       <div className="absolute top-6 left-6 z-20">
@@ -184,10 +181,7 @@ export default function RegisterPage() {
       </div>
 
       {/* LEFT SIDE - BRAND CONTENT */}
-      <motion.div 
-        initial={{ opacity: 0, x: -20 }}
-        animate={{ opacity: 1, x: 0 }}
-        transition={{ duration: 0.8, delay: 0.2, ease: appleEase }}
+      <div
         className="relative z-20 w-full lg:w-[45%] flex flex-col justify-center mt-12 lg:mt-0 mb-6 lg:mb-0"
       >
         <Link href="/" className="mb-4 lg:mb-8 w-max">
@@ -195,41 +189,28 @@ export default function RegisterPage() {
             Skill Sphere.
           </span>
         </Link>
-        <motion.h1 
-          initial={{ opacity: 0, y: 10 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.3 }}
+        <h1
           className="font-heading text-[22px] lg:text-[32px] text-white leading-[1.1] mb-4 max-w-[400px]"
         >
           Education, crafted for how you think.
-        </motion.h1>
-        <motion.p
-          initial={{ opacity: 0, y: 10 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.4 }}
+        </h1>
+        <p
           className="font-sans text-[15px] text-[#F5F1EB] mb-8 lg:mb-12"
         >
           Join our community of learners shaping their future.
-        </motion.p>
-      </motion.div>
+        </p>
+      </div>
 
       {/* RIGHT SIDE - FLOATING CARD */}
-      <motion.div 
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.6, delay: 0.3, ease: appleEase }}
+      <div
         className="relative z-20 w-full lg:w-[55%] max-w-[480px] bg-white rounded-[16px] shadow-[0_12px_40px_rgba(0,0,0,0.18)] p-[28px] flex flex-col mx-auto lg:mr-0 max-h-[85vh] overflow-y-auto"
       >
         <Stepper />
 
         <AnimatePresence mode="wait">
           {step === "account" && (
-            <motion.div 
+            <div 
               key="account"
-              initial={{ opacity: 0, x: 20 }}
-              animate={{ opacity: 1, x: 0 }}
-              exit={{ opacity: 0, x: -20 }}
-              transition={{ duration: 0.3 }}
               className="flex flex-col"
             >
               <div className="text-center mb-6">
@@ -274,14 +255,12 @@ export default function RegisterPage() {
                   </div>
                 </div>
 
-                <motion.button 
+                <button 
                   type="button" onClick={goToRole}
-                  whileHover={{ scale: 1.01 }}
-                  whileTap={{ scale: 0.98 }}
                   className="w-full h-[48px] bg-[#C9A96E] text-[#1E1B2E] rounded-xl font-sans text-[16px] font-medium mt-4 flex items-center justify-center"
                 >
                   Continue
-                </motion.button>
+                </button>
               </div>
 
               {/* SOCIAL LOGINS */}
@@ -305,16 +284,12 @@ export default function RegisterPage() {
                 )}
                 Google
               </button>
-            </motion.div>
+            </div>
           )}
 
           {step === "role" && (
-            <motion.div 
+            <div 
               key="role"
-              initial={{ opacity: 0, x: 20 }}
-              animate={{ opacity: 1, x: 0 }}
-              exit={{ opacity: 0, x: -20 }}
-              transition={{ duration: 0.3 }}
               className="flex flex-col"
             >
               <div className="text-center mb-6">
@@ -326,9 +301,8 @@ export default function RegisterPage() {
                 {roles.map(role => {
                   const isSelected = formData.role === role.id;
                   return (
-                    <motion.button
+                    <button
                       key={role.id} type="button"
-                      whileHover={{ y: -2 }}
                       onClick={() => setFormData({ ...formData, role: role.id })}
                       className={`w-full p-4 rounded-xl flex items-center gap-4 text-left transition-all ${
                         isSelected 
@@ -345,14 +319,14 @@ export default function RegisterPage() {
                         <h3 className="font-heading text-[18px] text-[#1E1B2E] mb-0.5">{role.name}</h3>
                         <p className="font-sans text-[13px] text-[#8E8E93]">{role.desc}</p>
                       </div>
-                    </motion.button>
+                    </button>
                   );
                 })}
               </div>
 
               <div className="flex gap-3">
                 <Button variant="ghost" onClick={() => setStep("account")} className="text-[#8E8E93] hover:text-[#1E1B2E]">Back</Button>
-                <motion.button 
+                <button 
                   type="button" onClick={goToDetails}
                   disabled={!formData.role}
                   whileHover={formData.role ? { scale: 1.01 } : {}}
@@ -362,18 +336,14 @@ export default function RegisterPage() {
                   }`}
                 >
                   Continue
-                </motion.button>
+                </button>
               </div>
-            </motion.div>
+            </div>
           )}
 
           {step === "details" && (
-            <motion.div 
+            <div 
               key="details"
-              initial={{ opacity: 0, x: 20 }}
-              animate={{ opacity: 1, x: 0 }}
-              exit={{ opacity: 0, x: -20 }}
-              transition={{ duration: 0.3 }}
               className="flex flex-col"
             >
               <div className="text-center mb-6">
@@ -406,25 +376,21 @@ export default function RegisterPage() {
 
                 <div className="flex gap-3 pt-4">
                   <Button variant="ghost" type="button" onClick={() => setStep("role")} className="text-[#8E8E93] hover:text-[#1E1B2E]">Back</Button>
-                  <motion.button 
+                  <button 
                     type="submit" disabled={loading}
-                    whileHover={{ scale: 1.01 }}
-                    whileTap={{ scale: 0.98 }}
                     className="flex-1 h-[48px] bg-[#C9A96E] text-[#1E1B2E] rounded-xl font-sans text-[16px] font-medium flex items-center justify-center"
                   >
                     {loading ? <Loader2 className="mr-2 animate-spin" size={16} /> : null}
                     Sign Up & Verify Gmail
-                  </motion.button>
+                  </button>
                 </div>
               </form>
-            </motion.div>
+            </div>
           )}
 
           {step === "otp" && (
-            <motion.div 
+            <div 
               key="otp"
-              initial={{ opacity: 0, x: 20 }}
-              animate={{ opacity: 1, x: 0 }}
               className="flex flex-col"
             >
               <button onClick={() => setStep("details")} className="inline-flex items-center gap-2 font-sans text-[13px] text-[#8E8E93] hover:text-[#C9A96E] transition-colors mb-6 self-start">
@@ -446,18 +412,15 @@ export default function RegisterPage() {
                   />
                 </div>
                 
-                <motion.button 
+                <button 
                   type="submit" disabled={loading}
-                  whileHover={{ scale: 1.01, boxShadow: "0 8px 24px rgba(30,27,46,0.12)" }}
-                  whileTap={{ scale: 0.98 }}
-                  transition={{ duration: 0.3 }}
                   className="w-full h-[48px] bg-[#1E1B2E] text-white rounded-xl font-sans text-[15px] font-medium flex items-center justify-center shadow-[0_4px_14px_rgba(30,27,46,0.08)]"
                 >
                   {loading ? <Loader2 className="mr-2 animate-spin" size={18} /> : <ShieldCheck className="mr-2" size={18} />}
                   Complete Registration
-                </motion.button>
+                </button>
               </form>
-            </motion.div>
+            </div>
           )}
         </AnimatePresence>
 
@@ -466,7 +429,7 @@ export default function RegisterPage() {
             Already have an account? <Link href="/login" className="text-[#C9A96E] hover:underline transition-colors">Sign In</Link>
           </p>
         )}
-      </motion.div>
+      </div>
 
     </div>
   );

@@ -1,8 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { MessageSquare, User, Calendar, Bug, Lightbulb, Heart, Shield } from "lucide-react";
+import { MessageSquare, Calendar, Bug, Lightbulb, Heart } from "lucide-react";
 
 export default function AdminFeedbackPage() {
   const [feedbacks, setFeedbacks] = useState<any[]>([]);
@@ -24,75 +23,121 @@ export default function AdminFeedbackPage() {
 
   const getTypeStyle = (type: string) => {
     switch (type) {
-      case "bug": return "bg-red-100 text-red-700 border-red-200";
-      case "suggestion": return "bg-blue-100 text-blue-700 border-blue-200";
-      default: return "bg-green-100 text-green-700 border-green-200";
+      case "bug": return "bg-[rgba(220,38,38,0.08)] text-[#DC2626] border border-[rgba(220,38,38,0.15)]";
+      case "suggestion": return "bg-[rgba(201,169,110,0.1)] text-[#C9A96E] border border-[rgba(201,169,110,0.2)]";
+      default: return "bg-[rgba(201,169,110,0.08)] text-[#C9A96E] border border-[rgba(201,169,110,0.15)]"; // Fallback for positive/other
     }
   };
 
   const getTypeIcon = (type: string) => {
     switch (type) {
-      case "bug": return <Bug size={14} />;
-      case "suggestion": return <Lightbulb size={14} />;
-      default: return <Heart size={14} />;
+      case "bug": return <Bug size={12} className="mr-[4px]" />;
+      case "suggestion": return <Lightbulb size={12} className="mr-[4px]" />;
+      default: return <Heart size={12} className="mr-[4px]" />;
     }
   };
 
-  return (
-    <div className="max-w-6xl mx-auto space-y-10 animate-in fade-in slide-in-from-bottom-4 duration-500">
-      <div className="flex items-center justify-between bg-black text-white p-8 rounded-[2.5rem] border-4 border-black shadow-[8px_8px_0px_0px_rgba(0,0,0,1)]">
-        <div>
-          <h1 className="text-4xl font-black uppercase tracking-tighter flex items-center gap-3">
-            <Shield className="text-primary" /> User Feedback Vault
-          </h1>
-          <p className="font-bold opacity-60 mt-1">Review bug reports and suggestions from the community.</p>
-        </div>
-        <div className="bg-primary/20 px-6 py-3 rounded-2xl border-2 border-primary/40 font-black">
-          {feedbacks.length} ENTRIES
-        </div>
-      </div>
+  const getRoleStyle = (role: string) => {
+    const lowercaseRole = role.toLowerCase();
+    if (lowercaseRole === "teacher") {
+      return "bg-[rgba(201,169,110,0.1)] text-[#C9A96E]";
+    }
+    return "bg-[rgba(30,27,46,0.06)] text-[#1E1B2E]"; // Student or default
+  };
 
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        {loading ? (
-          <div className="col-span-2 text-center py-20 font-black text-2xl opacity-20">Accessing secure feedback logs...</div>
-        ) : feedbacks.length === 0 ? (
-          <div className="col-span-2 text-center py-20 border-4 border-dashed border-black rounded-[2.5rem]">
-            <p className="font-black text-xl opacity-40">No feedback received yet.</p>
+  // Animation variants
+  const containerVariants = {
+    hidden: { opacity: 0 },
+    visible: { opacity: 1, transition: { staggerChildren: 0.1 } }
+  };
+  const itemVariants = {
+    hidden: { opacity: 0, y: 16 },
+    visible: { opacity: 1, y: 0, transition: { duration: 0.3, ease: "easeOut" } }
+  };
+
+  return (
+    <div
+      className="flex flex-col bg-[#F5F1EB] min-h-screen w-full font-sans pb-20 overflow-x-hidden min-w-0"
+    >
+      {/* HEADER */}
+      <div className="flex flex-col md:flex-row md:items-center justify-between px-[32px] pt-[8px] pb-[24px] gap-[16px]">
+        <p className="font-sans text-[14px] text-[#8E8E93]">Review bug reports and suggestions from the community.</p>
+        
+        {!loading && (
+          <div className="flex items-center">
+            <span className="bg-[rgba(30,27,46,0.06)] text-[#1E1B2E] font-sans text-[12px] font-medium px-[12px] py-[4px] rounded-full tracking-[0.08em] uppercase">
+              {feedbacks.length} ENTRIES
+            </span>
           </div>
-        ) : (
-          feedbacks.map((f) => (
-            <Card key={f.id} className="border-4 border-black shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] rounded-[2rem] overflow-hidden hover:translate-x-0.5 hover:translate-y-0.5 transition-all">
-              <CardHeader className="border-b-2 border-black bg-muted/10 p-5">
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-3">
-                    <div className="w-8 h-8 bg-white border-2 border-black rounded-full flex items-center justify-center font-black text-xs">
-                      {f.user.name.charAt(0)}
-                    </div>
-                    <div>
-                      <p className="text-[10px] font-black uppercase leading-none">{f.user.name}</p>
-                      <p className="text-[9px] font-bold text-muted-foreground uppercase">{f.user.email}</p>
-                    </div>
-                  </div>
-                  <div className={`px-2.5 py-1 border-2 border-black rounded-full text-[8px] font-black uppercase flex items-center gap-1.5 ${getTypeStyle(f.type)} shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]`}>
-                    {getTypeIcon(f.type)} {f.type}
-                  </div>
-                </div>
-              </CardHeader>
-              <CardContent className="p-6 space-y-4">
-                <p className="text-sm font-bold leading-relaxed italic">"{f.content}"</p>
-                <div className="flex items-center justify-between pt-4 border-t-2 border-black/5">
-                  <div className="flex items-center gap-1.5 text-[10px] font-black text-muted-foreground">
-                    <Calendar size={12} /> {new Date(f.createdAt).toLocaleDateString()}
-                  </div>
-                  <div className="text-[10px] font-black bg-black text-white px-2 py-0.5 rounded-md uppercase">
-                    {f.user.role}
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-          ))
         )}
       </div>
+
+      {/* CONTENT */}
+      {loading ? (
+        <div className="px-[32px] pt-[40px] text-center font-sans text-[14px] text-[#8E8E93] animate-pulse">
+          Loading feedback logs...
+        </div>
+      ) : feedbacks.length === 0 ? (
+        <div
+          className="bg-white rounded-[16px] mx-[32px] p-[60px_24px] shadow-[0_4px_20px_rgba(0,0,0,0.06)] flex flex-col items-center text-center"
+        >
+          <MessageSquare size={48} className="text-[#1E1B2E] opacity-25 mb-[16px]" />
+          <h3 className="font-heading text-[20px] text-[#1E1B2E]">No Feedback Yet</h3>
+          <p className="font-sans text-[14px] text-[#8E8E93] mt-[8px]">
+            Feedback from users will appear here once submitted.
+          </p>
+        </div>
+      ) : (
+        <div 
+          variants={containerVariants}
+          initial="hidden"
+          animate="visible"
+          className="grid grid-cols-1 md:grid-cols-2 gap-[24px] px-[32px] pb-[32px]"
+        >
+          {feedbacks.map((f) => (
+            <div 
+              key={f.id} 
+              variants={itemVariants}
+              className="bg-white rounded-[16px] shadow-[0_4px_16px_rgba(0,0,0,0.05)] overflow-hidden flex flex-col"
+            >
+              {/* Card Header */}
+              <div className="p-[20px_24px] flex flex-row items-center justify-between border-b border-[rgba(30,27,46,0.06)]">
+                <div className="flex items-center gap-[12px]">
+                  <div className="w-[36px] h-[36px] rounded-full bg-[rgba(30,27,46,0.04)] flex items-center justify-center font-sans text-[14px] font-medium text-[#1E1B2E]">
+                    {f.user.name.charAt(0).toUpperCase()}
+                  </div>
+                  <div>
+                    <p className="font-sans text-[14px] font-medium text-[#1E1B2E]">{f.user.name}</p>
+                    <p className="font-sans text-[12px] text-[#8E8E93]">{f.user.email}</p>
+                  </div>
+                </div>
+                <div className={`flex items-center px-[10px] py-[4px] rounded-full font-sans text-[11px] font-medium ${getTypeStyle(f.type)}`}>
+                  {getTypeIcon(f.type)}
+                  <span className="capitalize">{f.type}</span>
+                </div>
+              </div>
+              
+              {/* Card Body */}
+              <div className="p-[20px_24px] flex-1">
+                <p className="font-sans text-[14px] text-[#1E1B2E] leading-[1.6] italic">
+                  "{f.content}"
+                </p>
+              </div>
+              
+              {/* Card Footer */}
+              <div className="p-[16px_24px_20px] flex flex-row items-center justify-between">
+                <div className="flex items-center gap-[6px] font-sans text-[12px] text-[#8E8E93]">
+                  <Calendar size={14} className="text-[#8E8E93]" /> 
+                  {new Date(f.createdAt).toLocaleDateString()}
+                </div>
+                <div className={`px-[10px] py-[4px] rounded-full font-sans text-[11px] font-medium capitalize ${getRoleStyle(f.user.role)}`}>
+                  {f.user.role}
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
+      )}
     </div>
   );
 }

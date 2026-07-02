@@ -3,16 +3,21 @@
 import Link from "next/link";
 import Image from "next/image";
 import { usePathname, useRouter } from "next/navigation";
-import { BookOpen, LogOut, MessageSquare, Sparkles, Trophy, Users, Shield, LayoutDashboard, UserCircle, Menu, X, School, Home, Bell, HelpCircle, Heart, Globe, Settings, ShieldAlert } from "lucide-react";
+import { BookOpen, LogOut, MessageSquare, Sparkles, Trophy, Users, Shield, LayoutDashboard, UserCircle, Menu, X, School, Home, Bell, HelpCircle, Heart, Globe, Settings, ShieldAlert, Search, ChevronDown } from "lucide-react";
+import { motion, AnimatePresence } from "framer-motion";
 import { Button } from "@/components/ui/button";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 
 export default function DashboardLayout({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
   const router = useRouter();
+  const scrollRefStudent = useRef<HTMLDivElement>(null);
+  const scrollRefOther = useRef<HTMLDivElement>(null);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [userRole, setUserRole] = useState<string | null>(null);
+  const [userData, setUserData] = useState<any>(null);
   const [unreadCount, setUnreadCount] = useState(0);
+  const [userDropdownOpen, setUserDropdownOpen] = useState(false);
 
   useEffect(() => {
     const fetchUser = async () => {
@@ -21,6 +26,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
         const data = await res.json();
         if (res.ok) {
           setUserRole(data.user.role);
+          setUserData(data.user);
         } else {
           router.push("/login");
         }
@@ -42,6 +48,12 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
     return () => clearInterval(interval);
   }, [router]);
 
+  // Reset scroll position on route change
+  useEffect(() => {
+    if (scrollRefStudent.current) scrollRefStudent.current.scrollTo(0, 0);
+    if (scrollRefOther.current) scrollRefOther.current.scrollTo(0, 0);
+  }, [pathname]);
+
   const handleLogout = async () => {
     await fetch("/api/auth/logout", { method: "POST" });
     router.push("/login");
@@ -56,10 +68,11 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
           { href: "/dashboard/student", label: "Overview", icon: LayoutDashboard },
           { href: "/dashboard/student/courses", label: "My Courses", icon: BookOpen },
           { href: "/dashboard/student/leaderboard", label: "Leaderboard", icon: Trophy },
-          { href: "/dashboard/student/chat", label: "Course Chat", icon: MessageSquare },
           { href: "/dashboard/student/ai-tutor", label: "AI Study Tutor", icon: Sparkles },
           { href: "/dashboard/student/institutions", label: "Institutions", icon: School },
-          { href: "/dashboard/qa", label: "Q&A Forum", icon: HelpCircle },
+          { href: "/dashboard/student/community", label: "Community", icon: Users },
+          { href: "/dashboard/student/settings", label: "Settings", icon: Settings },
+          { href: "/dashboard/feedback", label: "Give Feedback", icon: Heart },
         ];
       case "teacher":
         return [
@@ -67,7 +80,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
           { href: "/dashboard/teacher/courses", label: "Manage Courses", icon: BookOpen },
           { href: "/dashboard/teacher/students", label: "My Students", icon: Users },
           { href: "/dashboard/teacher/institutions", label: "Institutions", icon: School },
-          { href: "/dashboard/qa", label: "Q&A Forum", icon: HelpCircle },
+          { href: "/dashboard/teacher/community", label: "Community", icon: Users },
         ];
       case "parent":
         return [
@@ -94,158 +107,180 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
 
   const links = getLinks();
 
-  return (
-    <div className="min-h-screen bg-background flex flex-col md:flex-row">
-      {/* Mobile Header */}
-      <div className="md:hidden flex items-center justify-between p-4 bg-white border-b-4 border-black z-30">
-        <Link href="/" className="flex items-center gap-2">
-           <div className="w-8 h-8 relative border-2 border-black rounded shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]">
-              <Image src="/images/new-skill-sphere-logo.png" alt="Logo" fill className="object-contain" />
-           </div>
-           <span className="font-black text-sm uppercase">Skill Sphere</span>
-        </Link>
-        <Button variant="ghost" className="p-1 border-2 border-black" onClick={() => setMobileMenuOpen(!mobileMenuOpen)}>
-           {mobileMenuOpen ? <X size={20} /> : <Menu size={20} />}
-        </Button>
-      </div>
-
-      {/* Sidebar */}
-      <aside className={`
-        fixed inset-0 z-40 bg-white md:relative md:flex md:w-56 md:flex-col border-r-4 border-black h-screen transition-transform duration-300
-        ${mobileMenuOpen ? 'translate-x-0' : '-translate-x-full md:translate-x-0'}
-      `}>
-        <div className="p-4 border-b-4 border-black bg-white">
-          <div className="flex justify-center mt-2">
-            <div className={`inline-block px-2 py-0.5 text-[8px] font-black border-2 border-black rounded uppercase ${
-              userRole === "superadmin" ? "bg-red-500 text-white" :
-              userRole === "institute_admin" ? "bg-[#F5C84C] text-black" :
-              "bg-[#F5C84C] text-black"
-            }`}>
-              {userRole === "superadmin" ? "⚡ Super Admin" :
-               userRole === "institute_admin" ? "🏛 Institute Admin" :
-               `${userRole} Portal`}
-            </div>
-          </div>
-        </div>
-
-        <nav className="flex-1 p-3 space-y-2 overflow-y-auto">
-          {links.map((link) => {
-            const Icon = link.icon;
-            const isActive = pathname === link.href;
-            return (
-              <Link key={link.href} href={link.href} onClick={() => setMobileMenuOpen(false)}>
-                <Button 
-                  variant={isActive ? "default" : "ghost"} 
-                  className={`w-full justify-start font-black text-xs h-10 ${isActive ? "neo-brutalism bg-[#4F7DF3] text-white" : "hover:bg-accent/20 border-2 border-transparent hover:border-black"}`}
-                >
-                  <Icon className="mr-3 h-4 w-4" />
-                  {link.label}
-                </Button>
-              </Link>
-            );
-          })}
-
-          <div className="pt-2 border-t-2 border-black border-dashed mt-2">
-             <Link href="/dashboard/chat/direct" onClick={() => setMobileMenuOpen(false)}>
-                <Button 
-                  variant={pathname === "/dashboard/chat/direct" ? "default" : "ghost"} 
-                  className={`w-full justify-start font-black text-xs h-10 ${pathname === "/dashboard/chat/direct" ? "neo-brutalism bg-[#F9A8D4] text-black" : "hover:bg-accent/20 border-2 border-transparent hover:border-black"}`}
-                >
-                  <MessageSquare className="mr-3 h-4 w-4" />
-                  Messages
-                </Button>
-             </Link>
-          </div>
-          
-          <div className="pt-2 border-t-2 border-black border-dashed mt-2">
-             <Link href="/dashboard/profile" onClick={() => setMobileMenuOpen(false)}>
-                <Button 
-                  variant={pathname === "/dashboard/profile" ? "default" : "ghost"} 
-                  className={`w-full justify-start font-black text-xs h-10 ${pathname === "/dashboard/profile" ? "neo-brutalism bg-[#34D399] text-white" : "hover:bg-accent/20 border-2 border-transparent hover:border-black"}`}
-                >
-                  <UserCircle className="mr-3 h-4 w-4" />
-                  My Profile
-                </Button>
-             </Link>
-          </div>
-          <div className="pt-2 border-t-2 border-black border-dashed mt-2">
-             <Link href="/dashboard/feedback" onClick={() => setMobileMenuOpen(false)}>
-                <Button 
-                   variant={pathname === "/dashboard/feedback" ? "default" : "ghost"} 
-                   className={`w-full justify-start font-black text-xs h-10 ${pathname === "/dashboard/feedback" ? "neo-brutalism bg-orange-100 text-orange-700" : "hover:bg-accent/20 border-2 border-transparent hover:border-black"}`}
-                >
-                   <Heart className="mr-3 h-4 w-4" />
-                   Give Feedback
-                </Button>
-             </Link>
-          </div>
-
-          <div className="pt-2 border-t-2 border-black border-dashed mt-2">
-             <Link href="/dashboard/notifications" onClick={() => setMobileMenuOpen(false)}>
-                <Button 
-                  variant={pathname === "/dashboard/notifications" ? "default" : "ghost"} 
-                  className={`w-full justify-start font-black text-xs h-10 relative ${pathname === "/dashboard/notifications" ? "neo-brutalism bg-[#F5C84C] text-black" : "hover:bg-accent/20 border-2 border-transparent hover:border-black"}`}
-                >
-                  <Bell className="mr-3 h-4 w-4" />
-                  Notifications
-                  {unreadCount > 0 && (
-                    <span className="absolute right-3 bg-red-500 text-white text-[8px] font-black w-5 h-5 rounded-full flex items-center justify-center border border-black">
-                      {unreadCount > 9 ? "9+" : unreadCount}
-                    </span>
-                  )}
-                </Button>
-             </Link>
-          </div>
-
-          <div className="pt-4 mt-4 mb-2 px-2 text-[10px] font-black uppercase text-muted-foreground tracking-widest">
-            Platform
-          </div>
-          
-          <Link href="/" onClick={() => setMobileMenuOpen(false)}>
-             <Button variant="ghost" className="w-full justify-start font-black text-xs h-10 hover:bg-accent/20 border-2 border-transparent hover:border-black">
-               <Home className="mr-3 h-4 w-4" />
-               Home
-             </Button>
+  
+    return (
+      <div className="min-h-screen bg-[#F5F1EB] flex flex-col md:flex-row font-sans">
+        {/* Mobile Header (Student) */}
+        <div className="md:hidden flex items-center justify-between p-4 bg-white z-30 shadow-sm">
+          <Link href="/" className="flex items-center gap-2">
+             <span className="font-heading text-xl font-bold text-[#1E1B2E]">Skill Sphere</span>
           </Link>
-          <Link href="/courses" onClick={() => setMobileMenuOpen(false)}>
-             <Button variant="ghost" className="w-full justify-start font-black text-xs h-10 hover:bg-accent/20 border-2 border-transparent hover:border-black">
-               <BookOpen className="mr-3 h-4 w-4" />
-               All Courses
-             </Button>
-          </Link>
-          <Link href="/features" onClick={() => setMobileMenuOpen(false)}>
-             <Button variant="ghost" className="w-full justify-start font-black text-xs h-10 hover:bg-accent/20 border-2 border-transparent hover:border-black">
-               <Sparkles className="mr-3 h-4 w-4" />
-               Features
-             </Button>
-          </Link>
-        </nav>
-        
-        <div className="p-4 border-t-4 border-black">
-          <Button variant="ghost" className="w-full justify-start font-black text-xs text-red-600 hover:bg-red-50 border-2 border-transparent hover:border-black h-10" onClick={handleLogout}>
-            <LogOut className="mr-3 h-4 w-4" />
-            Logout
+          <Button variant="ghost" className="p-1 text-[#1E1B2E]" onClick={() => setMobileMenuOpen(!mobileMenuOpen)}>
+             {mobileMenuOpen ? <X size={24} /> : <Menu size={24} />}
           </Button>
         </div>
-      </aside>
 
-      {/* Main Content Area */}
-      <main className="flex-1 flex flex-col bg-[#f8f9fa] h-screen overflow-hidden relative">
-        <div className="absolute inset-0 bg-[url('https://patterns.dev/img/grid.svg')] opacity-[0.03] pointer-events-none z-0"></div>
-        
-
-
-        <div className="flex-1 overflow-y-auto p-4 md:p-8 z-10">
-          <div className="max-w-7xl mx-auto">
-            {children}
+        {/* Premium Student Sidebar */}
+        <aside
+          className={`
+            fixed inset-y-0 left-0 z-40 bg-[#1E1B2E] w-[260px] flex flex-col shadow-xl md:shadow-none transition-transform duration-300 md:relative md:translate-x-0
+            ${mobileMenuOpen ? 'translate-x-0' : '-translate-x-full'}
+          `}
+        >
+          <div className="p-6">
+            <Link href="/" className="flex items-center">
+              <span className="font-heading text-[20px] text-white">Skill Sphere</span>
+            </Link>
           </div>
-        </div>
-      </main>
-      
-      {/* Mobile Overlay */}
-      {mobileMenuOpen && (
-        <div className="fixed inset-0 bg-black/50 z-30 md:hidden" onClick={() => setMobileMenuOpen(false)}></div>
-      )}
-    </div>
-  );
+
+          <div className="flex-1 overflow-y-auto px-4 pb-6 custom-scrollbar">
+            {/* Nav Links */}
+            <div className="space-y-1">
+              {links.map((link) => {
+                const Icon = link.icon;
+                const isActive = pathname === link.href;
+                return (
+                  <Link key={link.href} href={link.href} onClick={() => setMobileMenuOpen(false)}>
+                    <div className={`flex items-center px-5 py-3 rounded-xl transition-all duration-200 group ${
+                      isActive 
+                        ? "bg-[rgba(201,169,110,0.08)] border-l-[3px] border-[#C9A96E]" 
+                        : "border-l-[3px] border-transparent hover:bg-[rgba(255,255,255,0.05)]"
+                    }`}>
+                      <Icon className={`w-[18px] h-[18px] mr-3 ${isActive ? "text-[#C9A96E]" : "text-[rgba(255,255,255,0.85)] group-hover:text-white"}`} />
+                      <span className={`text-[14px] ${isActive ? "text-[#C9A96E] font-medium" : "text-[rgba(255,255,255,0.85)] group-hover:text-white"}`}>
+                        {link.label}
+                      </span>
+                    </div>
+                  </Link>
+                );
+              })}
+            </div>
+
+            <div className="h-px bg-[rgba(255,255,255,0.08)] mx-4 my-4" />
+
+            {/* Platform Section */}
+            <div className="space-y-1">
+               {[
+                { href: "/", label: "Home", icon: Home },
+                { href: "/courses", label: "All Courses", icon: BookOpen },
+                { href: "/features", label: "Features", icon: Sparkles },
+               ].map((link) => {
+                const Icon = link.icon;
+                return (
+                  <Link key={link.href} href={link.href} onClick={() => setMobileMenuOpen(false)}>
+                    <div className="flex items-center px-5 py-3 rounded-xl transition-all duration-200 group border-l-[3px] border-transparent hover:bg-[rgba(255,255,255,0.05)]">
+                      <Icon className="w-[18px] h-[18px] mr-3 text-[rgba(255,255,255,0.85)] group-hover:text-white" />
+                      <span className="text-[14px] text-[rgba(255,255,255,0.85)] group-hover:text-white">
+                        {link.label}
+                      </span>
+                    </div>
+                  </Link>
+                )
+               })}
+            </div>
+
+          </div>
+        </aside>
+
+        {/* Mobile Overlay */}
+        {mobileMenuOpen && (
+          <div className="fixed inset-0 bg-black/50 z-30 md:hidden" onClick={() => setMobileMenuOpen(false)}></div>
+        )}
+
+        {/* Main Content Area */}
+        <main className="flex-1 flex flex-col h-screen overflow-hidden min-w-0">
+          {/* Top Bar */}
+          <header
+            className="h-16 bg-[#F5F1EB] sticky top-0 z-20 flex items-center justify-between px-8"
+          >
+            <h1 className="font-heading text-[28px] text-[#1E1B2E]">
+              {pathname === "/dashboard/student" ? "Overview" : 
+               pathname === "/dashboard/chat/direct" ? "Messages" :
+               pathname === "/dashboard/profile" ? "My Profile" :
+               pathname === "/dashboard/student/settings" ? "Settings" :
+               pathname === "/dashboard/notifications" ? "Notifications" :
+               pathname === "/dashboard/feedback" ? "Give Feedback" :
+               pathname.startsWith("/dashboard/student/courses/") ? "Course Content" :
+               links.find(l => l.href === pathname)?.label || "Dashboard"}
+            </h1>
+            
+            <div className="flex items-center gap-6">
+               <div className="relative hidden md:block">
+                  <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                    <Search className="h-4 w-4 text-[#8E8E93]" />
+                  </div>
+                  <input 
+                    type="text" 
+                    placeholder="Search..." 
+                    className="w-[280px] h-10 bg-white rounded-full pl-10 pr-4 text-[14px] text-[#1E1B2E] placeholder:text-[#8E8E93] focus:outline-none focus:ring-2 focus:ring-[#C9A96E]/50 shadow-[0_2px_8px_rgba(0,0,0,0.04)]"
+                  />
+               </div>
+               
+               <Link href="/dashboard/notifications" className="relative cursor-pointer hover:opacity-80 transition-opacity">
+                  <Bell className="w-5 h-5 text-[#1E1B2E]" />
+                  {unreadCount > 0 && (
+                    <span className="absolute -top-1 -right-1 bg-[#DC2626] text-white text-[10px] w-4 h-4 rounded-full flex items-center justify-center font-bold">
+                      {unreadCount > 9 ? '9+' : unreadCount}
+                    </span>
+                  )}
+               </Link>
+
+               <div className="relative">
+                  <button 
+                    onClick={() => setUserDropdownOpen(!userDropdownOpen)}
+                    className="flex items-center gap-2 focus:outline-none"
+                  >
+                    {userData?.image ? (
+                      /* eslint-disable-next-line @next/next/no-img-element */
+                      <img src={userData.image} alt="User" className="w-9 h-9 rounded-full object-cover shadow-sm" />
+                    ) : (
+                      <div className="w-9 h-9 rounded-full bg-[#C9A96E] flex items-center justify-center text-[#1E1B2E] font-bold shadow-sm">
+                        {userData?.name?.charAt(0) || "U"}
+                      </div>
+                    )}
+                    <ChevronDown className="w-4 h-4 text-[#8E8E93]" />
+                  </button>
+
+                  <AnimatePresence>
+                    {userDropdownOpen && (
+                      <motion.div
+                        initial={{ opacity: 0, y: -8, scale: 0.97 }}
+                        animate={{ opacity: 1, y: 0, scale: 1 }}
+                        exit={{ opacity: 0, y: -8, scale: 0.97 }}
+                        transition={{ duration: 0.15 }}
+                        className="absolute right-0 mt-2 w-52 bg-white rounded-xl shadow-[0_4px_20px_rgba(0,0,0,0.08)] py-2 border border-[rgba(0,0,0,0.04)]"
+                      >
+                        <div className="px-4 py-2 mb-1 border-b border-[rgba(0,0,0,0.04)]">
+                          <p className="text-[13px] font-medium text-[#1E1B2E] truncate">{userData?.name || "User"}</p>
+                          <p className="text-[11px] text-[#8E8E93] truncate">{userData?.email}</p>
+                        </div>
+                        <Link href="/dashboard/profile" onClick={() => setUserDropdownOpen(false)} className="block px-4 py-2 text-[14px] text-[#1E1B2E] hover:bg-[#F5F1EB] transition-colors">
+                          My Profile
+                        </Link>
+                        <Link href={userRole === "student" ? "/dashboard/student/settings" : "/dashboard/settings"} onClick={() => setUserDropdownOpen(false)} className="block px-4 py-2 text-[14px] text-[#1E1B2E] hover:bg-[#F5F1EB] transition-colors">
+                          Settings
+                        </Link>
+                        <div className="h-px bg-gray-100 my-1"></div>
+                        <button onClick={() => { setUserDropdownOpen(false); handleLogout(); }} className="w-full text-left px-4 py-2 text-[14px] text-[#DC2626] hover:bg-red-50 transition-colors">
+                          Sign Out
+                        </button>
+                      </motion.div>
+                    )}
+                  </AnimatePresence>
+               </div>
+            </div>
+          </header>
+
+          {/* Main Content Area */}
+          <div 
+            ref={scrollRefStudent} 
+            className={`flex-1 overflow-y-auto ${pathname === "/dashboard/student/ai-tutor" ? "" : "px-8 pb-8"}`}
+          >
+            <div className={pathname === "/dashboard/student/ai-tutor" ? "h-full" : "max-w-[1200px] mx-auto"}>
+              {children}
+            </div>
+          </div>
+        </main>
+      </div>
+    );
 }

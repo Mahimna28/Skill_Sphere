@@ -1,10 +1,11 @@
 "use client";
 
 import { useState } from "react";
-import { Card, CardContent } from "@/components/ui/card";
+import { motion } from "framer-motion";
+import { FadeIn, SlideUp, StaggerContainer, StaggerItem } from "@/components/animations";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { School, CheckCircle2, ArrowRight, Loader2, Send, Search, LogOut, ShieldAlert, Building2, BookOpen, Users, Plus } from "lucide-react";
+import { CheckCircle2, Loader2, Send, Search, LogOut, ShieldAlert, Building2, BookOpen, Users, Plus, Check } from "lucide-react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 
@@ -56,160 +57,212 @@ export default function JoinInstitutionClient({ institutions, userInstitutionId,
     }
   };
 
+  // Animation variants
+  const containerVariants = {
+    hidden: { opacity: 0, y: 16 },
+    visible: { opacity: 1, y: 0, transition: { duration: 0.4 } }
+  };
+
+  const itemVariants = {
+    hidden: { opacity: 0, y: 10 },
+    visible: { opacity: 1, y: 0, transition: { duration: 0.3 } }
+  };
+
   return (
-    <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500 pb-20">
-      <div>
-        <h1 className="text-4xl font-black uppercase tracking-tight flex items-center gap-3">
-           <div className="bg-primary text-white p-2 rounded-xl border-4 border-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]">
-              <School size={32} />
-           </div>
-           Institutions Management
-        </h1>
-        <p className="text-muted-foreground font-medium text-lg mt-1">Directly manage your institutional classes and affiliation.</p>
-      </div>
+    <div className="flex flex-col h-full bg-[#F5F1EB] font-sans pb-20 w-full min-w-0">
+      <div className="w-full mx-auto min-w-0">
+        
+        {/* PAGE HEADER */}
+        <FadeIn>
+          <div className="pt-[8px] px-[32px] mb-[24px]">
+            <p className="font-sans text-[14px] text-[#8E8E93]">Directly manage your institutional classes and affiliation.</p>
+          </div>
+        </FadeIn>
 
-      {userInstitutionId ? (
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-           <div className="lg:col-span-2 space-y-8">
-              {/* Info Banner */}
-              <div className="bg-[#4F7DF3] text-white border-4 border-black p-8 rounded-[2rem] shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] flex flex-col md:flex-row items-center justify-between gap-6 relative overflow-hidden">
-                <div className="absolute top-0 right-0 w-64 h-64 bg-white opacity-10 rounded-full blur-3xl -translate-y-1/2 translate-x-1/4 pointer-events-none"></div>
-                <div className="z-10">
-                    <p className="text-[10px] font-black uppercase tracking-widest opacity-70">Faculty Affiliation</p>
-                    <h2 className="text-5xl font-black uppercase tracking-tight">
-                      {teacherData?.institution?.name || "RNGPIT"}
-                    </h2>
-                    <div className="mt-4 flex items-center gap-4">
-                      <div className="flex items-center gap-2 px-3 py-1 bg-white/20 rounded-full">
-                        <div className="w-2 h-2 bg-green-400 rounded-full animate-pulse"></div>
-                        <span className="text-xs font-black uppercase">Verified Member</span>
-                      </div>
-                      {teacherData?.department && (
-                        <div className="flex items-center gap-2 px-3 py-1 bg-white/20 rounded-full">
-                           <Building2 size={14} />
-                           <span className="text-xs font-black uppercase">{teacherData.department.name}</span>
-                        </div>
-                      )}
+        {userInstitutionId ? (
+          <SlideUp delay={0.1}>
+            <div className="flex flex-col lg:flex-row gap-[24px] px-[32px] pb-[32px] w-full min-w-0">
+              {/* LEFT COLUMN (2/3) */}
+              <div className="lg:w-2/3 flex flex-col gap-[24px] min-w-0">
+                
+                {/* FACULTY AFFILIATION CARD */}
+                <motion.div
+                  whileHover={{ y: -2, boxShadow: "0 8px 30px rgba(0,0,0,0.08)" }}
+                  className="bg-white rounded-[16px] p-[28px] shadow-[0_4px_20px_rgba(0,0,0,0.06)] flex items-center justify-between w-full"
+                >
+                <div className="flex flex-col">
+                  <span className="font-sans text-[12px] uppercase tracking-[0.08em] text-[#8E8E93] mb-[8px]">Faculty Affiliation</span>
+                  <h2 className="font-heading text-[28px] text-[#1E1B2E] capitalize">
+                    {teacherData?.institution?.name?.toLowerCase() || "rngpit"}
+                  </h2>
+                  <div className="mt-[12px] flex items-center gap-[8px]">
+                    <div className="bg-[rgba(201,169,110,0.1)] text-[#C9A96E] flex items-center gap-[4px] px-[12px] py-[4px] rounded-full">
+                      <CheckCircle2 size={12} />
+                      <span className="font-sans text-[11px] font-medium">Verified Member</span>
                     </div>
-                </div>
-                <CheckCircle2 size={100} className="opacity-20 z-10 shrink-0" />
-              </div>
-
-              {/* Class Management List */}
-              <div className="neo-brutalism bg-white border-4 border-black overflow-hidden">
-                 <div className="p-6 bg-muted border-b-4 border-black flex items-center justify-between">
-                    <h3 className="text-xl font-black uppercase flex items-center gap-2">
-                       <BookOpen size={24} /> Private Classes
-                    </h3>
-                    <Link href="/dashboard/teacher/courses">
-                       <Button className="h-10 bg-[#34D399] text-black border-2 border-black font-black uppercase">
-                          <Plus className="mr-2 h-4 w-4" /> New Class
-                       </Button>
-                    </Link>
-                 </div>
-                 <div className="p-0">
-                    {!teacherData?.courses || teacherData.courses.length === 0 ? (
-                      <div className="p-20 text-center opacity-40 italic font-bold">
-                         <BookOpen size={40} className="mx-auto mb-4 opacity-30" />
-                         <p>You haven't created any private classes yet.</p>
-                         <p className="text-xs mt-2">Go to <strong>Manage Courses</strong> → Create a course → Select <strong>"Private Class"</strong> type.</p>
-                      </div>
-                    ) : (
-                      <div className="divide-y-4 divide-black">
-                         {teacherData.courses.map((course: any) => (
-                           <div key={course.id} className="p-6 flex flex-col md:flex-row md:items-center justify-between gap-4 hover:bg-muted/10 transition-colors">
-                              <div className="flex items-center gap-4">
-                                 <div className="w-12 h-12 bg-primary/10 border-2 border-black rounded-xl flex items-center justify-center text-primary">
-                                    <BookOpen size={24} />
-                                 </div>
-                                 <div>
-                                    <h4 className="font-black text-lg uppercase leading-tight">{course.title}</h4>
-                                    <p className="text-xs font-bold text-muted-foreground uppercase">{course.subject}</p>
-                                 </div>
-                              </div>
-                              <div className="flex items-center gap-6">
-                                 <div className="flex items-center gap-2 font-black text-xs uppercase opacity-60">
-                                    <Users size={14} /> {course._count.enrollments} Students
-                                 </div>
-                                 <Link href={`/dashboard/teacher/courses/${course.id}`}>
-                                    <Button className="neo-brutalism border-2 border-black h-10 px-6 font-black uppercase bg-secondary text-black">
-                                       Manage Class
-                                    </Button>
-                                 </Link>
-                              </div>
-                           </div>
-                         ))}
+                    {teacherData?.department && (
+                      <div className="bg-[rgba(30,27,46,0.06)] text-[#1E1B2E] flex items-center gap-[4px] px-[12px] py-[4px] rounded-full">
+                        <Building2 size={12} />
+                        <span className="font-sans text-[11px] font-medium">{teacherData.department.name}</span>
                       </div>
                     )}
-                 </div>
-              </div>
-           </div>
+                  </div>
+                </div>
+                
+                <div className="w-[48px] h-[48px] rounded-full bg-[rgba(201,169,110,0.08)] flex items-center justify-center shrink-0 ml-[16px]">
+                  <Check size={24} className="text-[#C9A96E]" />
+                </div>
+              </motion.div>
 
-           {/* Sidebar: Exit & Rules */}
-           <div className="lg:col-span-1 space-y-6">
-              <Card className="neo-brutalism bg-white border-4 border-black p-6 shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] flex flex-col justify-between min-h-[300px]">
-                 <div>
-                    <h3 className="text-xl font-black uppercase mb-4 flex items-center gap-2 text-red-600">
-                       <ShieldAlert size={24} /> Security Protocol
-                    </h3>
-                    <p className="text-sm font-bold text-muted-foreground leading-relaxed mb-6">
-                       As a verified faculty member of **{teacherData?.institution?.name}**, you are restricted from joining other organizations. 
-                    </p>
-                    <div className="p-4 bg-muted/20 border-2 border-black border-dashed rounded-xl">
-                       <p className="text-[10px] font-black uppercase mb-2">Hierarchy Rules</p>
-                       <ul className="text-[10px] font-bold space-y-2 opacity-70">
-                          <li>• Manage classes within your Dept.</li>
-                          <li>• Enroll students via direct Gmail.</li>
-                          <li>• Exit requires Admin Approval.</li>
-                       </ul>
+              {/* PRIVATE CLASSES SECTION */}
+              <div className="mt-[8px] flex flex-col w-full min-w-0">
+                <div className="flex items-center justify-between pb-[16px] border-b border-[rgba(30,27,46,0.06)]">
+                  <h3 className="font-heading text-[20px] text-[#1E1B2E] flex items-center gap-[8px]">
+                    <BookOpen size={18} className="text-[#1E1B2E]" /> Private Classes
+                  </h3>
+                  <Link href="/dashboard/teacher/courses">
+                    <button className="h-[36px] px-[16px] rounded-xl bg-[#1E1B2E] text-white text-[13px] font-medium flex items-center gap-[6px] hover:scale-[1.02] transition-transform">
+                      <Plus size={14} /> New Class
+                    </button>
+                  </Link>
+                </div>
+
+                <div className="mt-[16px] flex flex-col gap-[16px] w-full min-w-0">
+                  {!teacherData?.courses || teacherData.courses.length === 0 ? (
+                    <div className="p-[40px] text-center flex flex-col items-center justify-center">
+                       <BookOpen size={40} className="text-[#1E1B2E] opacity-20 mb-[16px]" />
+                       <h3 className="font-heading text-[18px] text-[#1E1B2E]">No private classes</h3>
+                       <p className="font-sans text-[13px] text-[#8E8E93] mt-[8px]">Create a new class to manage your institutional students.</p>
                     </div>
-                 </div>
-                 <Button 
-                   onClick={handleLeave} 
-                   disabled={loading || leaveRequested}
-                   variant="destructive" 
-                   className="w-full h-14 font-black neo-brutalism border-2 border-black mt-6 shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:shadow-none transition-all"
-                 >
-                    {loading ? <Loader2 className="animate-spin" /> : (leaveRequested ? "Exit Pending Approval" : <><LogOut size={20} className="mr-2" /> Request to Leave</>)}
-                 </Button>
-              </Card>
-           </div>
-        </div>
-      ) : (
-        <div className="space-y-6">
-           <div className="flex gap-3">
-              <div className="relative flex-1">
-                 <Search className="absolute left-4 top-3.5 h-5 w-5 text-muted-foreground" />
-                 <Input 
-                   placeholder="Search for your school or college..." 
-                   className="pl-12 h-12 border-4 border-black font-bold text-lg bg-white shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]"
-                   value={searchTerm}
-                   onChange={e => setSearchTerm(e.target.value)}
-                 />
-              </div>
-           </div>
+                  ) : (
+                    <StaggerContainer staggerDelay={0.05} className="mt-[16px] flex flex-col gap-[16px] w-full min-w-0">
+                      {teacherData.courses.map((course: any, i: number) => (
+                        <StaggerItem key={course.id}>
+                          <motion.div 
+                            whileHover={{ scale: 1.01 }}
+                            className="bg-white rounded-[16px] p-[20px] shadow-[0_4px_16px_rgba(0,0,0,0.05)] flex items-center justify-between w-full border border-[rgba(30,27,46,0.04)]"
+                          >
+                        <div className="flex items-center gap-[16px] min-w-0">
+                          <div className="w-[40px] h-[40px] rounded-full bg-[rgba(201,169,110,0.1)] flex items-center justify-center shrink-0">
+                            <BookOpen size={20} className="text-[#C9A96E]" />
+                          </div>
+                          <div className="flex flex-col min-w-0 overflow-hidden pr-4">
+                            <span className="font-sans text-[16px] font-medium text-[#1E1B2E] truncate">{course.title}</span>
+                            <span className="font-sans text-[13px] text-[#8E8E93] truncate">{course.subject}</span>
+                          </div>
+                        </div>
 
-           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {filteredInstitutions.map((inst) => (
-                <Card key={inst.id} className="neo-brutalism bg-white border-4 border-black overflow-hidden hover:translate-x-1 hover:-translate-y-1 transition-transform">
-                   <div className="p-6 border-b-4 border-black bg-muted/20">
-                      <h3 className="text-xl font-black uppercase truncate">{inst.name}</h3>
-                      <p className="text-[10px] font-bold text-muted-foreground uppercase mt-1">{inst._count.members} Verified Members</p>
-                   </div>
-                   <CardContent className="p-6">
-                      <Button 
-                        onClick={() => handleJoin(inst.id)} 
-                        disabled={loading || requestedId === inst.id}
-                        className={`w-full h-12 font-black border-2 border-black uppercase shadow-[3px_3px_0px_0px_rgba(0,0,0,1)] hover:shadow-none transition-all ${requestedId === inst.id ? 'bg-muted' : 'bg-secondary text-black'}`}
-                      >
-                         {loading ? <Loader2 className="animate-spin" /> : (requestedId === inst.id ? "Awaiting Review" : <><Send size={18} className="mr-2" /> Join as Faculty</>)}
-                      </Button>
-                   </CardContent>
-                </Card>
-              ))}
-           </div>
+                        <div className="flex items-center gap-[24px] shrink-0">
+                          <div className="hidden sm:flex items-center gap-[6px] text-[#8E8E93]">
+                            <Users size={14} />
+                            <span className="font-sans text-[13px]">{course._count.enrollments} Students</span>
+                          </div>
+                          <Link href={`/dashboard/teacher/courses/${course.id}`}>
+                            <button className="h-[36px] px-[16px] rounded-xl border border-[#1E1B2E] text-[#1E1B2E] text-[13px] font-medium hover:bg-[#1E1B2E] hover:text-white transition-colors shrink-0">
+                              Manage Class
+                            </button>
+                          </Link>
+                        </div>
+                          </motion.div>
+                        </StaggerItem>
+                      ))}
+                    </StaggerContainer>
+                  )}
+                </div>
+              </div>
+
+            </div>
+
+            {/* RIGHT COLUMN (1/3) */}
+            <div className="lg:w-1/3 flex flex-col min-w-0">
+              <div
+                className="bg-white rounded-[16px] p-[24px] shadow-[0_4px_16px_rgba(0,0,0,0.05)] w-full"
+              >
+                <div className="flex items-center gap-[8px]">
+                  <ShieldAlert size={18} className="text-[#DC2626]" />
+                  <h3 className="font-sans text-[14px] font-medium text-[#DC2626]">Security Protocol</h3>
+                </div>
+                
+                <p className="font-sans text-[13px] text-[#8E8E93] leading-[1.6] mt-[12px]">
+                  As a verified faculty member of <strong className="text-[#1E1B2E] font-medium">{teacherData?.institution?.name}</strong>, you are restricted from joining other organizations.
+                </p>
+
+                <div className="mt-[20px]">
+                  <p className="font-sans text-[12px] uppercase tracking-[0.08em] text-[#8E8E93] mb-[10px]">Hierarchy Rules</p>
+                  <div className="flex flex-col gap-[8px]">
+                    <div className="flex items-start gap-[8px]">
+                      <div className="w-[6px] h-[6px] rounded-full bg-[#C9A96E] shrink-0 mt-[6px]"></div>
+                      <span className="font-sans text-[13px] text-[#8E8E93]">Manage classes within your Dept.</span>
+                    </div>
+                    <div className="flex items-start gap-[8px]">
+                      <div className="w-[6px] h-[6px] rounded-full bg-[#C9A96E] shrink-0 mt-[6px]"></div>
+                      <span className="font-sans text-[13px] text-[#8E8E93]">Enroll students via direct Gmail.</span>
+                    </div>
+                    <div className="flex items-start gap-[8px]">
+                      <div className="w-[6px] h-[6px] rounded-full bg-[#C9A96E] shrink-0 mt-[6px]"></div>
+                      <span className="font-sans text-[13px] text-[#8E8E93]">Exit requires Admin Approval.</span>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="w-full h-[1px] bg-[rgba(30,27,46,0.06)] my-[20px]"></div>
+
+                <button 
+                  onClick={handleLeave} 
+                  disabled={loading || leaveRequested}
+                  className="w-full h-[44px] rounded-xl bg-[#DC2626] text-white font-sans text-[14px] font-medium flex items-center justify-center gap-[8px] hover:bg-[#B91C1C] hover:scale-[1.01] transition-all disabled:opacity-50 disabled:hover:scale-100"
+                >
+                  {loading ? <Loader2 className="animate-spin w-[16px] h-[16px]" /> : (leaveRequested ? "Exit Pending Approval" : <><LogOut size={16} /> Request to Leave</>)}
+                </button>
+              </div>
+            </div>
+            </div>
+          </SlideUp>
+        ) : (
+          /* UN-JOINED STATE: BROWSE INSTITUTIONS */
+          <SlideUp delay={0.1}>
+            <div className="px-[32px] pb-[32px] flex flex-col gap-[24px]">
+              <div className="relative w-full max-w-md">
+              <Search className="absolute left-[16px] top-1/2 -translate-y-1/2 text-[#8E8E93]" size={18} />
+              <Input 
+                placeholder="Search for your school or college..." 
+                className="w-full h-[44px] bg-white border border-[rgba(30,27,46,0.12)] rounded-full pl-[44px] pr-[16px] text-[14px] text-[#1E1B2E] placeholder:text-[#8E8E93] focus:outline-none focus:border-[#C9A96E] focus:ring-[3px] focus:ring-[rgba(201,169,110,0.15)] transition-all shadow-[0_2px_8px_rgba(0,0,0,0.04)]"
+                value={searchTerm}
+                onChange={e => setSearchTerm(e.target.value)}
+              />
+            </div>
+
+            <StaggerContainer staggerDelay={0.05} className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-[24px]">
+              {filteredInstitutions.map((inst, i) => (
+                <StaggerItem key={inst.id}>
+                  <motion.div 
+                    whileHover={{ y: -4, boxShadow: "0 12px 32px rgba(0,0,0,0.08)" }}
+                    className="bg-white rounded-[16px] shadow-[0_4px_16px_rgba(0,0,0,0.05)] overflow-hidden flex flex-col border border-[rgba(30,27,46,0.04)] h-full"
+                  >
+                    <div className="p-[24px] border-b border-[rgba(30,27,46,0.04)] bg-[#F5F1EB]/30">
+                    <h3 className="font-heading text-[20px] text-[#1E1B2E] truncate">{inst.name}</h3>
+                    <p className="font-sans text-[11px] uppercase tracking-[0.08em] font-medium text-[#8E8E93] mt-[4px]">{inst._count.members} Verified Members</p>
+                  </div>
+                  <div className="p-[24px] mt-auto">
+                    <button 
+                      onClick={() => handleJoin(inst.id)} 
+                      disabled={loading || requestedId === inst.id}
+                      className={`w-full h-[40px] rounded-xl font-sans text-[13px] font-medium flex items-center justify-center gap-[8px] transition-all
+                        ${requestedId === inst.id 
+                          ? 'bg-[rgba(30,27,46,0.06)] text-[#8E8E93]' 
+                          : 'bg-[#1E1B2E] text-white hover:bg-[#C9A96E]'
+                        } disabled:opacity-60`}
+                    >
+                    </button>
+                  </div>
+                </motion.div>
+              </StaggerItem>
+            ))}
+          </StaggerContainer>
         </div>
-      )}
+      </SlideUp>
+        )}
+      </div>
     </div>
   );
 }

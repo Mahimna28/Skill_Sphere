@@ -3,11 +3,9 @@
 import { useState, useEffect, Suspense } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 import { Loader2, ArrowLeft, ShieldCheck, Eye, EyeOff } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
+import styles from "./login.module.css";
 
 const appleEase = [0.4, 0, 0.2, 1];
 
@@ -106,18 +104,19 @@ function LoginContent() {
   };
 
   return (
-    <div className="relative min-h-[100dvh] flex flex-col lg:flex-row items-center justify-between p-6 lg:p-16 overflow-hidden">
+    <div className={styles.loginPage}>
       
       {/* Background Image with Dark Overlay */}
-      <motion.div 
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        transition={{ duration: 0.5, ease: appleEase }}
+      <div
         className="absolute inset-0 z-0"
       >
         <div className="absolute inset-0 bg-[rgba(30,27,46,0.75)] z-10 backdrop-blur-[1px]" />
         <div className="absolute inset-0 bg-[url('/images/hero-workspace.jpg')] bg-cover bg-center blur-[2px] scale-105" />
-      </motion.div>
+      </div>
+
+      {/* DECORATIVE FLOATING BLOBS (CENTER AREA) */}
+      <div className={styles.blob1} />
+      <div className={styles.blob2} />
 
       {/* TOP LEFT BACK BUTTON */}
       <div className="absolute top-6 left-6 z-20">
@@ -127,79 +126,65 @@ function LoginContent() {
       </div>
 
       {/* LEFT SIDE - BRAND CONTENT */}
-      <motion.div 
-        initial={{ opacity: 0, x: -20 }}
-        animate={{ opacity: 1, x: 0 }}
-        transition={{ duration: 0.8, delay: 0.2, ease: appleEase }}
-        className="relative z-20 w-full lg:w-[55%] flex flex-col justify-center mt-12 lg:mt-0 mb-6 lg:mb-0"
+      <div
+        className="relative z-20 w-full lg:w-1/2 max-w-[500px] flex flex-col justify-center mt-12 lg:mt-0 mb-6 lg:mb-0"
       >
         <Link href="/" className="mb-4 lg:mb-8 w-max">
           <span className="font-heading font-black text-[28px] tracking-tight text-white">
             Skill Sphere.
           </span>
         </Link>
-        <motion.h1 
-          initial={{ opacity: 0, y: 10 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.3 }}
+        <h1
           className="font-heading text-[22px] lg:text-[32px] text-white leading-[1.1] mb-4 max-w-[400px]"
         >
           Education, crafted for how you think.
-        </motion.h1>
-        <motion.p
-          initial={{ opacity: 0, y: 10 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.4 }}
+        </h1>
+        <p
           className="font-sans text-[15px] text-[#F5F1EB] mb-8 lg:mb-12"
         >
           Join our community of learners shaping their future.
-        </motion.p>
-      </motion.div>
+        </p>
+      </div>
 
       {/* RIGHT SIDE - FLOATING CARD */}
-      <motion.div 
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.6, delay: 0.3, ease: appleEase }}
-        className="relative z-20 w-full lg:w-[45%] max-w-[420px] bg-white rounded-[16px] shadow-[0_12px_40px_rgba(0,0,0,0.2)] p-[32px] flex flex-col mx-auto lg:mr-0 max-h-[85vh] overflow-y-auto"
+      <div
+        className={styles.formCard}
       >
         <AnimatePresence mode="wait">
           {step === "credentials" && (
-            <motion.div 
+            <div 
               key="credentials"
-              initial={{ opacity: 0, x: 20 }}
-              animate={{ opacity: 1, x: 0 }}
-              exit={{ opacity: 0, x: -20 }}
-              transition={{ duration: 0.3 }}
               className="flex flex-col"
             >
-              <div className="text-center mb-6">
-                <h2 className="font-heading text-[24px] text-[#1E1B2E] mb-1">Welcome back</h2>
-                <p className="font-sans text-[14px] text-[#8E8E93]">Enter your credentials to sign in.</p>
-              </div>
+              <h2 className="font-heading text-[24px] text-[#1E1B2E] text-center mb-1">Welcome back</h2>
+              <p className="font-sans text-[14px] text-[#8E8E93] text-center mb-8">Enter your credentials to sign in.</p>
 
-              {error && <div className="p-2 mb-4 bg-red-50 text-red-600 border border-red-200 rounded-lg font-sans text-[13px] text-center">{error}</div>}
-
-              <form onSubmit={handleCredentialsSubmit} className="space-y-4">
-                <div className="space-y-1">
-                  <Label className="font-sans text-[12px] uppercase tracking-[0.1em] text-[#8E8E93]">Email Address</Label>
-                  <Input 
-                    type="email" required className="h-[48px] bg-white border border-[rgba(30,27,46,0.08)] rounded-xl font-sans text-[15px] text-[#1E1B2E] placeholder:text-[#8E8E93] focus-visible:ring-0 focus-visible:border-[#C9A96E] focus-visible:shadow-[0_0_0_3px_rgba(201,169,110,0.15)] transition-all px-4" 
+              <form 
+                onSubmit={handleCredentialsSubmit} 
+                animate={error ? { x: [-4, 4, -4, 4, 0] } : {}}
+              >
+                <div style={{ marginBottom: 16 }}>
+                  <label className={styles.formLabel}>Email address</label>
+                  <input 
+                    type="email" required 
+                    className={`${styles.inputField} ${error ? styles.inputFieldError : ''}`} 
                     placeholder="you@example.com" value={email} onChange={e => setEmail(e.target.value)}
                   />
+                  {error && <p className={styles.errorText}>{error}</p>}
                 </div>
                 
-                <div className="space-y-1">
-                  <div className="flex justify-between items-center">
-                    <Label className="font-sans text-[12px] uppercase tracking-[0.1em] text-[#8E8E93]">Password</Label>
-                    <Link href="/forgot-password" className="text-[11px] font-medium text-[#8E8E93] hover:text-[#1E1B2E] transition-colors">
+                <div style={{ marginBottom: 24 }}>
+                  <div className="flex justify-between items-center mb-1">
+                    <label className={styles.formLabel} style={{ marginBottom: 0 }}>Password</label>
+                    <Link href="/forgot-password" className="font-sans text-[13px] text-[#8E8E93] hover:text-[#C9A96E] hover:underline transition-colors">
                       Forgot Password?
                     </Link>
                   </div>
                   <div className="relative">
-                    <Input 
+                    <input 
                       type={showPassword ? "text" : "password"} required 
-                      className="h-[48px] bg-white border border-[rgba(30,27,46,0.08)] rounded-xl font-sans text-[15px] text-[#1E1B2E] placeholder:text-[#8E8E93] focus-visible:ring-0 focus-visible:border-[#C9A96E] focus-visible:shadow-[0_0_0_3px_rgba(201,169,110,0.15)] transition-all px-4 pr-10" 
+                      className={`${styles.inputField} ${error ? styles.inputFieldError : ''}`} 
+                      style={{ paddingRight: 40 }}
                       placeholder="••••••••" value={password} onChange={e => setPassword(e.target.value)}
                     />
                     <button 
@@ -210,29 +195,23 @@ function LoginContent() {
                       {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
                     </button>
                   </div>
+                  {error && <p className={styles.errorText}>{error}</p>}
                 </div>
 
-                <motion.button 
+                <button 
                   type="submit" disabled={loading}
-                  whileHover={{ scale: 1.01 }}
-                  whileTap={{ scale: 0.98 }}
-                  className="w-full h-[48px] bg-[#C9A96E] text-[#1E1B2E] rounded-xl font-sans text-[16px] font-medium mt-4 flex items-center justify-center shadow-md hover:bg-[#b0935d] transition-colors"
+                  className={styles.signInButton}
                 >
                   {loading ? <Loader2 className="mr-2 animate-spin" size={16} /> : null}
                   Sign In
-                </motion.button>
+                </button>
               </form>
 
-              {/* SOCIAL LOGINS */}
-              <div className="relative flex items-center gap-3 my-5">
-                <div className="flex-1 h-[1px] bg-[rgba(30,27,46,0.08)]" />
-                <span className="font-sans text-[12px] text-[#8E8E93]">or continue with</span>
-                <div className="flex-1 h-[1px] bg-[rgba(30,27,46,0.08)]" />
-              </div>
+              <div className={styles.divider}>or continue with</div>
 
               <button
                 type="button" onClick={handleGoogleLogin} disabled={googleLoading}
-                className="w-full h-[44px] bg-white border border-[rgba(30,27,46,0.08)] hover:border-[rgba(30,27,46,0.2)] rounded-xl font-sans text-[14px] text-[#1E1B2E] flex items-center justify-center gap-2 transition-colors"
+                className={styles.googleButton}
               >
                 {googleLoading ? <Loader2 size={16} className="animate-spin text-[#8E8E93]" /> : (
                   <svg viewBox="0 0 24 24" width="16" height="16" xmlns="http://www.w3.org/2000/svg">
@@ -246,16 +225,14 @@ function LoginContent() {
               </button>
 
               <p className="mt-8 text-center font-sans text-[14px] text-[#8E8E93]">
-                Don't have an account? <Link href="/register" className="text-[#C9A96E] hover:underline transition-colors font-medium">Join Free</Link>
+                Don't have an account? <Link href="/register" className="text-[#C9A96E] hover:text-[#B8956A] hover:underline transition-colors font-medium">Join Free</Link>
               </p>
-            </motion.div>
+            </div>
           )}
 
           {step === "otp" && (
-            <motion.div 
+            <div 
               key="otp"
-              initial={{ opacity: 0, x: 20 }}
-              animate={{ opacity: 1, x: 0 }}
               className="flex flex-col"
             >
               <button onClick={() => setStep("credentials")} className="inline-flex items-center gap-2 font-sans text-[13px] text-[#8E8E93] hover:text-[#C9A96E] transition-colors mb-6 self-start">
@@ -269,29 +246,26 @@ function LoginContent() {
 
               <form onSubmit={handleVerifyOtp} className="space-y-6">
                 <div className="space-y-2">
-                  <Label className="font-sans text-[12px] uppercase tracking-[0.05em] text-[#1E1B2E] text-center block">6-Digit Code</Label>
-                  <Input 
+                  <label className="font-sans text-[12px] uppercase tracking-[0.05em] text-[#1E1B2E] text-center block mb-2">6-Digit Code</label>
+                  <input 
                     type="text" maxLength={6} required autoFocus
-                    className="h-[56px] bg-white border border-[rgba(30,27,46,0.08)] rounded-xl text-center font-heading text-[28px] tracking-[0.2em] text-[#1E1B2E] focus-visible:ring-0 focus-visible:border-[#C9A96E] focus-visible:shadow-[0_0_0_3px_rgba(201,169,110,0.15)] transition-all duration-200" 
+                    className={`${styles.inputField} ${styles.otpInput} ${error ? styles.inputFieldError : ''}`}
                     placeholder="000000" value={otpCode} onChange={e => setOtpCode(e.target.value)}
                   />
                 </div>
                 
-                <motion.button 
+                <button 
                   type="submit" disabled={loading}
-                  whileHover={{ scale: 1.01, boxShadow: "0 8px 24px rgba(30,27,46,0.12)" }}
-                  whileTap={{ scale: 0.98 }}
-                  transition={{ duration: 0.3 }}
-                  className="w-full h-[48px] bg-[#1E1B2E] text-white rounded-xl font-sans text-[15px] font-medium flex items-center justify-center shadow-[0_4px_14px_rgba(30,27,46,0.08)]"
+                  className={`${styles.signInButton} ${styles.completeButton}`}
                 >
                   {loading ? <Loader2 className="mr-2 animate-spin" size={18} /> : <ShieldCheck className="mr-2" size={18} />}
                   Complete Login
-                </motion.button>
+                </button>
               </form>
-            </motion.div>
+            </div>
           )}
         </AnimatePresence>
-      </motion.div>
+      </div>
     </div>
   );
 }

@@ -1,6 +1,5 @@
 "use client";
 
-import { motion } from "framer-motion";
 import Image from "next/image";
 import Link from "next/link";
 import { BookOpen, Users, Clock, Star, ArrowRight, ArrowLeft, ShieldCheck, Mail, MapPin, Briefcase } from "lucide-react";
@@ -47,10 +46,7 @@ export default function TeacherProfileClient({ teacher, courses }: { teacher: Te
 
           <div className="flex flex-col md:flex-row items-center md:items-start gap-10">
             {/* Avatar */}
-            <motion.div 
-              initial={{ opacity: 0, scale: 0.9 }}
-              animate={{ opacity: 1, scale: 1 }}
-              transition={{ duration: 0.8, ease: appleEase }}
+            <div
               className="w-32 h-32 md:w-48 md:h-48 rounded-full overflow-hidden border-4 border-[#C9A96E] shrink-0 shadow-[0_8px_32px_rgba(0,0,0,0.3)] bg-white relative"
             >
               {teacher.image ? (
@@ -60,13 +56,10 @@ export default function TeacherProfileClient({ teacher, courses }: { teacher: Te
                   {teacher.name.charAt(0)}
                 </div>
               )}
-            </motion.div>
+            </div>
 
             {/* Info */}
-            <motion.div 
-              initial={{ opacity: 0, x: -40 }}
-              animate={{ opacity: 1, x: 0 }}
-              transition={{ duration: 0.8, delay: 0.1, ease: appleEase }}
+            <div
               className="flex-1 text-center md:text-left text-white"
             >
               <h1 className="font-heading font-bold text-[36px] md:text-[56px] leading-none mb-2">
@@ -92,7 +85,7 @@ export default function TeacherProfileClient({ teacher, courses }: { teacher: Te
                   <span className="font-sans text-[14px] text-[#8E8E93] uppercase tracking-wider">Students</span>
                 </div>
               </div>
-            </motion.div>
+            </div>
           </div>
         </div>
       </section>
@@ -112,17 +105,11 @@ export default function TeacherProfileClient({ teacher, courses }: { teacher: Te
                 const mockRating = course.rating || 4.8;
 
                 return (
-                  <motion.div
+                  <div
                     key={course.id}
-                    initial={{ opacity: 0, y: 40 }}
-                    whileInView={{ opacity: 1, y: 0 }}
-                    viewport={{ once: true, margin: "-50px" }}
-                    transition={{ duration: 0.7, delay: idx * 0.1, ease: appleEase }}
                   >
                     <Link href={`/courses/${course.id}`} className="block h-full group">
-                      <motion.div 
-                        whileHover={{ y: -8, boxShadow: "0 12px 40px rgba(30,27,46,0.12)" }}
-                        transition={{ type: "spring", stiffness: 300, damping: 20 }}
+                      <div
                         className="bg-white rounded-[16px] overflow-hidden h-full flex flex-col shadow-[0_4px_20px_rgba(30,27,46,0.06)] border border-[rgba(30,27,46,0.03)]"
                       >
                         <div className="w-full aspect-[16/9] relative overflow-hidden bg-[#1E1B2E]">
@@ -176,9 +163,9 @@ export default function TeacherProfileClient({ teacher, courses }: { teacher: Te
                             </div>
                           </div>
                         </div>
-                      </motion.div>
+                      </div>
                     </Link>
-                  </motion.div>
+                  </div>
                 );
               })}
             </div>

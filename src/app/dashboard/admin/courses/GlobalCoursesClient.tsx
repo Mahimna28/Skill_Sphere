@@ -1,11 +1,9 @@
 "use client";
 
 import { useState } from "react";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { BookOpen, Users, Plus, Loader2, X, Globe, Lock } from "lucide-react";
+import { BookOpen, Users, Plus, Loader2, X, Globe, Code } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 
@@ -19,7 +17,7 @@ export default function GlobalCoursesClient({ superadmin, initialCourses }: { su
   const [toast, setToast] = useState<{ message: string; type: "success" | "error" } | null>(null);
   const [form, setForm] = useState({ title: "", description: "", subject: "Python", thumbnail: "", isPublic: true });
 
-  const totalStudents = courses.reduce((sum, c) => sum + c._count.enrollments, 0);
+  const totalStudents = courses.reduce((sum: number, c: any) => sum + (c._count?.enrollments || 0), 0);
 
   const showToast = (message: string, type: "success" | "error") => {
     setToast({ message, type });
@@ -53,50 +51,64 @@ export default function GlobalCoursesClient({ superadmin, initialCourses }: { su
     }
   };
 
+  // Variants for animations
+  const containerVariants = {
+    hidden: { opacity: 0 },
+    visible: { opacity: 1, transition: { staggerChildren: 0.08 } }
+  };
+  const itemVariants = {
+    hidden: { opacity: 0, y: 16 },
+    visible: { opacity: 1, y: 0, transition: { duration: 0.25, ease: "easeOut" } }
+  };
+
   return (
-    <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
+    <div
+      className="flex flex-col bg-[#F5F1EB] min-h-screen w-full font-sans pb-20 overflow-x-hidden min-w-0"
+    >
       {/* Toast */}
       {toast && (
-        <div className={`fixed top-4 right-4 p-4 rounded-xl border-4 border-black font-black z-50 animate-in slide-in-from-top-2 ${toast.type === "success" ? "bg-[#34D399] text-black" : "bg-red-500 text-white"}`}>
+        <div className={`fixed top-4 right-4 p-4 rounded-xl shadow-[0_4px_20px_rgba(0,0,0,0.1)] font-sans font-medium text-[14px] z-50 animate-in slide-in-from-top-2 ${toast.type === "success" ? "bg-[#C9A96E] text-white" : "bg-[#DC2626] text-white"}`}>
           {toast.message}
         </div>
       )}
 
       {/* Course Creation Modal */}
       {showForm && (
-        <div className="fixed inset-0 bg-black/50 z-40 flex items-center justify-center p-4">
-          <Card className="w-full max-w-2xl bg-white border-4 border-black shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] rounded-2xl animate-in zoom-in-95 duration-200 overflow-hidden">
-            <CardHeader className="bg-[#4F7DF3] text-white border-b-4 border-black flex flex-row items-center justify-between pb-4">
-              <CardTitle className="text-2xl font-black">Deploy Global Course</CardTitle>
-              <button onClick={() => setShowForm(false)} className="w-9 h-9 border-2 border-black bg-white text-black rounded-lg flex items-center justify-center hover:bg-muted transition-colors">
+        <div className="fixed inset-0 bg-[rgba(30,27,46,0.6)] backdrop-blur-sm z-50 flex items-center justify-center p-4">
+          <div
+            className="w-full max-w-2xl bg-white rounded-[24px] shadow-[0_12px_40px_rgba(0,0,0,0.12)] overflow-hidden flex flex-col"
+          >
+            <div className="px-[24px] py-[20px] border-b border-[rgba(30,27,46,0.08)] flex items-center justify-between">
+              <h2 className="font-heading text-[22px] text-[#1E1B2E]">Deploy Global Course</h2>
+              <button onClick={() => setShowForm(false)} className="w-[32px] h-[32px] rounded-full flex items-center justify-center text-[#8E8E93] hover:bg-[rgba(30,27,46,0.04)] hover:text-[#1E1B2E] transition-colors">
                 <X size={18} />
               </button>
-            </CardHeader>
-            <CardContent className="p-6">
-              <form onSubmit={handleCreateCourse} className="space-y-5">
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
-                  <div className="space-y-2">
-                    <Label className="font-black text-base">Course Title *</Label>
-                    <Input required placeholder="e.g. Advanced Networking" className="neo-brutalism-static h-11" value={form.title} onChange={(e) => setForm({ ...form, title: e.target.value })} />
+            </div>
+            <div className="p-[24px] overflow-y-auto max-h-[75vh]">
+              <form onSubmit={handleCreateCourse} className="flex flex-col gap-[20px]">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-[20px]">
+                  <div className="flex flex-col gap-[8px]">
+                    <Label className="font-sans text-[13px] font-medium text-[#1E1B2E]">Course Title *</Label>
+                    <input required placeholder="e.g. Advanced Networking" className="w-full h-[44px] px-[16px] rounded-xl border border-[rgba(30,27,46,0.12)] font-sans text-[14px] text-[#1E1B2E] placeholder:text-[#8E8E93] focus:outline-none focus:border-[#C9A96E] focus:shadow-[0_0_0_3px_rgba(201,169,110,0.15)] transition-all" value={form.title} onChange={(e) => setForm({ ...form, title: e.target.value })} />
                   </div>
-                  <div className="space-y-2">
-                    <Label className="font-black text-base">Subject / Category *</Label>
-                    <select required className="flex w-full h-11 rounded-xl border-2 border-black bg-background px-3 py-2 font-medium text-sm shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] focus:outline-none focus:ring-2 focus:ring-primary" value={form.subject} onChange={(e) => setForm({ ...form, subject: e.target.value })}>
+                  <div className="flex flex-col gap-[8px]">
+                    <Label className="font-sans text-[13px] font-medium text-[#1E1B2E]">Subject / Category *</Label>
+                    <select required className="w-full h-[44px] px-[16px] rounded-xl border border-[rgba(30,27,46,0.12)] font-sans text-[14px] text-[#1E1B2E] bg-white focus:outline-none focus:border-[#C9A96E] focus:shadow-[0_0_0_3px_rgba(201,169,110,0.15)] transition-all" value={form.subject} onChange={(e) => setForm({ ...form, subject: e.target.value })}>
                       {SUBJECTS.map((s) => <option key={s} value={s}>{s}</option>)}
                     </select>
                   </div>
                 </div>
-                <div className="space-y-2">
-                  <Label className="font-black text-base">Description *</Label>
-                  <textarea required rows={4} placeholder="Describe what students will learn..." className="flex w-full rounded-xl border-2 border-black bg-background px-3 py-2 font-medium text-sm shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] focus:outline-none focus:ring-2 focus:ring-primary resize-none" value={form.description} onChange={(e) => setForm({ ...form, description: e.target.value })} />
+                <div className="flex flex-col gap-[8px]">
+                  <Label className="font-sans text-[13px] font-medium text-[#1E1B2E]">Description *</Label>
+                  <textarea required rows={3} placeholder="Describe what students will learn..." className="w-full px-[16px] py-[12px] rounded-xl border border-[rgba(30,27,46,0.12)] font-sans text-[14px] text-[#1E1B2E] placeholder:text-[#8E8E93] focus:outline-none focus:border-[#C9A96E] focus:shadow-[0_0_0_3px_rgba(201,169,110,0.15)] transition-all resize-none" value={form.description} onChange={(e) => setForm({ ...form, description: e.target.value })} />
                 </div>
-                <div className="space-y-2">
-                  <Label className="font-black text-base">Cover Photo <span className="font-normal text-muted-foreground">(optional)</span></Label>
-                  <div className="flex gap-2 items-center">
-                    <Input 
+                <div className="flex flex-col gap-[8px]">
+                  <Label className="font-sans text-[13px] font-medium text-[#1E1B2E]">Cover Photo <span className="text-[#8E8E93] font-normal">(optional)</span></Label>
+                  <div className="flex gap-[12px] items-center">
+                    <input 
                       type="file" 
                       accept="image/*"
-                      className="neo-brutalism-static h-11 flex-1 cursor-pointer" 
+                      className="flex-1 h-[44px] px-[16px] py-[10px] rounded-xl border border-[rgba(30,27,46,0.12)] font-sans text-[13px] text-[#1E1B2E] cursor-pointer file:mr-4 file:py-1 file:px-3 file:rounded-full file:border-0 file:text-[12px] file:font-medium file:bg-[rgba(201,169,110,0.1)] file:text-[#C9A96E] hover:file:bg-[rgba(201,169,110,0.2)]" 
                       onChange={async (e) => {
                         const file = e.target.files?.[0];
                         if (!file) return;
@@ -123,44 +135,37 @@ export default function GlobalCoursesClient({ superadmin, initialCourses }: { su
                       }} 
                     />
                     {form.thumbnail && (
-                      <div className="h-11 w-11 rounded border-2 border-black overflow-hidden shrink-0">
+                      <div className="h-[44px] w-[44px] rounded-lg border border-[rgba(30,27,46,0.12)] overflow-hidden shrink-0">
                          <img src={form.thumbnail} alt="Preview" className="w-full h-full object-cover" />
                       </div>
                     )}
                   </div>
-                  <p className="text-xs font-bold text-muted-foreground mt-1">Select an image file from your device.</p>
                 </div>
-                <div className="space-y-2">
-                  <Label className="font-black text-base">Course Details <span className="font-normal text-muted-foreground">(Detailed Description)</span></Label>
-                  <textarea rows={6} placeholder="Write a comprehensive description of what students will learn..." className="flex w-full rounded-xl border-2 border-black bg-background px-3 py-2 font-medium text-sm shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] focus:outline-none focus:ring-2 focus:ring-primary resize-y" value={(form as any).details || ""} onChange={(e) => setForm({ ...form, details: e.target.value } as any)} />
+                <div className="flex flex-col gap-[8px]">
+                  <Label className="font-sans text-[13px] font-medium text-[#1E1B2E]">Course Details <span className="text-[#8E8E93] font-normal">(Detailed Description)</span></Label>
+                  <textarea rows={5} placeholder="Write a comprehensive description..." className="w-full px-[16px] py-[12px] rounded-xl border border-[rgba(30,27,46,0.12)] font-sans text-[14px] text-[#1E1B2E] placeholder:text-[#8E8E93] focus:outline-none focus:border-[#C9A96E] focus:shadow-[0_0_0_3px_rgba(201,169,110,0.15)] transition-all resize-y" value={(form as any).details || ""} onChange={(e) => setForm({ ...form, details: e.target.value } as any)} />
                 </div>
-                <div className="flex gap-3 pt-2">
-                  <Button type="button" variant="outline" className="flex-1 border-2 border-black font-bold h-12" onClick={() => setShowForm(false)}>Cancel</Button>
-                  <Button type="submit" className="flex-1 neo-brutalism font-bold h-12 text-lg" disabled={loading}>
-                    {loading ? <><Loader2 className="mr-2 h-5 w-5 animate-spin" /> Deploying...</> : "Publish Global Course"}
-                  </Button>
+                <div className="flex gap-[12px] pt-[12px]">
+                  <button type="button" onClick={() => setShowForm(false)} className="flex-1 h-[44px] rounded-xl border border-[#1E1B2E] text-[#1E1B2E] font-sans text-[14px] font-medium hover:bg-[rgba(30,27,46,0.04)] transition-colors">
+                    Cancel
+                  </button>
+                  <button type="submit" disabled={loading} className="flex-1 h-[44px] rounded-xl bg-[#C9A96E] text-[#1E1B2E] font-sans text-[14px] font-medium hover:scale-[1.02] hover:shadow-[0_4px_16px_rgba(201,169,110,0.3)] transition-all flex items-center justify-center">
+                    {loading ? <><Loader2 className="mr-[8px] h-[16px] w-[16px] animate-spin" /> Deploying...</> : "Publish Global Course"}
+                  </button>
                 </div>
               </form>
-            </CardContent>
-          </Card>
+            </div>
+          </div>
         </div>
       )}
 
-      {/* Header */}
-      <div className="flex flex-col md:flex-row md:items-end justify-between gap-4">
-        <div>
-          <h1 className="text-4xl font-black mb-2 flex items-center gap-3">
-             <div className="bg-[#4F7DF3] text-white p-2 rounded-xl border-4 border-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]">
-                <Globe size={32} />
-             </div>
-             Global Courses
-          </h1>
-          <p className="text-muted-foreground font-medium text-lg">Platform-wide courses managed by the Superadmin.</p>
-        </div>
-        <div className="flex flex-wrap gap-2">
+      {/* HEADER & ACTION BUTTONS */}
+      <div className="flex flex-col md:flex-row md:items-center justify-between px-[32px] pt-[8px] pb-[24px] gap-[16px]">
+        <p className="font-sans text-[14px] text-[#8E8E93]">Platform-wide courses managed by the Superadmin.</p>
+        
+        <div className="flex flex-row gap-[12px]">
           {!courses.some((c: any) => c.title === "CS50: Introduction to Computer Science") && (
-            <Button 
-              className="neo-brutalism bg-[#F9A8D4] text-black font-black text-sm md:text-lg h-12 px-6" 
+            <button 
               onClick={async () => {
                 if (confirm("Are you sure you want to instantly deploy 10 Free CS Courses?")) {
                   setLoading(true);
@@ -169,7 +174,6 @@ export default function GlobalCoursesClient({ superadmin, initialCourses }: { su
                     const data = await res.json();
                     if (res.ok) {
                       showToast(data.message, "success");
-                      // Automatically reload page to fetch new courses and hide the button
                       setTimeout(() => window.location.reload(), 1500);
                     } else {
                       showToast(data.message, "error");
@@ -180,96 +184,122 @@ export default function GlobalCoursesClient({ superadmin, initialCourses }: { su
                 }
               }}
               disabled={loading}
+              className="flex items-center h-[40px] px-[18px] rounded-xl border border-[#1E1B2E] text-[#1E1B2E] font-sans text-[13px] font-medium hover:bg-[#1E1B2E] hover:text-white transition-colors disabled:opacity-50"
             >
-              <BookOpen className="mr-2 h-5 w-5" /> Seed Free CS Courses
-            </Button>
+              <Code size={14} className="mr-[6px]" /> Seed Free CS Courses
+            </button>
           )}
-          <Button className="neo-brutalism font-bold text-sm md:text-lg h-12 px-6" onClick={() => setShowForm(true)}>
-            <Plus className="mr-2 h-5 w-5" /> Deploy New Course
-          </Button>
+          <button 
+            onClick={() => setShowForm(true)}
+            className="flex items-center h-[40px] px-[18px] rounded-xl bg-[#C9A96E] text-[#1E1B2E] font-sans text-[13px] font-medium hover:scale-[1.02] hover:shadow-[0_4px_16px_rgba(201,169,110,0.3)] transition-all"
+          >
+            <Plus size={14} className="mr-[6px]" /> Deploy New Course
+          </button>
         </div>
       </div>
 
-      {/* Stats */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        <Card className="neo-brutalism bg-[#34D399] border-4 border-black rounded-3xl overflow-hidden">
-          <CardContent className="p-6">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm font-black uppercase tracking-widest opacity-80 mb-1">Global Courses</p>
-                <p className="text-5xl font-black">{courses.length}</p>
-              </div>
-              <div className="w-16 h-16 bg-white/20 rounded-full flex items-center justify-center border-4 border-black">
-                <BookOpen size={28} />
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-        <Card className="neo-brutalism bg-[#F5C84C] border-4 border-black rounded-3xl overflow-hidden">
-          <CardContent className="p-6">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm font-black uppercase tracking-widest opacity-80 mb-1">Total Global Students</p>
-                <p className="text-5xl font-black">{totalStudents}</p>
-              </div>
-              <div className="w-16 h-16 bg-white/20 rounded-full flex items-center justify-center border-4 border-black">
-                <Users size={28} />
-              </div>
-            </div>
-          </CardContent>
-        </Card>
+      {/* STATS CARDS ROW */}
+      <div 
+        variants={{ hidden: { opacity: 0 }, visible: { opacity: 1, transition: { staggerChildren: 0.1 } } }}
+        initial="hidden"
+        animate="visible"
+        className="grid grid-cols-1 md:grid-cols-2 gap-[24px] px-[32px] pb-[24px]"
+      >
+        <div variants={itemVariants} className="bg-white rounded-[16px] p-[24px] shadow-[0_4px_20px_rgba(0,0,0,0.06)] flex flex-col">
+          <div className="flex items-center justify-between mb-[16px]">
+            <span className="font-sans text-[12px] uppercase tracking-[0.08em] font-medium text-[#8E8E93]">Global Courses</span>
+            <Globe size={20} className="text-[#8E8E93]" />
+          </div>
+          <div className="font-heading text-[32px] text-[#1E1B2E] leading-none mb-[8px]">{courses.length}</div>
+          <div className="font-sans text-[13px] text-[#8E8E93]">Platform-wide</div>
+        </div>
+        
+        <div variants={itemVariants} className="bg-white rounded-[16px] p-[24px] shadow-[0_4px_20px_rgba(0,0,0,0.06)] flex flex-col">
+          <div className="flex items-center justify-between mb-[16px]">
+            <span className="font-sans text-[12px] uppercase tracking-[0.08em] font-medium text-[#8E8E93]">Total Global Students</span>
+            <Users size={20} className="text-[#8E8E93]" />
+          </div>
+          <div className="font-heading text-[32px] text-[#1E1B2E] leading-none mb-[8px]">{totalStudents}</div>
+          <div className="font-sans text-[13px] text-[#8E8E93]">Enrolled across all</div>
+        </div>
       </div>
 
-      {/* Course List */}
+      {/* ACTIVE GLOBAL COURSES SECTION */}
       <div>
-        <h2 className="text-2xl font-black uppercase mb-6 flex items-center gap-2">
-          <BookOpen size={24} /> Active Global Courses
+        <h2 className="font-heading text-[20px] text-[#1E1B2E] px-[32px] pt-[24px] pb-[16px] flex items-center gap-[8px]">
+          <BookOpen size={18} className="text-[#1E1B2E]" /> Active Global Courses
         </h2>
         
         {courses.length === 0 ? (
-          <div className="neo-brutalism bg-white border-4 border-black border-dashed rounded-3xl p-12 text-center">
-            <div className="w-20 h-20 bg-muted rounded-full flex items-center justify-center mx-auto mb-4 border-4 border-black">
-              <BookOpen size={32} className="opacity-50" />
-            </div>
-            <h3 className="text-xl font-black uppercase mb-2">No Global Courses Yet</h3>
-            <p className="text-muted-foreground font-bold max-w-md mx-auto mb-6">Create your first public course to make it available to all students platform-wide.</p>
-            <Button className="neo-brutalism font-bold" onClick={() => setShowForm(true)}>
+          <div
+            className="bg-white rounded-[16px] mx-[32px] mb-[32px] p-[80px_24px] shadow-[0_4px_20px_rgba(0,0,0,0.06)] flex flex-col items-center text-center"
+          >
+            <Globe size={48} className="text-[#1E1B2E] opacity-25 mb-[20px]" />
+            <h3 className="font-heading text-[20px] text-[#1E1B2E]">No Global Courses Yet</h3>
+            <p className="font-sans text-[14px] text-[#8E8E93] max-w-[400px] mt-[8px] leading-[1.6]">
+              Create your first public course to make it available to all students platform-wide.
+            </p>
+            <button 
+              onClick={() => setShowForm(true)}
+              className="mt-[24px] h-[44px] px-[24px] rounded-xl bg-[#C9A96E] text-[#1E1B2E] font-sans text-[14px] font-medium hover:scale-[1.02] transition-transform"
+            >
               Deploy Course Now
-            </Button>
+            </button>
           </div>
         ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          <div 
+            variants={containerVariants}
+            initial="hidden"
+            animate="visible"
+            className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-[24px] px-[32px] pb-[32px]"
+          >
             {courses.map((course) => (
-              <Card key={course.id} className="neo-brutalism bg-white border-4 border-black rounded-2xl overflow-hidden flex flex-col hover:-translate-y-1 hover:shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] transition-all">
-                <div className="h-40 bg-muted border-b-4 border-black relative overflow-hidden group">
+              <div 
+                key={course.id} 
+                variants={itemVariants}
+                className="bg-white rounded-[16px] overflow-hidden shadow-[0_4px_16px_rgba(0,0,0,0.05)] hover:shadow-[0_8px_24px_rgba(0,0,0,0.08)] hover:-translate-y-1 transition-all duration-300 flex flex-col group"
+              >
+                <div className="w-full aspect-[16/9] relative overflow-hidden shrink-0">
                   {course.thumbnail ? (
                     <img src={course.thumbnail} alt={course.title} className="w-full h-full object-cover" />
                   ) : (
-                    <div className="w-full h-full flex items-center justify-center bg-[#F9A8D4]">
-                      <BookOpen size={48} className="opacity-20" />
+                    <div className="w-full h-full bg-[rgba(245,241,235,0.6)] flex items-center justify-center">
+                      <Globe size={32} className="text-[#8E8E93]" />
                     </div>
                   )}
-                  <div className="absolute top-3 left-3 bg-white border-2 border-black rounded-lg px-2 py-1 text-[10px] font-black uppercase">
-                    {course.subject}
-                  </div>
                 </div>
-                <CardContent className="p-5 flex flex-col flex-1">
-                  <div className="flex-1">
-                    <h3 className="text-xl font-black uppercase line-clamp-1 mb-1" title={course.title}>{course.title}</h3>
-                    <p className="text-xs font-bold text-muted-foreground line-clamp-2 mb-4">{course.description}</p>
+                
+                <div className="p-[20px] flex flex-col flex-1">
+                  <h3 className="font-heading text-[18px] text-[#1E1B2E] line-clamp-2 leading-snug" title={course.title}>
+                    {course.title}
+                  </h3>
+                  
+                  <div className="mt-[12px] flex items-center">
+                    <span className="inline-flex items-center bg-[rgba(201,169,110,0.1)] text-[#C9A96E] px-[10px] py-[4px] rounded-full font-sans text-[11px] font-medium tracking-wide">
+                      {course.subject}
+                    </span>
                   </div>
-                  <div className="flex items-center justify-between mt-auto pt-4 border-t-2 border-black/10">
-                    <div className="flex items-center gap-1.5 text-xs font-black uppercase text-primary">
-                      <Users size={14} /> {course._count.enrollments} Students
-                    </div>
+                  
+                  <div className="mt-[6px] font-sans text-[13px] text-[#8E8E93] flex items-center gap-[6px]">
+                    <Users size={14} /> {course._count?.enrollments || 0} students enrolled
                   </div>
-                  <div className="mt-4 flex gap-2">
-                    <Link href={`/dashboard/teacher/courses/${course.id}`} className="flex-1">
-                      <Button className="w-full neo-brutalism font-bold text-xs">Manage Lessons</Button>
-                    </Link>
-                  </div>
-                </CardContent>
-              </Card>
+                  
+                  <p className="mt-[6px] font-sans text-[13px] text-[#8E8E93] line-clamp-2 leading-[1.5]">
+                    {course.description}
+                  </p>
+                </div>
+                
+                <div className="px-[20px] pb-[20px] flex flex-row gap-[10px] mt-auto">
+                  <button className="flex-1 h-[36px] rounded-xl bg-[#C9A96E] text-[#1E1B2E] font-sans text-[13px] font-medium transition-colors hover:brightness-105">
+                    Edit
+                  </button>
+                  <Link href={`/dashboard/teacher/courses/${course.id}`} className="flex-1">
+                    <button className="w-full h-[36px] rounded-xl border border-[#1E1B2E] text-[#1E1B2E] font-sans text-[13px] font-medium hover:bg-[#1E1B2E] hover:text-white transition-colors">
+                      Manage
+                    </button>
+                  </Link>
+                </div>
+              </div>
             ))}
           </div>
         )}

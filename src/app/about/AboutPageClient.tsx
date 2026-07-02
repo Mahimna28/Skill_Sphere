@@ -1,395 +1,265 @@
 "use client";
 
-import { motion, useScroll, useTransform } from "framer-motion";
-import { Heart, Shield, Zap, Globe, Mail } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
-import { cn } from "@/lib/utils";
+import { motion } from "framer-motion";
+import { Target, Eye, Star, Heart, Shield, Zap } from "lucide-react";
 
-const appleEase = [0.4, 0, 0.2, 1];
-
-const TEAM_MEMBERS = [
-  {
-    name: "Mahimna Mistry",
-    role: "Project Lead",
-    bio: "Former educator turned product strategist. Obsessed with building systems that actually help students learn, not just pass tests.",
-    image: "/images/team/mahimna1.jpg",
-    email: "cse.230840131049@gmail.com",
-    github: "https://github.com/Mahimna28",
-    linkedin: "https://www.linkedin.com/in/mahimna-mistry-8a7aa1327/"
-  },
-  {
-    name: "Dev Patel",
-    role: "Lead Developer",
-    bio: "Full-stack engineer with a passion for clean code and cleaner UX. Believes the best technology is the kind you don't notice.",
-    image: "/images/team/dev.png",
-    email: "cse.230840131066@gmail.com",
-    github: "https://github.com/Dev-Patel1610", // ADD GITHUB LINK HERE
-    linkedin: "www.linkedin.com/in/dev-patel-a41853344" // ADD LINKEDIN LINK HERE
-  },
-  {
-    name: "Swayam Chaudhari",
-    role: "AI Specialist",
-    bio: "Machine learning researcher focused on natural language understanding. Builds the brain behind our Socratic AI tutor.",
-    image: "/images/team/swayam.jpg",
-    email: "cse.230840131015@gmail.com",
-    github: "https://github.com/SwamPy-bot",
-    linkedin: "https://www.linkedin.com/in/swayam-chaudhari-b85b66347?utm_source=share_via&utm_content=profile&utm_medium=member_android"
-  },
-  {
-    name: "Jal Lad",
-    role: "UI/UX Designer",
-    bio: "Design thinker who believes beauty and function are inseparable. Crafts every pixel to reduce cognitive load and increase delight.",
-    image: "/images/team/jal.jpeg",
-    email: "cse.230840131039@gmail.com",
-    github: "https://github.com/Jallad-19?tab=stars",
-    linkedin: "#" // ADD LINKEDIN LINK HERE
-  }
-];
-
-const MILESTONES = [
-  { year: "2024", title: "The Idea", desc: "For our GTU DE subject project, we decided on the idea and built the frontend." },
-  { year: "2025", title: "Building the Engine", desc: "Developed the backend infrastructure to power the platform." },
-  { year: "2026", title: "Launch & Deploy", desc: "Successfully deployed the complete project to production." }
-];
-
-const VALUES = [
-  { icon: Heart, title: "Empathy First", desc: "We design for the frustrated student at 2 AM, not just the expert." },
-  { icon: Shield, title: "Academic Integrity", desc: "Our AI is built to guide and teach, never to simply do the work for you." },
-  { icon: Zap, title: "Continuous Iteration", desc: "We update our curriculum and platform weekly based on real student data." },
-  { icon: Globe, title: "Accessible Excellence", desc: "World-class education should not be bound by geography or background." }
-];
+import { useReducedMotion, useIsMobile } from "@/lib/animations";
+import { FadeIn } from "@/components/animations/FadeIn";
+import { SlideUp } from "@/components/animations/SlideUp";
+import { StaggerContainer, StaggerItem } from "@/components/animations/StaggerContainer";
+import { CountUp } from "@/components/animations/CountUp";
+import { ParallaxWrapper } from "@/components/animations/ParallaxWrapper";
 
 export default function AboutPageClient() {
-  const { scrollY } = useScroll();
-  const yParallax = useTransform(scrollY, [0, 1000], [0, 150]);
+  const isMobile = useIsMobile();
+  const shouldReduceMotion = useReducedMotion();
+
+  const getStaggerDelay = (desktopDelay: number) => isMobile ? desktopDelay * 0.5 : desktopDelay;
 
   return (
-    <div className="flex flex-col min-h-screen bg-[#F5F1EB] overflow-hidden">
+    <div className="flex flex-col overflow-hidden font-sans bg-[#F5F1EB]">
+      {/* 1. HERO SECTION */}
+      <section className="relative min-h-[60vh] flex flex-col items-center justify-center pt-32 pb-32 px-4 overflow-hidden bg-[#1E1B2E]">
+        <div className="absolute inset-0 z-0">
+          <div className="absolute inset-0 bg-[rgba(30,27,46,0.75)] z-10" />
+          <Image src="/images/hero-workspace.jpg" alt="About Hero" fill className="object-cover" priority />
+        </div>
 
-      {/* 1. FOUNDER'S LETTER */}
-      <section className="pt-[210px] pb-[100px] bg-[#1E1B2E]">
-        <div className="max-w-[800px] mx-auto px-4 text-center">
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8, ease: appleEase }}
-          >
-            <span className="font-sans text-[12px] uppercase tracking-[0.15em] text-[#C9A96E] mb-6 block">
-              Our Story
+        <div className="relative z-20 w-full max-w-7xl mx-auto flex flex-col items-center text-center">
+          <FadeIn delay={0.1}>
+            <span className="font-sans text-[12px] uppercase text-[#C9A96E] tracking-[0.08em] font-semibold mb-4 block">
+              OUR STORY
             </span>
-          </motion.div>
+          </FadeIn>
 
-          <motion.h1
-            initial={{ opacity: 0, y: 30 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8, delay: 0.1, ease: appleEase }}
-            className="font-heading font-bold text-[28px] md:text-[48px] text-white leading-[0.95] mb-6"
-          >
-            Built by educators, shaped by students.
-          </motion.h1>
+          <FadeIn delay={0.2} direction="up">
+            <h1 className="font-heading text-[36px] md:text-[48px] text-white leading-[1.15] max-w-[600px] mb-6">
+              Empowering learners worldwide
+            </h1>
+          </FadeIn>
 
-          <motion.p
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8, delay: 0.2, ease: appleEase }}
-            className="font-sans text-[18px] text-[#F5F1EB] leading-[1.6] opacity-90"
-          >
-            We are on a mission to bring the warmth, patience, and rigour of a dedicated tutor to anyone with an internet connection.
-          </motion.p>
-        </div>
-      </section>
-
-      {/* 2. MANIFESTO SECTION */}
-      <section className="py-[80px] bg-[#1E1B2E] border-t border-white/10">
-        <div className="max-w-7xl mx-auto px-4 flex flex-col items-center">
-          <motion.div
-            initial={{ opacity: 0, scale: 0.98 }}
-            whileInView={{ opacity: 1, scale: 1 }}
-            viewport={{ once: true }}
-            transition={{ duration: 1, ease: appleEase }}
-            className="text-center"
-          >
-            <h2 className="font-heading italic text-[24px] md:text-[28px] text-[#F5F1EB] leading-[1.4] max-w-[700px] mb-8">
-              "Education shouldn't just be about broadcasting information. It should be a dialogue that respects the pace and curiosity of the learner."
-            </h2>
-            <p className="font-sans text-[14px] text-[#C9A96E] uppercase tracking-wider">
-              — The Skill Sphere Founding Team
+          <FadeIn delay={0.3}>
+            <p className="font-sans text-[16px] md:text-[18px] text-[rgba(255,255,255,0.75)] max-w-[600px] leading-[1.6]">
+              Skill Sphere was built to bridge the gap between traditional education and the skills that actually matter in today's world.
             </p>
-          </motion.div>
+          </FadeIn>
         </div>
       </section>
 
-      {/* 3. ORIGIN STORY */}
-      <section className="py-[160px] bg-[#F5F1EB]">
-        <div className="max-w-7xl mx-auto px-4 md:px-8">
-          <div className="flex flex-col lg:flex-row items-center gap-[60px] lg:gap-[100px]">
-
-            {/* Left Content */}
-            <motion.div
-              initial={{ opacity: 0, x: -40 }}
-              whileInView={{ opacity: 1, x: 0 }}
-              viewport={{ once: true }}
-              transition={{ duration: 0.8, ease: appleEase }}
-              className="w-full lg:w-1/2"
-            >
-              <span className="font-sans text-[12px] uppercase tracking-[0.15em] text-[#C9A96E] mb-6 block">
-                The Beginning
+      {/* 2. WHY SKILL SPHERE */}
+      <section className="py-[80px] px-[32px] max-w-6xl mx-auto w-full">
+        <div className="flex flex-col lg:flex-row gap-[48px] items-center">
+          <div className="flex-1 text-center lg:text-left">
+            <SlideUp y={30}>
+              <span className="font-sans text-[12px] uppercase text-[#C9A96E] tracking-[0.08em] font-semibold block mb-4">
+                Why we exist
               </span>
-              <h2 className="font-heading text-[28px] text-[#1E1B2E] leading-[1.2] mb-8">
-                For decades, online education meant watching a video and taking a multiple choice test.
+              <h2 className="font-heading text-[32px] text-[#1E1B2E] leading-[1.2] mb-5">
+                Education should be accessible, engaging, and effective.
               </h2>
-              <div className="space-y-6">
-                <p className="font-sans text-[17px] text-[#8E8E93] leading-[1.7]">
-                  We knew there had to be a better way — a way to leverage modern technology to recreate the intimate, responsive environment of a 1-on-1 tutorial. Skill Sphere was founded by a small team of frustrated educators looking for a better way to teach online.
-                </p>
-                <p className="font-sans text-[17px] text-[#8E8E93] leading-[1.7]">
-                  Today, thousands of students, teachers, and institutions trust Skill Sphere to make education more personal, more connected, and more human.
-                </p>
+              <p className="font-sans text-[16px] text-[#8E8E93] leading-[1.7] max-w-[480px] mx-auto lg:mx-0">
+                We believe that learning shouldn't be a solitary, frustrating experience. By combining AI-driven personalization with a vibrant community, we've created a platform where students actually want to learn.
+              </p>
+              <Link href="/courses" className="inline-block mt-[24px]">
+                <button className="h-[44px] px-[20px] bg-transparent border border-[#1E1B2E] text-[#1E1B2E] font-sans text-[15px] font-medium rounded-xl hover:bg-[#1E1B2E] hover:text-white transition-colors">
+                  Explore Courses
+                </button>
+              </Link>
+            </SlideUp>
+          </div>
+
+          <div className="flex-1 w-full relative aspect-[4/3]">
+            {isMobile ? (
+              <div className="w-full h-full relative rounded-2xl overflow-hidden shadow-[0_12px_40px_rgba(0,0,0,0.15)]">
+                <Image src="https://images.unsplash.com/photo-1522202176988-66273c2fd55f?w=800&h=600&fit=crop" alt="Students learning" fill className="object-cover" />
               </div>
-            </motion.div>
-
-            {/* Right Image */}
-            <motion.div
-              initial={{ opacity: 0, x: 40 }}
-              whileInView={{ opacity: 1, x: 0 }}
-              viewport={{ once: true }}
-              transition={{ duration: 0.8, delay: 0.2, ease: appleEase }}
-              className="w-full lg:w-1/2 relative h-[400px] lg:h-[600px] rounded-[16px] overflow-hidden shadow-[0_8px_32px_rgba(30,27,46,0.08)]"
-            >
-              <motion.div style={{ y: yParallax }} className="absolute inset-0 -top-[100px] -bottom-[100px]">
-                <Image
-                  src="/images/about-origin.jpg"
-                  alt="Students collaborating"
-                  fill
-                  className="object-cover"
-                />
-              </motion.div>
-            </motion.div>
-
+            ) : (
+              <ParallaxWrapper speed={0.5} className="w-full h-full relative rounded-2xl overflow-hidden shadow-[0_12px_40px_rgba(0,0,0,0.15)]">
+                <Image src="https://images.unsplash.com/photo-1522202176988-66273c2fd55f?w=800&h=600&fit=crop" alt="Students learning" fill className="object-cover" />
+              </ParallaxWrapper>
+            )}
           </div>
         </div>
       </section>
 
-      {/* 4. TIMELINE */}
-      <section className="py-[120px] bg-[#F5F1EB] overflow-hidden">
-        <div className="max-w-7xl mx-auto px-4 md:px-8">
-          <div className="text-center mb-24">
-            <span className="font-sans text-[12px] uppercase tracking-[0.15em] text-[#C9A96E] mb-4 block">
-              Our Journey
-            </span>
-            <h2 className="font-heading text-[36px] text-[#1E1B2E]">
-              How we got here.
-            </h2>
-          </div>
-
-          <div className="relative">
-            {/* Desktop Horizontal Line */}
-            <motion.div
-              initial={{ scaleX: 0 }}
-              whileInView={{ scaleX: 1 }}
-              viewport={{ once: true, margin: "-100px" }}
-              transition={{ duration: 1.5, ease: appleEase }}
-              className="hidden md:block absolute top-[18px] left-0 right-0 h-[1px] bg-[rgba(30,27,46,0.08)] origin-left"
-            />
-            {/* Mobile Vertical Line */}
-            <motion.div
-              initial={{ scaleY: 0 }}
-              whileInView={{ scaleY: 1 }}
-              viewport={{ once: true }}
-              transition={{ duration: 1.5, ease: appleEase }}
-              className="md:hidden absolute left-[5.5px] top-0 bottom-0 w-[1px] bg-[rgba(30,27,46,0.08)] origin-top"
-            />
-
-            <div className="grid grid-cols-1 md:grid-cols-4 gap-12 md:gap-6 relative z-10">
-              {MILESTONES.map((milestone, i) => (
-                <div key={i} className="flex md:flex-col gap-6 md:gap-0">
-                  <motion.div
-                    initial={{ scale: 0, opacity: 0 }}
-                    whileInView={{ scale: 1, opacity: 1 }}
-                    viewport={{ once: true }}
-                    transition={{ duration: 0.5, delay: i * 0.2 + 0.3, type: "spring" }}
-                    className="flex flex-col items-center shrink-0 md:mb-6"
-                  >
-                    <div className="font-heading text-[24px] text-[#1E1B2E] leading-none mb-3 hidden md:block">
-                      {milestone.year}
-                    </div>
-                    <div className="w-3 h-3 rounded-full bg-[#C9A96E] ring-4 ring-[#F5F1EB] md:mb-0 mb-auto mt-1 md:mt-0" />
-                  </motion.div>
-
-                  <motion.div
-                    initial={{ opacity: 0, y: 20 }}
-                    whileInView={{ opacity: 1, y: 0 }}
-                    viewport={{ once: true }}
-                    transition={{ duration: 0.6, delay: i * 0.2 + 0.5, ease: appleEase }}
-                    className="flex flex-col md:items-center text-left md:text-center mt-[-4px] md:mt-0"
-                  >
-                    <div className="font-heading text-[24px] text-[#1E1B2E] leading-none mb-2 md:hidden">
-                      {milestone.year}
-                    </div>
-                    <h3 className="font-sans text-[16px] text-[#1E1B2E] font-bold mb-2">
-                      {milestone.title}
-                    </h3>
-                    <p className="font-sans text-[14px] text-[#8E8E93] leading-[1.6] max-w-[200px]">
-                      {milestone.desc}
-                    </p>
-                  </motion.div>
-                </div>
-              ))}
+      {/* 3. MISSION & VISION CARDS */}
+      <section className="px-[32px] pb-[80px] max-w-6xl mx-auto w-full">
+        <StaggerContainer staggerDelay={getStaggerDelay(0.2)} className="flex flex-col md:flex-row gap-[24px]">
+          <StaggerItem className="flex-1">
+            <div className="bg-white rounded-2xl p-[40px] shadow-[0_4px_20px_rgba(0,0,0,0.06)] h-full">
+              <Target size={32} className="text-[#C9A96E] mb-[20px]" />
+              <h3 className="font-heading text-[24px] text-[#1E1B2E] mt-[16px]">Our Mission</h3>
+              <p className="font-sans text-[14px] text-[#8E8E93] leading-[1.7] mt-[12px]">
+                To democratize education by providing accessible, high-quality learning experiences that prepare students for real-world success.
+              </p>
             </div>
-          </div>
-        </div>
+          </StaggerItem>
+          
+          <StaggerItem className="flex-1">
+            <div className="bg-white rounded-2xl p-[40px] shadow-[0_4px_20px_rgba(0,0,0,0.06)] h-full">
+              <Eye size={32} className="text-[#C9A96E] mb-[20px]" />
+              <h3 className="font-heading text-[24px] text-[#1E1B2E] mt-[16px]">Our Vision</h3>
+              <p className="font-sans text-[14px] text-[#8E8E93] leading-[1.7] mt-[12px]">
+                A world where anyone, anywhere can learn the skills they need to thrive in the digital economy.
+              </p>
+            </div>
+          </StaggerItem>
+        </StaggerContainer>
       </section>
 
-      {/* 5. THE TEAM */}
-      <section className="py-[160px] bg-[#F5F1EB]">
-        <div className="max-w-7xl mx-auto px-4 md:px-8">
-          <div className="text-center mb-[80px]">
-            <span className="font-sans text-[12px] uppercase tracking-[0.15em] text-[#C9A96E] mb-4 block">
-              The Brains Behind
-            </span>
-            <h2 className="font-heading text-[42px] text-[#1E1B2E] mb-6">
-              Meet the team.
-            </h2>
-            <p className="font-sans text-[16px] text-[#8E8E93] max-w-[500px] mx-auto leading-[1.6]">
-              A collective of academics, engineers, and designers dedicated to the future of learning.
-            </p>
+      {/* 4. TIMELINE SECTION */}
+      <section className="py-[80px] px-[32px] max-w-5xl mx-auto w-full relative">
+        <div className="text-center mb-16">
+          <FadeIn>
+            <span className="font-sans text-[12px] uppercase text-[#C9A96E] tracking-[0.08em] font-semibold block mb-4">OUR JOURNEY</span>
+            <h2 className="font-heading text-[32px] text-[#1E1B2E]">The story so far</h2>
+          </FadeIn>
+        </div>
+
+        <div className="relative">
+          {/* Vertical line */}
+          <div className="absolute top-0 bottom-0 left-[24px] md:left-1/2 md:-translate-x-1/2 w-[2px]">
+            <motion.div 
+              initial={shouldReduceMotion ? { scaleY: 1 } : { scaleY: 0 }}
+              whileInView={{ scaleY: 1 }}
+              viewport={{ once: true, margin: "-10%" }}
+              transition={{ duration: 1.2, ease: [0.075, 0.82, 0.165, 1] }}
+              style={{ originY: 0 }}
+              className="w-full h-full bg-[#C9A96E]"
+            />
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-8">
-            {TEAM_MEMBERS.map((member, i) => (
-              <motion.div
-                key={member.name}
-                initial={{ opacity: 0, y: 40 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true, margin: "-50px" }}
-                transition={{ duration: 0.7, delay: i * 0.15, ease: appleEase }}
-              >
-                <motion.div
-                  whileHover={{ y: -4, boxShadow: "0 12px 32px rgba(30,27,46,0.08)" }}
-                  transition={{ type: "spring", stiffness: 300, damping: 20 }}
-                  className="bg-white rounded-[16px] overflow-hidden flex flex-col shadow-[0_4px_20px_rgba(30,27,46,0.04)] group"
-                >
-                  <div className="w-full aspect-square relative overflow-hidden bg-[#1E1B2E]">
-                    <Image
-                      src={member.image}
-                      alt={member.name}
-                      fill
-                      sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 25vw"
-                      className="object-cover grayscale group-hover:grayscale-0 transition-all duration-700 ease-out"
+          <div className="relative z-10 flex flex-col gap-12">
+            {[
+              { year: "2023", title: "Founded", desc: "Skill Sphere started as a small project to help students learn programming." },
+              { year: "2024", title: "First 1,000 Students", desc: "Reached our first milestone with students from 15 countries." },
+              { year: "2025", title: "AI Tutor Launch", desc: "Introduced AI-powered tutoring to provide 24/7 personalized help." },
+              { year: "2026", title: "Global Expansion", desc: "Now serving students across 45+ countries with 200+ courses." }
+            ].map((item, index) => {
+              const isEven = index % 2 === 0;
+              return (
+                <div key={index} className={`flex w-full ${isEven ? 'md:justify-start' : 'md:justify-end'} relative`}>
+                  
+                  {/* Content Container */}
+                  <motion.div 
+                    initial={shouldReduceMotion ? { opacity: 1 } : { opacity: 0, x: isMobile ? 0 : (isEven ? -40 : 40), y: isMobile ? 30 : 0 }}
+                    whileInView={{ opacity: 1, x: 0, y: 0 }}
+                    viewport={{ once: true, amount: 0.3 }}
+                    transition={{ duration: 0.6, ease: [0.25, 0.1, 0.25, 1.0], delay: 0.1 }}
+                    className={`w-full md:w-1/2 flex ${isEven ? 'md:justify-end md:pr-12' : 'md:justify-start md:pl-12'} pl-[60px] md:pl-0`}
+                  >
+                    <div className="bg-white rounded-xl p-[24px] shadow-[0_4px_20px_rgba(0,0,0,0.06)] max-w-[360px] text-left w-full">
+                      <span className="font-sans text-[12px] text-[#C9A96E] uppercase font-semibold">{item.year}</span>
+                      <h3 className="font-heading text-[20px] text-[#1E1B2E] mt-2 mb-2">{item.title}</h3>
+                      <p className="font-sans text-[14px] text-[#8E8E93] leading-[1.6]">{item.desc}</p>
+                    </div>
+                  </motion.div>
+
+                  {/* Dot */}
+                  <div className="absolute left-[24px] md:left-1/2 top-8 -translate-x-1/2">
+                    <motion.div 
+                      initial={shouldReduceMotion ? { scale: 1 } : { scale: 0 }}
+                      whileInView={{ scale: 1 }}
+                      viewport={{ once: true }}
+                      transition={{ type: "spring", stiffness: 300, damping: 20 }}
+                      className="w-[12px] h-[12px] bg-[#C9A96E] rounded-full shadow-[0_0_0_4px_rgba(201,169,110,0.2)]"
                     />
                   </div>
-                  <div className="p-7 flex flex-col flex-1">
-                    <h3 className="font-heading text-[20px] text-[#1E1B2E] leading-none">
-                      {member.name}
-                    </h3>
-                    <span className="font-sans text-[12px] uppercase tracking-[0.1em] text-[#C9A96E] mt-2 block">
-                      {member.role}
-                    </span>
-                    <p className="font-sans text-[14px] text-[#8E8E93] leading-[1.6] mt-4 mb-6 line-clamp-3">
-                      {member.bio}
-                    </p>
-
-                    <div className="mt-auto flex flex-col gap-4">
-                      <div className="flex items-center gap-2 text-[#8E8E93] font-sans text-[13px]">
-                        <Mail size={14} />
-                        <a href={`mailto:${member.email}`} className="hover:text-[#C9A96E] transition-colors">{member.email}</a>
-                      </div>
-                      <div className="flex items-center gap-3 border-t border-[rgba(30,27,46,0.06)] pt-4">
-                        <a href={member.linkedin} target="_blank" rel="noopener noreferrer" className="text-[#8E8E93] hover:text-[#C9A96E] transition-colors">
-                          <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z" /><rect width="4" height="12" x="2" y="9" /><circle cx="4" cy="4" r="2" /></svg>
-                        </a>
-                        <a href={member.github} target="_blank" rel="noopener noreferrer" className="text-[#8E8E93] hover:text-[#C9A96E] transition-colors">
-                          <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M15 22v-4a4.8 4.8 0 0 0-1-3.5c3 0 6-2 6-5.5.08-1.25-.27-2.48-1-3.5.28-1.15.28-2.35 0-3.5 0 0-1 0-3 1.5-2.64-.5-5.36-.5-8 0C6 2 5 2 5 2c-.3 1.15-.3 2.35 0 3.5A5.403 5.403 0 0 0 4 9c0 3.5 3 5.5 6 5.5-.39.49-.68 1.05-.85 1.65-.17.6-.22 1.23-.15 1.85v4" /><path d="M9 18c-4.51 2-5-2-7-2" /></svg>
-                        </a>
-                      </div>
-                    </div>
-                  </div>
-                </motion.div>
-              </motion.div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* 6. CORE VALUES */}
-      <section className="py-[160px] bg-[#1E1B2E]">
-        <div className="max-w-7xl mx-auto px-4 md:px-8">
-          <div className="text-center mb-[80px]">
-            <span className="font-sans text-[12px] uppercase tracking-[0.15em] text-[#C9A96E] mb-4 block">
-              What Drives Us
-            </span>
-            <h2 className="font-heading text-[36px] text-white">
-              Our values.
-            </h2>
-          </div>
-
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-            {VALUES.map((value, i) => {
-              const Icon = value.icon;
-              return (
-                <motion.div
-                  key={value.title}
-                  initial={{ opacity: 0, y: 20 }}
-                  whileInView={{ opacity: 1, y: 0 }}
-                  viewport={{ once: true }}
-                  transition={{ duration: 0.6, delay: i * 0.15, ease: appleEase }}
-                  className="flex flex-col items-center text-center p-6"
-                >
-                  <motion.div
-                    initial={{ scale: 0.5, opacity: 0 }}
-                    whileInView={{ scale: 1, opacity: 1 }}
-                    viewport={{ once: true }}
-                    transition={{ duration: 0.5, delay: i * 0.15 + 0.2, type: "spring" }}
-                  >
-                    <Icon size={48} className="text-[#C9A96E] mb-4" strokeWidth={1.5} />
-                  </motion.div>
-                  <h3 className="font-heading text-[20px] text-white mb-3">
-                    {value.title}
-                  </h3>
-                  <p className="font-sans text-[15px] text-[#F5F1EB] leading-[1.6] opacity-90 max-w-[280px]">
-                    {value.desc}
-                  </p>
-                </motion.div>
-              )
+                </div>
+              );
             })}
           </div>
         </div>
       </section>
 
-      {/* 7. FINAL CTA */}
-      <section className="py-[160px] bg-[#F5F1EB] text-center">
-        <div className="max-w-2xl mx-auto px-4">
-          <motion.div
-            initial={{ opacity: 0, y: 30 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.8, ease: appleEase }}
-          >
-            <h2 className="font-heading font-bold text-[36px] text-[#1E1B2E] mb-4">
-              Join us in redefining education.
-            </h2>
-            <p className="font-sans text-[16px] text-[#8E8E93] mb-10 leading-[1.6]">
-              We're always looking for passionate educators, engineers, and designers.
-            </p>
-            <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
-              <motion.button
-                whileHover={{ scale: 1.02 }}
-                whileTap={{ scale: 0.98 }}
-                className="w-full sm:w-auto bg-[#C9A96E] text-[#1E1B2E] font-sans font-medium text-[16px] rounded-full px-10 py-4 shadow-[0_4px_14px_rgba(201,169,110,0.2)]"
-              >
-                View Open Roles
-              </motion.button>
-              <motion.button
-                whileHover={{ backgroundColor: "#1E1B2E", color: "#FFFFFF" }}
-                whileTap={{ scale: 0.98 }}
-                className="w-full sm:w-auto bg-transparent border border-[#1E1B2E] text-[#1E1B2E] font-sans font-medium text-[16px] rounded-full px-10 py-4 transition-colors"
-              >
-                Contact Us
-              </motion.button>
-            </div>
-          </motion.div>
+      {/* 5. TEAM SECTION */}
+      <section className="py-[80px] px-[32px] max-w-6xl mx-auto w-full text-center">
+        <FadeIn>
+          <h2 className="font-heading text-[36px] text-[#1E1B2E]">Meet the Team</h2>
+        </FadeIn>
+
+        <StaggerContainer staggerDelay={getStaggerDelay(0.15)} className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-[24px] mt-[40px]">
+          {[
+            { name: "Swayam Chaudhari", role: "Founder & CEO", img: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=400&h=400&fit=crop" },
+            { name: "Mahimna Mistry", role: "Head of Product", img: "https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?w=400&h=400&fit=crop" },
+            { name: "Jal Patel", role: "Lead Designer", img: "https://images.unsplash.com/photo-1519085360753-af0119f7cbe7?w=400&h=400&fit=crop" },
+            { name: "Priya S.", role: "Lead Engineer", img: "https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=400&h=400&fit=crop" }
+          ].map((member, i) => (
+            <StaggerItem key={i}>
+              <div className="bg-white rounded-2xl overflow-hidden shadow-[0_4px_20px_rgba(0,0,0,0.06)] group transition-all duration-400 hover:-translate-y-1 hover:shadow-[0_12px_32px_rgba(0,0,0,0.12)]">
+                <div className="w-full aspect-square relative overflow-hidden bg-[#1E1B2E]">
+                  <Image src={member.img} alt={member.name} fill className="object-cover grayscale group-hover:grayscale-0 transition-all duration-400" />
+                </div>
+                <div className="text-left">
+                  <h3 className="font-heading text-[18px] text-[#1E1B2E] pt-[16px] px-[20px] pb-[4px]">{member.name}</h3>
+                  <p className="font-sans text-[13px] text-[#8E8E93] px-[20px] pb-[20px]">{member.role}</p>
+                </div>
+              </div>
+            </StaggerItem>
+          ))}
+        </StaggerContainer>
+      </section>
+
+      {/* 6. VALUES SECTION */}
+      <section className="px-[32px] pb-[80px] max-w-6xl mx-auto w-full text-center">
+        <FadeIn>
+          <h2 className="font-heading text-[32px] text-[#1E1B2E]">Our Values</h2>
+        </FadeIn>
+
+        <StaggerContainer staggerDelay={getStaggerDelay(0.12)} className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-[20px] mt-[40px]">
+          {[
+            { icon: Star, title: "Excellence", desc: "We strive for the highest quality in everything we create." },
+            { icon: Heart, title: "Passion", desc: "Learning should be engaging, inspiring, and fun." },
+            { icon: Shield, title: "Integrity", desc: "Trust and transparency are at the core of our platform." },
+            { icon: Zap, title: "Innovation", desc: "We constantly evolve to bring you the best tools." }
+          ].map((val, i) => (
+            <StaggerItem key={i}>
+              <div className="bg-white rounded-2xl p-[32px] text-left shadow-[0_4px_20px_rgba(0,0,0,0.05)] h-full">
+                <val.icon size={28} className="text-[#C9A96E] mb-[16px]" />
+                <h3 className="font-heading text-[18px] text-[#1E1B2E]">{val.title}</h3>
+                <p className="font-sans text-[14px] text-[#8E8E93] leading-[1.6] mt-[8px]">{val.desc}</p>
+              </div>
+            </StaggerItem>
+          ))}
+        </StaggerContainer>
+      </section>
+
+      {/* 7. BY THE NUMBERS */}
+      <section className="px-[32px] pb-[80px] max-w-7xl mx-auto w-full">
+        <div className="bg-[#1E1B2E] rounded-2xl p-[60px]">
+          <StaggerContainer staggerDelay={getStaggerDelay(0.15)} className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-[40px] text-center">
+            {[
+              { target: 2024, suffix: "", label: "FOUNDED" },
+              { target: 12500, suffix: "+", label: "STUDENTS" },
+              { target: 45, suffix: "+", label: "COUNTRIES" },
+              { target: 12, suffix: "+", label: "TEAM" }
+            ].map((stat, i) => (
+              <StaggerItem key={i} className="flex flex-col items-center">
+                <CountUp target={stat.target} suffix={stat.suffix} className="font-heading text-[48px] text-[#C9A96E]" />
+                <span className="font-sans text-[14px] text-white/70 uppercase tracking-[0.08em] mt-[8px]">{stat.label}</span>
+              </StaggerItem>
+            ))}
+          </StaggerContainer>
         </div>
+      </section>
+
+      {/* 8. JOIN MISSION CTA */}
+      <section className="py-[80px] px-[32px] text-center">
+        <SlideUp y={30} className="max-w-2xl mx-auto">
+          <h2 className="font-heading text-[32px] text-[#1E1B2E]">Join our mission</h2>
+          <p className="font-sans text-[16px] text-[#8E8E93] mt-[12px] mb-[24px]">
+            Be part of the future of education.
+          </p>
+          <FadeIn delay={0.2} direction="up">
+            <Link href="/register">
+              <button className="h-[52px] px-[32px] bg-[#C9A96E] text-[#1E1B2E] font-sans text-[16px] font-medium rounded-xl hover:scale-[1.02] hover:shadow-[0_8px_24px_rgba(201,169,110,0.3)] transition-all">
+                Get Started
+              </button>
+            </Link>
+          </FadeIn>
+        </SlideUp>
       </section>
 
     </div>

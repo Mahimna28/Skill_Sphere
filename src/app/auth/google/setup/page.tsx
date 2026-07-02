@@ -8,7 +8,6 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { GraduationCap, School, Users, Baby, Loader2, CheckCircle2, XCircle, AtSign, ArrowLeft } from "lucide-react";
-import { motion, AnimatePresence } from "framer-motion";
 
 const appleEase = [0.4, 0, 0.2, 1];
 
@@ -166,15 +165,12 @@ export default function GoogleSetupPage() {
     <div className="relative min-h-[100dvh] flex flex-col lg:flex-row items-center justify-between p-6 lg:p-16 overflow-hidden">
       
       {/* Background Image with Dark Overlay */}
-      <motion.div 
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        transition={{ duration: 0.5, ease: appleEase }}
+      <div
         className="absolute inset-0 z-0"
       >
         <div className="absolute inset-0 bg-[rgba(30,27,46,0.78)] z-10 backdrop-blur-[1px]" />
         <div className="absolute inset-0 bg-[url('/images/about-origin.jpg')] bg-cover bg-center blur-[2px] scale-105" />
-      </motion.div>
+      </div>
 
       {/* TOP LEFT BACK BUTTON */}
       <div className="absolute top-6 left-6 z-20">
@@ -184,10 +180,7 @@ export default function GoogleSetupPage() {
       </div>
 
       {/* LEFT SIDE - BRAND CONTENT */}
-      <motion.div 
-        initial={{ opacity: 0, x: -20 }}
-        animate={{ opacity: 1, x: 0 }}
-        transition={{ duration: 0.8, delay: 0.2, ease: appleEase }}
+      <div
         className="relative z-20 w-full lg:w-[45%] flex flex-col justify-center mt-12 lg:mt-0 mb-6 lg:mb-0"
       >
         <Link href="/" className="mb-4 lg:mb-8 w-max">
@@ -195,41 +188,28 @@ export default function GoogleSetupPage() {
             Skill Sphere.
           </span>
         </Link>
-        <motion.h1 
-          initial={{ opacity: 0, y: 10 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.3 }}
+        <h1
           className="font-heading text-[22px] lg:text-[32px] text-white leading-[1.1] mb-4 max-w-[400px]"
         >
           Education, crafted for how you think.
-        </motion.h1>
-        <motion.p
-          initial={{ opacity: 0, y: 10 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.4 }}
+        </h1>
+        <p
           className="font-sans text-[15px] text-[#F5F1EB] mb-8 lg:mb-12"
         >
           Join our community of learners shaping their future.
-        </motion.p>
-      </motion.div>
+        </p>
+      </div>
 
       {/* RIGHT SIDE - FLOATING CARD */}
-      <motion.div 
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.6, delay: 0.3, ease: appleEase }}
+      <div
         className="relative z-20 w-full lg:w-[55%] max-w-[480px] bg-white rounded-[16px] shadow-[0_12px_40px_rgba(0,0,0,0.18)] p-[28px] flex flex-col mx-auto lg:mr-0 max-h-[85vh] overflow-y-auto"
       >
         <Stepper />
 
         <AnimatePresence mode="wait">
           {step === "role" && (
-            <motion.div 
+            <div 
               key="role"
-              initial={{ opacity: 0, x: 20 }}
-              animate={{ opacity: 1, x: 0 }}
-              exit={{ opacity: 0, x: -20 }}
-              transition={{ duration: 0.3 }}
               className="flex flex-col"
             >
               <div className="text-center mb-6">
@@ -246,9 +226,8 @@ export default function GoogleSetupPage() {
                 {roles.map(r => {
                   const isSelected = role === r.id;
                   return (
-                    <motion.button
+                    <button
                       key={r.id} type="button"
-                      whileHover={{ y: -2 }}
                       onClick={() => setRole(r.id)}
                       className={`w-full p-4 rounded-xl flex items-center gap-4 text-left transition-all ${
                         isSelected 
@@ -265,12 +244,12 @@ export default function GoogleSetupPage() {
                         <h3 className="font-heading text-[18px] text-[#1E1B2E] mb-0.5">{r.name}</h3>
                         <p className="font-sans text-[13px] text-[#8E8E93]">{r.desc}</p>
                       </div>
-                    </motion.button>
+                    </button>
                   );
                 })}
               </div>
 
-              <motion.button 
+              <button 
                 type="button" onClick={() => setStep("details")}
                 disabled={!role}
                 whileHover={role ? { scale: 1.01 } : {}}
@@ -280,17 +259,13 @@ export default function GoogleSetupPage() {
                 }`}
               >
                 Continue
-              </motion.button>
-            </motion.div>
+              </button>
+            </div>
           )}
 
           {step === "details" && (
-            <motion.div 
+            <div 
               key="details"
-              initial={{ opacity: 0, x: 20 }}
-              animate={{ opacity: 1, x: 0 }}
-              exit={{ opacity: 0, x: -20 }}
-              transition={{ duration: 0.3 }}
               className="flex flex-col"
             >
               <div className="text-center mb-6">
@@ -318,14 +293,14 @@ export default function GoogleSetupPage() {
                     />
                     <div className="absolute right-3 top-1/2 -translate-y-1/2">
                       {usernameStatus === "checking" && <Loader2 size={16} className="animate-spin text-[#8E8E93]" />}
-                      {usernameStatus === "available" && <CheckCircle2 size={16} className="text-green-500" />}
+                      {usernameStatus === "available" && <CheckCircle2 size={16} className="text-[#C9A96E]" />}
                       {usernameStatus === "taken" && <XCircle size={16} className="text-red-500" />}
                       {usernameStatus === "invalid" && <XCircle size={16} className="text-orange-400" />}
                     </div>
                   </div>
                   <div className="flex gap-4 pt-1">
-                    <p className={`text-[10px] uppercase tracking-[0.05em] font-bold ${username.length >= 3 ? "text-green-500" : "text-[#8E8E93] opacity-50"}`}>• 3-20 chars</p>
-                    <p className={`text-[10px] uppercase tracking-[0.05em] font-bold ${/^[a-z0-9_]*$/.test(username) && username ? "text-green-500" : "text-[#8E8E93] opacity-50"}`}>• a-z, 0-9, _</p>
+                    <p className={`text-[10px] uppercase tracking-[0.05em] font-bold ${username.length >= 3 ? "text-[#C9A96E]" : "text-[#8E8E93] opacity-50"}`}>• 3-20 chars</p>
+                    <p className={`text-[10px] uppercase tracking-[0.05em] font-bold ${/^[a-z0-9_]*$/.test(username) && username ? "text-[#C9A96E]" : "text-[#8E8E93] opacity-50"}`}>• a-z, 0-9, _</p>
                     {usernameStatus === "taken" && <p className="text-[10px] uppercase tracking-[0.05em] font-bold text-red-500">• Taken!</p>}
                   </div>
                 </div>
@@ -349,21 +324,19 @@ export default function GoogleSetupPage() {
 
                 <div className="flex gap-3 pt-4">
                   <Button variant="ghost" type="button" onClick={() => setStep("role")} className="text-[#8E8E93] hover:text-[#1E1B2E]">Back</Button>
-                  <motion.button 
+                  <button 
                     type="submit" disabled={loading || usernameStatus === "taken" || usernameStatus === "invalid"}
-                    whileHover={{ scale: 1.01 }}
-                    whileTap={{ scale: 0.98 }}
                     className="flex-1 h-[48px] bg-[#C9A96E] text-[#1E1B2E] rounded-xl font-sans text-[16px] font-medium flex items-center justify-center disabled:opacity-50 disabled:cursor-not-allowed"
                   >
                     {loading ? <Loader2 className="mr-2 animate-spin" size={16} /> : null}
                     Complete Setup
-                  </motion.button>
+                  </button>
                 </div>
               </form>
-            </motion.div>
+            </div>
           )}
         </AnimatePresence>
-      </motion.div>
+      </div>
     </div>
   );
 }

@@ -3,8 +3,9 @@
 import { usePathname } from "next/navigation";
 import { Header } from "./Header";
 import { Footer } from "./Footer";
+import { ReactNode } from "react";
 
-export function HeaderFooterWrapper({ children }: { children: React.ReactNode }) {
+export function HeaderFooterWrapper({ children }: { children: ReactNode }) {
   const pathname = usePathname();
   const isDashboard = pathname?.startsWith("/dashboard");
   const isAuth = pathname === "/login" || pathname === "/register" || pathname === "/forgot-password";
@@ -13,7 +14,13 @@ export function HeaderFooterWrapper({ children }: { children: React.ReactNode })
   return (
     <>
       {!hideHeaderFooter && <Header />}
-      <main className="flex-1">{children}</main>
+      
+      <main className="flex-1">
+        <div key={pathname}>
+          {children}
+        </div>
+      </main>
+
       {!hideHeaderFooter && <Footer />}
     </>
   );

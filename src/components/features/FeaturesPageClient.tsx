@@ -1,6 +1,5 @@
 "use client";
 
-import { motion, useScroll, useTransform } from "framer-motion";
 import Image from "next/image";
 import Link from "next/link";
 import { CheckCircle2, ChevronDown } from "lucide-react";
@@ -20,9 +19,9 @@ function ParallaxImage({ src, alt, className }: { src: string, alt: string, clas
 
   return (
     <div ref={ref} className={`relative overflow-hidden rounded-[16px] shadow-[0_8px_32px_rgba(30,27,46,0.1)] ${className}`}>
-      <motion.div style={{ y }} className="absolute inset-0 scale-[1.3]">
+      <div style={{ y }} className="absolute inset-0 scale-[1.3]">
         <Image src={src} alt={alt} fill className="object-cover" />
-      </motion.div>
+      </div>
     </div>
   );
 }
@@ -41,10 +40,7 @@ export function FeaturesPageClient() {
       {/* 1. PAGE HEADER */}
       <section className="relative min-h-screen flex items-center justify-center bg-[#1E1B2E] overflow-hidden">
         {/* Background Image */}
-        <motion.div 
-          initial={{ scale: 1.0 }}
-          animate={{ scale: 1.05 }}
-          transition={{ duration: 20, ease: "linear", repeat: Infinity, repeatType: "reverse" }}
+        <div
           className="absolute inset-0 z-0 origin-center"
         >
           <Image 
@@ -54,46 +50,35 @@ export function FeaturesPageClient() {
             className="object-cover opacity-30"
             priority
           />
-        </motion.div>
+        </div>
         {/* Subtle dark gradient mesh overlay */}
         <div className="absolute inset-0 bg-gradient-to-br from-[#1E1B2E]/80 via-[#2A2640]/80 to-[#1E1B2E]/80 z-0" />
         
         <div className="relative z-10 w-full max-w-7xl mx-auto px-4 flex flex-col items-center text-center">
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ duration: 0.8, ease: appleEase }}
+          <div
             className="mb-6"
           >
             <span className="font-sans text-[12px] uppercase tracking-[0.15em] text-[#C9A96E]">
               Capabilities
             </span>
-          </motion.div>
+          </div>
 
-          <motion.h1
-            initial={{ opacity: 0, y: 30 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8, delay: 0.2, ease: appleEase }}
+          <h1
             className="font-heading font-bold text-[36px] md:text-[64px] text-white leading-[0.95] mb-8 max-w-[700px]"
           >
             Everything you need to master what matters.
-          </motion.h1>
+          </h1>
 
-          <motion.p
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8, delay: 0.4, ease: appleEase }}
+          <p
             className="font-sans text-[18px] leading-[1.5] text-[#F5F1EB] max-w-[560px]"
           >
             A complete ecosystem designed not just for consuming information, but for deep, lasting comprehension.
-          </motion.p>
+          </p>
         </div>
 
         {/* Scroll Indicator */}
         <div className="absolute bottom-10 left-1/2 -translate-x-1/2 z-10">
-          <motion.div
-            animate={{ y: [0, 8, 0] }}
-            transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
+          <div
             className="w-[1px] h-12 bg-gradient-to-b from-[#C9A96E] to-transparent"
           />
         </div>
@@ -104,22 +89,14 @@ export function FeaturesPageClient() {
         <div className="max-w-7xl mx-auto px-4 md:px-8">
           <div className="flex flex-col lg:flex-row items-center gap-[100px]">
             {/* Image Left */}
-            <motion.div 
-              initial={{ opacity: 0, x: -40 }}
-              whileInView={{ opacity: 1, x: 0 }}
-              viewport={{ once: true, margin: "-100px" }}
-              transition={{ duration: 0.7, ease: appleEase }}
+            <div
               className="w-full lg:w-[45%]"
             >
               <ParallaxImage src="/images/feature-1.jpg" alt="Adaptive Learning Path" className="w-full aspect-square" />
-            </motion.div>
+            </div>
             
             {/* Content Right */}
-            <motion.div 
-              initial={{ opacity: 0, x: 40 }}
-              whileInView={{ opacity: 1, x: 0 }}
-              viewport={{ once: true, margin: "-100px" }}
-              transition={{ duration: 0.7, delay: 0.2, ease: appleEase }}
+            <div
               className="w-full lg:w-[55%]"
             >
               <span className="font-sans text-[12px] uppercase tracking-[0.15em] text-[#C9A96E] mb-6 block">
@@ -144,7 +121,7 @@ export function FeaturesPageClient() {
                   </li>
                 ))}
               </ul>
-            </motion.div>
+            </div>
           </div>
         </div>
       </section>
@@ -154,11 +131,7 @@ export function FeaturesPageClient() {
         <div className="max-w-7xl mx-auto px-4 md:px-8">
           <div className="flex flex-col-reverse lg:flex-row items-center gap-[100px]">
             {/* Content Left */}
-            <motion.div 
-              initial={{ opacity: 0, x: -40 }}
-              whileInView={{ opacity: 1, x: 0 }}
-              viewport={{ once: true, margin: "-100px" }}
-              transition={{ duration: 0.7, ease: appleEase }}
+            <div
               className="w-full lg:w-[55%]"
             >
               <span className="font-sans text-[12px] uppercase tracking-[0.15em] text-[#C9A96E] mb-6 block">
@@ -183,18 +156,14 @@ export function FeaturesPageClient() {
                   </li>
                 ))}
               </ul>
-            </motion.div>
+            </div>
 
             {/* Image Right */}
-            <motion.div 
-              initial={{ opacity: 0, x: 40 }}
-              whileInView={{ opacity: 1, x: 0 }}
-              viewport={{ once: true, margin: "-100px" }}
-              transition={{ duration: 0.7, delay: 0.2, ease: appleEase }}
+            <div
               className="w-full lg:w-[45%]"
             >
               <ParallaxImage src="/images/feature-2.jpg" alt="AI Chat Interface" className="w-full aspect-[4/5]" />
-            </motion.div>
+            </div>
           </div>
         </div>
       </section>
@@ -204,22 +173,14 @@ export function FeaturesPageClient() {
         <div className="max-w-7xl mx-auto px-4 md:px-8">
           <div className="flex flex-col lg:flex-row items-center gap-[100px]">
             {/* Image Left */}
-            <motion.div 
-              initial={{ opacity: 0, x: -40 }}
-              whileInView={{ opacity: 1, x: 0 }}
-              viewport={{ once: true, margin: "-100px" }}
-              transition={{ duration: 0.7, ease: appleEase }}
+            <div
               className="w-full lg:w-[45%]"
             >
               <ParallaxImage src="/images/feature-3.jpg" alt="Study Group Session" className="w-full aspect-square" />
-            </motion.div>
+            </div>
             
             {/* Content Right */}
-            <motion.div 
-              initial={{ opacity: 0, x: 40 }}
-              whileInView={{ opacity: 1, x: 0 }}
-              viewport={{ once: true, margin: "-100px" }}
-              transition={{ duration: 0.7, delay: 0.2, ease: appleEase }}
+            <div
               className="w-full lg:w-[55%]"
             >
               <span className="font-sans text-[12px] uppercase tracking-[0.15em] text-[#C9A96E] mb-6 block">
@@ -244,7 +205,7 @@ export function FeaturesPageClient() {
                   </li>
                 ))}
               </ul>
-            </motion.div>
+            </div>
           </div>
         </div>
       </section>
@@ -254,11 +215,7 @@ export function FeaturesPageClient() {
         <div className="max-w-7xl mx-auto px-4 md:px-8">
           <div className="flex flex-col-reverse lg:flex-row items-center gap-[100px]">
             {/* Content Left */}
-            <motion.div 
-              initial={{ opacity: 0, x: -40 }}
-              whileInView={{ opacity: 1, x: 0 }}
-              viewport={{ once: true, margin: "-100px" }}
-              transition={{ duration: 0.7, ease: appleEase }}
+            <div
               className="w-full lg:w-[55%]"
             >
               <span className="font-sans text-[12px] uppercase tracking-[0.15em] text-[#C9A96E] mb-6 block">
@@ -283,18 +240,14 @@ export function FeaturesPageClient() {
                   </li>
                 ))}
               </ul>
-            </motion.div>
+            </div>
 
             {/* Image Right */}
-            <motion.div 
-              initial={{ opacity: 0, x: 40 }}
-              whileInView={{ opacity: 1, x: 0 }}
-              viewport={{ once: true, margin: "-100px" }}
-              transition={{ duration: 0.7, delay: 0.2, ease: appleEase }}
+            <div
               className="w-full lg:w-[45%]"
             >
               <ParallaxImage src="/images/feature-4.jpg" alt="Student Certificate Preview" className="w-full aspect-[4/5]" />
-            </motion.div>
+            </div>
           </div>
         </div>
       </section>
@@ -302,11 +255,7 @@ export function FeaturesPageClient() {
       {/* 6. FINAL CTA SECTION */}
       <section className="py-[200px] bg-[#1E1B2E] text-center border-t border-[#C9A96E]/20">
         <div className="max-w-3xl mx-auto px-4">
-          <motion.div
-            initial={{ opacity: 0, y: 40 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.8, ease: appleEase }}
+          <div
           >
             <h2 className="font-heading font-black text-[48px] text-white mb-6">
               Experience the difference.
@@ -316,27 +265,21 @@ export function FeaturesPageClient() {
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
               <Link href="/register">
-                <motion.button 
-                  whileHover={{ scale: 1.02 }}
-                  whileTap={{ scale: 0.98 }}
-                  transition={{ type: "spring", stiffness: 400, damping: 25 }}
+                <button
                   className="w-full sm:w-auto bg-[#C9A96E] text-[#1E1B2E] font-sans font-medium text-[17px] rounded-full px-10 py-4 shadow-[0_4px_14px_rgba(201,169,110,0.4)]"
                 >
                   Get Started Free
-                </motion.button>
+                </button>
               </Link>
               <Link href="/pricing">
-                <motion.button 
-                  whileHover={{ scale: 1.02, backgroundColor: "rgba(255,255,255,0.1)" }}
-                  whileTap={{ scale: 0.98 }}
-                  transition={{ type: "spring", stiffness: 400, damping: 25 }}
+                <button
                   className="w-full sm:w-auto bg-transparent border border-white text-white font-sans font-medium text-[17px] rounded-full px-10 py-4"
                 >
                   View Pricing
-                </motion.button>
+                </button>
               </Link>
             </div>
-          </motion.div>
+          </div>
         </div>
       </section>
     </div>
