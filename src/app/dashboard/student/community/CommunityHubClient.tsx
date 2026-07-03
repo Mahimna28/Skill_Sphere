@@ -78,12 +78,9 @@ export default function CommunityHubClient({ enrollments, currentUser }: Props) 
     router.replace(`${pathname}?${params.toString()}`, { scroll: false });
   };
 
-  // Lightweight dev telemetry log for feature flag and mount verification
-  useEffect(() => {
-    if (process.env.NODE_ENV !== "production") {
-      console.log("[Dev Telemetry] CommunityHub mounted", { flag: isCommunityHubEnabled(), tab: activeTab });
-    }
-  }, [activeTab]);
+  // Dev telemetry removed after QA sign-off.
+  // If you need lightweight dev-only telemetry in the future, guard it with:
+  // if (process.env.NODE_ENV !== "production") { console.log(...) }
 
   // Socket lifecycle subscription for community hub room
   useEffect(() => {
