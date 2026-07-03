@@ -113,6 +113,7 @@ export default function CommunityHubClient({ enrollments, currentUser }: Props) 
       }
       if (e.key === "/") {
         e.preventDefault();
+        // TODO: When StudentChatClient exposes a forwarded ref (composerRef), replace this DOM query with composerRef.current?.focus()
         const wrapper = document.querySelector(".hub-content-wrapper");
         if (wrapper) {
           const input = wrapper.querySelector(
