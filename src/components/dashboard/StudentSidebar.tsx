@@ -63,7 +63,6 @@ export default function StudentSidebar({
     { href: "/dashboard/student/institutions", label: "Institutions", icon: School },
     { href: "/dashboard/profile", label: "My Profile", icon: UserCircle },
     { href: "/dashboard/feedback", label: "Give Feedback", icon: Heart },
-    { href: "/dashboard/notifications", label: "Notifications", icon: Bell, badge: unreadCount },
   ];
 
   const isItemActive = (href: string) => {
@@ -121,36 +120,25 @@ export default function StudentSidebar({
       role="navigation"
       aria-label="Main sidebar"
     >
-      {/* Brand Header */}
-      <div className="relative z-10 px-3 py-4 border-b border-black/5 dark:border-white/10 flex items-center justify-between mb-2">
-        <Link href="/" className="flex items-center gap-3 group px-2">
-          <motion.div
-            whileHover={shouldReduceMotion ? {} : { scale: 1.08, rotate: [0, -4, 4, 0] }}
-            transition={{ duration: 0.4, ease: easing }}
-            className="relative w-8 h-8 rounded-xl overflow-hidden bg-white/40 dark:bg-white/10 backdrop-blur-md flex items-center justify-center border border-black/10 dark:border-white/20 shadow-sm shrink-0"
+      {/* Top Brand Area: Only SkillSphere in big bold letters, no logo */}
+      <div className="relative z-10 px-3 py-5 border-b border-white/10 mb-2">
+        <div className="flex items-center justify-between">
+          <Link href="/" className="block">
+            <span
+              className="text-2xl font-black tracking-tight text-white"
+              style={{ fontFamily: "var(--font-heading, serif)" }}
+            >
+              SkillSphere
+            </span>
+          </Link>
+          <button
+            onClick={() => setMobileOpen(false)}
+            className="md:hidden p-1 text-white/60 hover:text-white rounded transition-colors"
+            aria-label="Close Menu"
           >
-            <Image
-              src="/images/new-skill-sphere-logo.png"
-              alt="Skill Sphere Logo"
-              width={22}
-              height={22}
-              className="object-contain"
-            />
-          </motion.div>
-          <span
-            className="text-lg font-extrabold tracking-wide text-[#1E1B2E] dark:text-white group-hover:text-[#C9A96E] transition-colors truncate"
-            style={{ fontFamily: "var(--font-heading, serif)" }}
-          >
-            Skill Sphere
-          </span>
-        </Link>
-        <button
-          onClick={() => setMobileOpen(false)}
-          className="md:hidden p-1.5 text-gray-500 hover:text-black dark:hover:text-white rounded-lg transition-colors"
-          aria-label="Close Menu"
-        >
-          <X size={20} />
-        </button>
+            <X size={20} />
+          </button>
+        </div>
       </div>
 
       {/* Staggered Navigation Items List */}
@@ -158,7 +146,7 @@ export default function StudentSidebar({
         initial="hidden"
         animate="visible"
         variants={sidebarVariants as any}
-        className="sidebar-nav-scroll relative z-10 flex-1 space-y-1 overflow-y-auto pr-1"
+        className="sidebar-nav-scroll relative z-10 flex-1 space-y-0.5 overflow-y-auto pr-1 flex flex-col"
       >
         {navItemsTop.map((item) => (
           <motion.div key={`${item.label}-${item.href}`} variants={navItemVariants as any}>
@@ -177,8 +165,7 @@ export default function StudentSidebar({
           <CommunityHubSidebarGroup />
         </motion.div>
 
-        {/* Subtle Separator */}
-        <div className="my-3 border-t border-black/5 dark:border-white/10 mx-2" />
+        <div className="my-2 border-t border-white/10 mx-2" />
 
         {navItemsBottom.map((item) => (
           <motion.div key={`${item.label}-${item.href}`} variants={navItemVariants as any}>
@@ -192,69 +179,71 @@ export default function StudentSidebar({
             />
           </motion.div>
         ))}
-      </motion.nav>
 
-      {/* Bottom Area: Inset Profile & Logout Card (matching reference image!) */}
-      <div className="relative z-10 pt-3 mt-2 border-t border-black/5 dark:border-white/10">
-        <div className="p-3 rounded-[18px] bg-black/5 dark:bg-white/5 border border-black/5 dark:border-white/10 flex items-center justify-between gap-2.5 backdrop-blur-md shadow-inner">
-          <div className="flex items-center gap-2.5 min-w-0">
-            <div className="w-9 h-9 rounded-full bg-gradient-to-tr from-[#C9A96E] to-[#E6CD98] text-[#1E1B2E] font-extrabold text-xs flex items-center justify-center shrink-0 shadow-md ring-2 ring-white/60 dark:ring-white/20">
-              {initials}
+        {/* Bottom Section: Notifications, User Info & Reddish Logout Button */}
+        <div className="mt-auto pt-3 border-t border-white/10 space-y-2">
+          <SidebarItem
+            href="/dashboard/notifications"
+            label="Notifications"
+            icon={Bell}
+            active={isItemActive("/dashboard/notifications")}
+            badge={unreadCount}
+            shouldReduceMotion={shouldReduceMotion}
+          />
+
+          <div className="pt-3 border-t border-white/10 space-y-3">
+            <div className="flex items-center gap-3 px-2 py-1">
+              <div className="w-9 h-9 rounded-full bg-[#C9A96E] text-[#1E1B2E] font-extrabold text-sm flex items-center justify-center shrink-0 shadow-md">
+                {initials}
+              </div>
+              <div className="min-w-0 flex-1">
+                <h4 className="text-sm font-bold text-white truncate leading-tight">
+                  {userName}
+                </h4>
+                <span className="block text-[10px] font-bold text-[#C9A96E] tracking-wider uppercase truncate mt-0.5">
+                  LEVEL 2 EXPLORER
+                </span>
+              </div>
             </div>
-            <div className="min-w-0">
-              <h4 className="font-sans text-xs font-bold text-[#1E1B2E] dark:text-white truncate leading-tight">
-                {userName}
-              </h4>
-              <span className="inline-block mt-0.5 text-[9px] font-extrabold uppercase tracking-wider text-[#8E8E93]">
-                Student
-              </span>
-            </div>
+
+            <button
+              onClick={onLogout}
+              className="w-full bg-red-500/15 hover:bg-red-500 text-red-400 hover:text-white border border-red-500/30 hover:border-red-500 transition-all duration-200 flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl font-bold text-sm shadow-sm cursor-pointer"
+            >
+              <LogOut size={16} />
+              <span>Logout</span>
+            </button>
           </div>
-          <button
-            onClick={onLogout}
-            className="px-2.5 py-1.5 rounded-xl bg-white/90 dark:bg-white/10 hover:bg-red-500 hover:text-white text-[#1E1B2E] dark:text-white font-bold text-xs shadow-sm border border-black/5 dark:border-white/10 transition-all duration-200 shrink-0 cursor-pointer"
-            aria-label="Logout"
-          >
-            Logout
-          </button>
         </div>
-      </div>
+      </motion.nav>
     </div>
   );
 
   return (
     <>
-      {/* Desktop Floating Sidebar Card with Liquid Glass Aesthetics */}
+      {/* Desktop Native macOS Vibrant Sidebar (Exact 280px Width) */}
       <motion.aside
         initial="hidden"
         animate="visible"
         variants={sidebarVariants as any}
-        className="hidden md:flex md:w-60 md:flex-col md:fixed md:top-4 md:bottom-4 md:left-4 md:z-50 shrink-0"
+        className="hidden md:flex md:w-[280px] md:flex-col md:fixed md:top-0 md:bottom-0 md:left-0 md:z-50 shrink-0"
       >
         {sidebarContent}
       </motion.aside>
 
-      {/* Mobile Top Header */}
-      <div className="md:hidden flex items-center justify-between px-5 py-4 bg-white/80 dark:bg-[#1E1B2E]/90 backdrop-blur-xl text-[#1E1B2E] dark:text-white border-b border-black/10 dark:border-white/10 sticky top-0 z-40">
-        <Link href="/" className="flex items-center gap-2.5">
-          <div className="w-7 h-7 relative shrink-0">
-            <Image
-              src="/images/new-skill-sphere-logo.png"
-              alt="Logo"
-              fill
-              className="object-contain"
-            />
-          </div>
+      {/* Mobile Top Header: Only SkillSphere heading in bold letters */}
+      <div className="md:hidden flex items-center justify-between px-5 py-4 bg-[#1E1B2E] text-white border-b border-white/10 sticky top-0 z-40">
+        <Link href="/" className="block">
           <span
-            className="font-bold text-lg text-[#1E1B2E] dark:text-white truncate"
+            className="font-black text-xl text-white tracking-tight"
             style={{ fontFamily: "var(--font-heading, serif)" }}
           >
-            Skill Sphere
+            SkillSphere
           </span>
         </Link>
         <button
           onClick={() => setMobileOpen(true)}
-          className="p-2 text-[#1E1B2E] dark:text-white hover:bg-black/5 dark:hover:bg-white/10 rounded-xl transition-colors"
+          className="p-2 text-white hover:bg-white/10 rounded-xl transition-colors"
           aria-label="Open Menu"
         >
           <Menu size={22} />

@@ -83,7 +83,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
             onLogout={handleLogout}
           />
         </Suspense>
-        <main className="flex-1 flex flex-col md:pl-64 min-h-screen overflow-y-auto">
+        <main className="flex-1 flex flex-col md:pl-[280px] min-h-screen overflow-y-auto">
           <div className="flex-1 p-4 sm:p-6 md:p-10 max-w-7xl mx-auto w-full">
             {children}
           </div>

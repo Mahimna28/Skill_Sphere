@@ -1,155 +1,98 @@
-/* Apple Liquid Glass Aesthetic for Student Sidebar */
+/* Native macOS Vibrant Sidebar - Exact #1E1B2E Navy Background Specification */
 
 :root {
-  --glass-bg-light: rgba(255, 255, 255, 0.82);
-  --glass-bg-dark: rgba(24, 22, 36, 0.75);
-  --glass-blur: 24px;
-  --glass-border: rgba(255, 255, 255, 0.4);
-  --glass-glow: rgba(201, 169, 110, 0.15);
-  --accent: #C9A96E;
-  --navy: #1E1B2E;
-  --glass-shadow: 0 20px 50px rgba(0, 0, 0, 0.12), 0 0 0 1px rgba(0, 0, 0, 0.04);
+  --glass-bg: #1E1B2E;
+  --glass-border: rgba(255, 255, 255, 0.10);
+  --accent-gold: #C9A96E;
+  --text-primary: rgba(255, 255, 255, 0.90);
+  --text-secondary: rgba(255, 255, 255, 0.55);
+  --hover-bg: rgba(255, 255, 255, 0.08);
 }
 
-/* Sidebar root glass card */
+/* 1. Exactly match background color behind Resume Playback button (#1E1B2E) */
 .glass-sidebar {
-  background: linear-gradient(180deg, var(--glass-bg-light) 0%, rgba(255, 255, 255, 0.65) 100%);
-  backdrop-filter: blur(var(--glass-blur)) saturate(1.4);
-  -webkit-backdrop-filter: blur(var(--glass-blur)) saturate(1.4);
-  border: 1px solid var(--glass-border);
-  box-shadow: var(--glass-shadow);
-  border-radius: 24px;
-  padding: 14px;
-  transition: background .22s ease, transform .25s cubic-bezier(0.2, 0.8, 0.2, 1), box-shadow .25s ease;
-  color: var(--navy);
+  background: var(--glass-bg) !important;
+  border-right: 1px solid var(--glass-border);
+  border-top: none;
+  border-left: none;
+  border-bottom: none;
+  border-radius: 0;
+  box-shadow: 2px 0 16px rgba(0, 0, 0, 0.15);
+  padding: 12px 16px;
+  color: var(--text-primary);
+  font-family: -apple-system, BlinkMacSystemFont, "SF Pro", "Helvetica Neue", sans-serif;
+  position: relative;
+  overflow: hidden !important;
+  height: 100vh;
 }
 
-/* Optional micro motion: subtle parallax on hover */
-.glass-sidebar:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 24px 60px rgba(0, 0, 0, 0.16), 0 0 0 1px rgba(201, 169, 110, 0.2);
-}
-
-/* Dark mode override */
-@media (prefers-color-scheme: dark) {
-  .glass-sidebar {
-    background: linear-gradient(180deg, var(--glass-bg-dark) 0%, rgba(18, 16, 28, 0.60) 100%);
-    border: 1px solid rgba(255, 255, 255, 0.12);
-    box-shadow: 0 20px 50px rgba(0, 0, 0, 0.4), 0 0 0 1px rgba(255, 255, 255, 0.05);
-    color: #FFFFFF;
-  }
-  .glass-sidebar:hover {
-    box-shadow: 0 24px 60px rgba(0, 0, 0, 0.5), 0 0 0 1px rgba(201, 169, 110, 0.3);
-  }
-}
-
-/* Group toggle and item styling */
+/* 3. Typography & Icons & 4. Layout & Spacing (36px height, 8px 16px padding) */
 .sidebar-group-toggle,
 .sidebar-item-glass {
   display: flex;
   align-items: center;
   justify-content: space-between;
   gap: 12px;
-  padding: 10px 12px;
-  margin: 3px 0;
-  border-radius: 14px;
-  color: rgba(30, 27, 46, 0.85);
+  padding: 8px 16px;
+  min-height: 36px;
+  height: 36px;
+  margin: 2px 0;
+  border-radius: 8px;
+  color: var(--text-primary);
   background: transparent;
-  transition: all .2s cubic-bezier(0.2, 0.8, 0.2, 1);
+  transition: background-color 0.2s ease, color 0.2s ease;
   width: 100%;
-  border: 1px solid transparent;
+  border: none;
   cursor: pointer;
   font-family: inherit;
   font-size: 0.875rem;
-  font-weight: 500;
+  font-weight: 400;
   text-align: left;
   text-decoration: none;
+  position: relative;
 }
 
-@media (prefers-color-scheme: dark) {
-  .sidebar-group-toggle,
-  .sidebar-item-glass {
-    color: rgba(255, 255, 255, 0.85);
-  }
-}
-
-/* Hover state */
+/* Hover state: background rgba(255, 255, 255, 0.08), cursor pointer */
 .sidebar-group-toggle:hover,
 .sidebar-item-glass:hover {
-  transform: translateX(3px);
-  background: rgba(0, 0, 0, 0.04);
-  color: var(--navy);
+  background: var(--hover-bg);
+  color: #FFFFFF;
+  transform: none !important;
+  box-shadow: none !important;
 }
 
-@media (prefers-color-scheme: dark) {
-  .sidebar-group-toggle:hover,
-  .sidebar-item-glass:hover {
-    background: rgba(255, 255, 255, 0.06);
-    color: #FFFFFF;
-  }
-}
-
-/* Active State: Apple Liquid Gold Glass Pill */
+/* Selected / Active state: Solid Gold Pill #C9A96E with dark text #1E1B2E (matching Resume Playback button) */
 .sidebar-group.active > .sidebar-group-toggle,
 .sidebar-item-glass.active {
-  background: linear-gradient(135deg, rgba(245, 230, 196, 0.85) 0%, rgba(235, 210, 160, 0.65) 100%);
-  color: #2D2310;
-  font-weight: 700;
-  border: 1px solid rgba(201, 169, 110, 0.45);
-  box-shadow: 0 6px 20px rgba(201, 169, 110, 0.22), inset 0 1px 1px rgba(255, 255, 255, 0.9);
-  transform: scale(1.01);
+  background: var(--accent-gold) !important;
+  color: #1E1B2E !important;
+  font-weight: 600 !important;
+  border-radius: 8px !important;
+  border: none !important;
+  box-shadow: none !important;
+  transform: none !important;
 }
 
-@media (prefers-color-scheme: dark) {
-  .sidebar-group.active > .sidebar-group-toggle,
-  .sidebar-item-glass.active {
-    background: linear-gradient(135deg, rgba(201, 169, 110, 0.28) 0%, rgba(201, 169, 110, 0.12) 100%);
-    color: #F3D89D;
-    border: 1px solid rgba(201, 169, 110, 0.4);
-    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3), inset 0 1px 1px rgba(255, 255, 255, 0.15);
-  }
-}
-
-/* Icon Badges */
+/* Monochromatic SF Symbol style outline icons */
 .sidebar-icon-badge {
-  width: 28px;
-  height: 28px;
-  border-radius: 8px;
   display: flex;
   align-items: center;
   justify-content: center;
+  width: 20px;
+  height: 20px;
   flex-shrink: 0;
-  background: rgba(0, 0, 0, 0.05);
-  color: #6E6D7A;
-  transition: all .2s ease;
-}
-
-@media (prefers-color-scheme: dark) {
-  .sidebar-icon-badge {
-    background: rgba(255, 255, 255, 0.08);
-    color: #A0A0AB;
-  }
-}
-
-.sidebar-group.active .sidebar-icon-badge,
-.sidebar-item-glass.active .sidebar-icon-badge {
-  background: rgba(201, 169, 110, 0.25);
-  color: #9C7833;
-}
-
-@media (prefers-color-scheme: dark) {
-  .sidebar-group.active .sidebar-icon-badge,
-  .sidebar-item-glass.active .sidebar-icon-badge {
-    background: rgba(201, 169, 110, 0.3);
-    color: #F3D89D;
-  }
+  background: transparent !important;
+  color: inherit !important;
+  box-shadow: none !important;
+  border: none !important;
 }
 
 /* Chevron */
 .chevron {
-  transition: transform .25s cubic-bezier(.2, .9, .2, 1);
+  transition: transform 0.2s ease;
   margin-left: auto;
   opacity: 0.6;
+  font-size: 0.75rem;
 }
 
 .chevron.open {
@@ -157,25 +100,18 @@
   opacity: 1;
 }
 
-/* Children list with glass separators */
+/* Children list */
 .sidebar-group-children {
-  margin-top: 4px;
-  margin-bottom: 6px;
-  padding: 4px 6px 4px 14px;
-  border-radius: 14px;
-  background: rgba(0, 0, 0, 0.02);
-  border-left: 2px solid rgba(201, 169, 110, 0.25);
-  transition: max-height .25s cubic-bezier(0.2, 0.8, 0.2, 1), opacity .25s ease;
+  margin-top: 2px;
+  margin-bottom: 4px;
+  padding: 2px 4px 2px 16px;
+  border-radius: 8px;
+  background: transparent;
+  border-left: none;
+  transition: max-height 0.25s ease, opacity 0.25s ease;
   max-height: 0;
   opacity: 0;
   overflow: hidden;
-}
-
-@media (prefers-color-scheme: dark) {
-  .sidebar-group-children {
-    background: rgba(255, 255, 255, 0.02);
-    border-left: 2px solid rgba(201, 169, 110, 0.3);
-  }
 }
 
 .sidebar-group-children.open {
@@ -187,78 +123,53 @@
 .sidebar-child {
   display: flex;
   align-items: center;
-  gap: 10px;
-  padding: 8px 12px;
-  margin: 3px 0;
-  border-radius: 10px;
-  color: rgba(30, 27, 46, 0.75);
+  gap: 12px;
+  padding: 6px 12px;
+  min-height: 32px;
+  margin: 1px 0;
+  border-radius: 6px;
+  color: var(--text-secondary);
   text-decoration: none;
   font-size: 0.8125rem;
-  font-weight: 500;
-  transition: all .18s ease;
-  border: 1px solid transparent;
-}
-
-@media (prefers-color-scheme: dark) {
-  .sidebar-child {
-    color: rgba(255, 255, 255, 0.75);
-  }
+  font-weight: 400;
+  transition: background-color 0.2s ease, color 0.2s ease;
+  border: none;
 }
 
 .sidebar-child:hover {
-  color: var(--navy);
-  background: rgba(0, 0, 0, 0.04);
-  transform: translateX(2px);
-}
-
-@media (prefers-color-scheme: dark) {
-  .sidebar-child:hover {
-    color: #FFFFFF;
-    background: rgba(255, 255, 255, 0.06);
-  }
+  color: #FFFFFF;
+  background: var(--hover-bg);
+  transform: none !important;
 }
 
 .sidebar-child.active {
-  color: #2D2310;
-  background: linear-gradient(90deg, rgba(245, 230, 196, 0.8) 0%, rgba(235, 210, 160, 0.4) 100%);
-  border: 1px solid rgba(201, 169, 110, 0.35);
-  box-shadow: 0 4px 12px rgba(201, 169, 110, 0.12);
-  font-weight: 700;
-}
-
-@media (prefers-color-scheme: dark) {
-  .sidebar-child.active {
-    color: #F3D89D;
-    background: linear-gradient(90deg, rgba(201, 169, 110, 0.25) 0%, rgba(201, 169, 110, 0.08) 100%);
-    border: 1px solid rgba(201, 169, 110, 0.35);
-  }
+  color: #1E1B2E !important;
+  background: var(--accent-gold) !important;
+  font-weight: 600 !important;
+  border-radius: 6px !important;
+  border: none !important;
+  box-shadow: none !important;
 }
 
 /* Focus ring */
 .sidebar-group-toggle:focus-visible,
 .sidebar-child:focus-visible,
 .sidebar-item-glass:focus-visible {
-  outline: 3px solid rgba(201, 169, 110, 0.4);
-  outline-offset: 2px;
+  outline: 2px solid var(--accent-gold);
+  outline-offset: -2px;
 }
 
-/* Responsive: compact sidebar */
-@media (max-width: 900px) {
+/* Responsive mobile drawer override */
+@media (max-width: 767px) {
   .glass-sidebar {
-    border-radius: 16px;
-    padding: 10px;
+    border-right: none;
+    border-radius: 0 16px 16px 0;
   }
 }
 
 /* Reduced motion accessibility */
 @media (prefers-reduced-motion: reduce) {
-  .glass-sidebar,
-  .sidebar-group-toggle,
-  .sidebar-item-glass,
-  .sidebar-group-children,
-  .sidebar-child,
-  .chevron,
-  .sidebar-icon-badge {
+  * {
     transition: none !important;
     transform: none !important;
     animation: none !important;
@@ -275,6 +186,6 @@
 
 .sidebar-root *,
 .sidebar-nav-scroll {
-  -ms-overflow-style: none !important; /* IE and Edge */
-  scrollbar-width: none !important; /* Firefox */
+  -ms-overflow-style: none !important;
+  scrollbar-width: none !important;
 }
