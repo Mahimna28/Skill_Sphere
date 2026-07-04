@@ -1,0 +1,280 @@
+/* Apple Liquid Glass Aesthetic for Student Sidebar */
+
+:root {
+  --glass-bg-light: rgba(255, 255, 255, 0.82);
+  --glass-bg-dark: rgba(24, 22, 36, 0.75);
+  --glass-blur: 24px;
+  --glass-border: rgba(255, 255, 255, 0.4);
+  --glass-glow: rgba(201, 169, 110, 0.15);
+  --accent: #C9A96E;
+  --navy: #1E1B2E;
+  --glass-shadow: 0 20px 50px rgba(0, 0, 0, 0.12), 0 0 0 1px rgba(0, 0, 0, 0.04);
+}
+
+/* Sidebar root glass card */
+.glass-sidebar {
+  background: linear-gradient(180deg, var(--glass-bg-light) 0%, rgba(255, 255, 255, 0.65) 100%);
+  backdrop-filter: blur(var(--glass-blur)) saturate(1.4);
+  -webkit-backdrop-filter: blur(var(--glass-blur)) saturate(1.4);
+  border: 1px solid var(--glass-border);
+  box-shadow: var(--glass-shadow);
+  border-radius: 24px;
+  padding: 14px;
+  transition: background .22s ease, transform .25s cubic-bezier(0.2, 0.8, 0.2, 1), box-shadow .25s ease;
+  color: var(--navy);
+}
+
+/* Optional micro motion: subtle parallax on hover */
+.glass-sidebar:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 24px 60px rgba(0, 0, 0, 0.16), 0 0 0 1px rgba(201, 169, 110, 0.2);
+}
+
+/* Dark mode override */
+@media (prefers-color-scheme: dark) {
+  .glass-sidebar {
+    background: linear-gradient(180deg, var(--glass-bg-dark) 0%, rgba(18, 16, 28, 0.60) 100%);
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    box-shadow: 0 20px 50px rgba(0, 0, 0, 0.4), 0 0 0 1px rgba(255, 255, 255, 0.05);
+    color: #FFFFFF;
+  }
+  .glass-sidebar:hover {
+    box-shadow: 0 24px 60px rgba(0, 0, 0, 0.5), 0 0 0 1px rgba(201, 169, 110, 0.3);
+  }
+}
+
+/* Group toggle and item styling */
+.sidebar-group-toggle,
+.sidebar-item-glass {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 10px 12px;
+  margin: 3px 0;
+  border-radius: 14px;
+  color: rgba(30, 27, 46, 0.85);
+  background: transparent;
+  transition: all .2s cubic-bezier(0.2, 0.8, 0.2, 1);
+  width: 100%;
+  border: 1px solid transparent;
+  cursor: pointer;
+  font-family: inherit;
+  font-size: 0.875rem;
+  font-weight: 500;
+  text-align: left;
+  text-decoration: none;
+}
+
+@media (prefers-color-scheme: dark) {
+  .sidebar-group-toggle,
+  .sidebar-item-glass {
+    color: rgba(255, 255, 255, 0.85);
+  }
+}
+
+/* Hover state */
+.sidebar-group-toggle:hover,
+.sidebar-item-glass:hover {
+  transform: translateX(3px);
+  background: rgba(0, 0, 0, 0.04);
+  color: var(--navy);
+}
+
+@media (prefers-color-scheme: dark) {
+  .sidebar-group-toggle:hover,
+  .sidebar-item-glass:hover {
+    background: rgba(255, 255, 255, 0.06);
+    color: #FFFFFF;
+  }
+}
+
+/* Active State: Apple Liquid Gold Glass Pill */
+.sidebar-group.active > .sidebar-group-toggle,
+.sidebar-item-glass.active {
+  background: linear-gradient(135deg, rgba(245, 230, 196, 0.85) 0%, rgba(235, 210, 160, 0.65) 100%);
+  color: #2D2310;
+  font-weight: 700;
+  border: 1px solid rgba(201, 169, 110, 0.45);
+  box-shadow: 0 6px 20px rgba(201, 169, 110, 0.22), inset 0 1px 1px rgba(255, 255, 255, 0.9);
+  transform: scale(1.01);
+}
+
+@media (prefers-color-scheme: dark) {
+  .sidebar-group.active > .sidebar-group-toggle,
+  .sidebar-item-glass.active {
+    background: linear-gradient(135deg, rgba(201, 169, 110, 0.28) 0%, rgba(201, 169, 110, 0.12) 100%);
+    color: #F3D89D;
+    border: 1px solid rgba(201, 169, 110, 0.4);
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3), inset 0 1px 1px rgba(255, 255, 255, 0.15);
+  }
+}
+
+/* Icon Badges */
+.sidebar-icon-badge {
+  width: 28px;
+  height: 28px;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  background: rgba(0, 0, 0, 0.05);
+  color: #6E6D7A;
+  transition: all .2s ease;
+}
+
+@media (prefers-color-scheme: dark) {
+  .sidebar-icon-badge {
+    background: rgba(255, 255, 255, 0.08);
+    color: #A0A0AB;
+  }
+}
+
+.sidebar-group.active .sidebar-icon-badge,
+.sidebar-item-glass.active .sidebar-icon-badge {
+  background: rgba(201, 169, 110, 0.25);
+  color: #9C7833;
+}
+
+@media (prefers-color-scheme: dark) {
+  .sidebar-group.active .sidebar-icon-badge,
+  .sidebar-item-glass.active .sidebar-icon-badge {
+    background: rgba(201, 169, 110, 0.3);
+    color: #F3D89D;
+  }
+}
+
+/* Chevron */
+.chevron {
+  transition: transform .25s cubic-bezier(.2, .9, .2, 1);
+  margin-left: auto;
+  opacity: 0.6;
+}
+
+.chevron.open {
+  transform: rotate(180deg);
+  opacity: 1;
+}
+
+/* Children list with glass separators */
+.sidebar-group-children {
+  margin-top: 4px;
+  margin-bottom: 6px;
+  padding: 4px 6px 4px 14px;
+  border-radius: 14px;
+  background: rgba(0, 0, 0, 0.02);
+  border-left: 2px solid rgba(201, 169, 110, 0.25);
+  transition: max-height .25s cubic-bezier(0.2, 0.8, 0.2, 1), opacity .25s ease;
+  max-height: 0;
+  opacity: 0;
+  overflow: hidden;
+}
+
+@media (prefers-color-scheme: dark) {
+  .sidebar-group-children {
+    background: rgba(255, 255, 255, 0.02);
+    border-left: 2px solid rgba(201, 169, 110, 0.3);
+  }
+}
+
+.sidebar-group-children.open {
+  max-height: 240px;
+  opacity: 1;
+}
+
+/* Child link */
+.sidebar-child {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 12px;
+  margin: 3px 0;
+  border-radius: 10px;
+  color: rgba(30, 27, 46, 0.75);
+  text-decoration: none;
+  font-size: 0.8125rem;
+  font-weight: 500;
+  transition: all .18s ease;
+  border: 1px solid transparent;
+}
+
+@media (prefers-color-scheme: dark) {
+  .sidebar-child {
+    color: rgba(255, 255, 255, 0.75);
+  }
+}
+
+.sidebar-child:hover {
+  color: var(--navy);
+  background: rgba(0, 0, 0, 0.04);
+  transform: translateX(2px);
+}
+
+@media (prefers-color-scheme: dark) {
+  .sidebar-child:hover {
+    color: #FFFFFF;
+    background: rgba(255, 255, 255, 0.06);
+  }
+}
+
+.sidebar-child.active {
+  color: #2D2310;
+  background: linear-gradient(90deg, rgba(245, 230, 196, 0.8) 0%, rgba(235, 210, 160, 0.4) 100%);
+  border: 1px solid rgba(201, 169, 110, 0.35);
+  box-shadow: 0 4px 12px rgba(201, 169, 110, 0.12);
+  font-weight: 700;
+}
+
+@media (prefers-color-scheme: dark) {
+  .sidebar-child.active {
+    color: #F3D89D;
+    background: linear-gradient(90deg, rgba(201, 169, 110, 0.25) 0%, rgba(201, 169, 110, 0.08) 100%);
+    border: 1px solid rgba(201, 169, 110, 0.35);
+  }
+}
+
+/* Focus ring */
+.sidebar-group-toggle:focus-visible,
+.sidebar-child:focus-visible,
+.sidebar-item-glass:focus-visible {
+  outline: 3px solid rgba(201, 169, 110, 0.4);
+  outline-offset: 2px;
+}
+
+/* Responsive: compact sidebar */
+@media (max-width: 900px) {
+  .glass-sidebar {
+    border-radius: 16px;
+    padding: 10px;
+  }
+}
+
+/* Reduced motion accessibility */
+@media (prefers-reduced-motion: reduce) {
+  .glass-sidebar,
+  .sidebar-group-toggle,
+  .sidebar-item-glass,
+  .sidebar-group-children,
+  .sidebar-child,
+  .chevron,
+  .sidebar-icon-badge {
+    transition: none !important;
+    transform: none !important;
+    animation: none !important;
+  }
+}
+
+/* Invisible Scrollbars across all browsers while keeping scroll functionality */
+.sidebar-root *::-webkit-scrollbar,
+.sidebar-nav-scroll::-webkit-scrollbar {
+  display: none !important;
+  width: 0px !important;
+  height: 0px !important;
+}
+
+.sidebar-root *,
+.sidebar-nav-scroll {
+  -ms-overflow-style: none !important; /* IE and Edge */
+  scrollbar-width: none !important; /* Firefox */
+}

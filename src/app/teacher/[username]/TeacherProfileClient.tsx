@@ -7,7 +7,7 @@ import { BookOpen, Users, Clock, Star, ArrowRight, ArrowLeft, ShieldCheck, Mail,
 
 import { useRouter } from "next/navigation";
 
-const appleEase = [0.25, 0.1, 0.25, 1.0];
+const appleEase = [0.25, 0.1, 0.25, 1.0] as any;
 
 interface TeacherProps {
   id: string;

@@ -2,9 +2,9 @@ import React from "react";
 import { prisma } from "@/lib/prisma";
 import { cookies } from "next/headers";
 import { verifyToken } from "@/lib/auth";
-import StudentOverviewClient from "./StudentOverviewClient";
+import StudentOverviewClient from "../StudentOverviewClient";
 
-export default async function StudentDashboard() {
+export default async function StudentOverviewPage() {
   const cookieStore = await cookies();
   const token = cookieStore.get("token")?.value;
   const decoded: any = token ? verifyToken(token) : null;

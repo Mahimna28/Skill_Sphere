@@ -39,7 +39,11 @@ export async function POST(req: Request) {
 
     // Send email
     try {
-      await sendOtpEmail(email, otp);
+      if (process.env.NODE_ENV === 'development' || !process.env.BREVO_API_KEY) {
+        console.log(`\n🔑 [DEVELOPMENT] Generated OTP for ${email}: ${otp}\n`);
+      } else {
+        await sendOtpEmail(email, otp);
+      }
     } catch (emailError: any) {
       console.error("Email send error:", emailError.message);
       return NextResponse.json(

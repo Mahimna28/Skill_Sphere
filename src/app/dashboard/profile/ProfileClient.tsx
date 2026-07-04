@@ -2,6 +2,8 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { motion, AnimatePresence, useReducedMotion } from "framer-motion";
+import { containerVariant, microVariant } from "./motionVariants";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { 
@@ -20,6 +22,8 @@ export default function ProfileClient({ user, roleData }: { user: any, roleData:
   const [isEditing, setIsEditing] = useState(false);
   const [loading, setLoading] = useState(false);
   const [otpSent, setOtpSent] = useState(false);
+  const [saveSuccess, setSaveSuccess] = useState(false);
+  const shouldReduceMotion = useReducedMotion() ?? false;
   
   const [formData, setFormData] = useState({
     name: user.name,
@@ -64,6 +68,7 @@ export default function ProfileClient({ user, roleData }: { user: any, roleData:
   const handleUpdate = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
+    setSaveSuccess(false);
     try {
       const res = await fetch("/api/profile/update", {
         method: "PATCH",
@@ -74,7 +79,9 @@ export default function ProfileClient({ user, roleData }: { user: any, roleData:
       if (res.ok) {
         setIsEditing(false);
         setOtpSent(false);
+        setSaveSuccess(true);
         setFormData({ ...formData, password: "", otpCode: "" });
+        setTimeout(() => setSaveSuccess(false), 3500);
         router.refresh();
       } else {
         alert(data.message);
@@ -90,343 +97,263 @@ export default function ProfileClient({ user, roleData }: { user: any, roleData:
   const skillsArray = formData.skills ? formData.skills.split(",").map((s: string) => s.trim()) : [];
 
   return (
-    <div className="max-w-7xl mx-auto space-y-10 animate-in fade-in slide-in-from-bottom-4 duration-500 pb-20 px-4">
+    <motion.div
+      initial={shouldReduceMotion ? false : "hidden"}
+      animate={shouldReduceMotion ? false : "show"}
+      variants={containerVariant}
+      className="max-w-7xl mx-auto space-y-10 font-sans pb-20 px-4 overflow-hidden"
+    >
+      {/* Save Success Micro-Animation Toast */}
+      <AnimatePresence>
+        {saveSuccess && (
+          <motion.div
+            initial={{ opacity: 0, scale: 0.9, y: -20 }}
+            animate={{ opacity: 1, scale: 1, y: 0 }}
+            exit={{ opacity: 0, scale: 0.9, y: -20 }}
+            role="status"
+            aria-live="polite"
+            className="fixed top-20 right-6 z-50 p-4 rounded-2xl bg-[#22C55E]/90 backdrop-blur-xl text-white font-bold text-sm shadow-[0_12px_30px_rgba(34,197,94,0.3)] flex items-center gap-3 border border-white/20"
+          >
+            <div className="w-7 h-7 rounded-full bg-white text-[#22C55E] flex items-center justify-center font-black">
+              <CheckCircle2 className="w-4 h-4" />
+            </div>
+            <span>Profile settings saved successfully!</span>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
       {/* Header Section */}
-      <div className="flex flex-col md:flex-row md:items-end justify-between gap-6">
+      <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 border-b border-[#1E1B2E]/10 pb-6">
         <div className="flex items-center gap-6">
-          <div className="relative group">
-            <div className="w-24 h-24 md:w-32 md:h-32 rounded-[2.5rem] border-4 border-black overflow-hidden shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] bg-white flex items-center justify-center">
+          <motion.div
+            whileHover={shouldReduceMotion ? {} : { scale: 1.03 }}
+            className="relative group cursor-pointer shrink-0"
+          >
+            <div className="w-24 h-24 md:w-32 md:h-32 rounded-[2.5rem] bg-white/80 backdrop-blur-xl border-2 border-[#C9A96E] overflow-hidden shadow-[0_12px_35px_rgba(30,27,46,0.08)] flex items-center justify-center relative">
+              {/* Shimmer Overlay */}
+              <div className="absolute inset-0 animate-shimmer pointer-events-none opacity-0 group-hover:opacity-100 transition-opacity" />
               {user.image ? (
                 <img src={user.image} alt={user.name} className="w-full h-full object-cover" />
               ) : (
-                <span className="text-4xl md:text-5xl font-black text-primary">{user.name.charAt(0)}</span>
+                <span className="text-4xl md:text-5xl font-bold text-[#1E1B2E]" style={{ fontFamily: "var(--font-heading, serif)" }}>
+                  {user.name.charAt(0)}
+                </span>
               )}
             </div>
             {isEditing && (
-              <div className="absolute -bottom-2 -right-2 bg-black text-white p-2 rounded-xl border-2 border-white shadow-lg cursor-pointer">
+              <div className="absolute -bottom-2 -right-2 bg-[#1E1B2E] text-[#C9A96E] p-2.5 rounded-xl border-2 border-white shadow-md">
                 <Camera size={16} />
               </div>
             )}
-          </div>
+          </motion.div>
           <div>
-            <div className="flex items-center gap-3 mb-2">
-              <h1 className="text-4xl md:text-5xl font-black uppercase tracking-tighter">{user.name}</h1>
-              <div className="px-3 py-1 bg-primary text-white text-[10px] font-black border-2 border-black rounded-full uppercase tracking-widest shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]">
+            <div className="flex flex-wrap items-center gap-2.5 mb-2">
+              <h1 className="text-3xl md:text-4xl font-bold text-[#1E1B2E] tracking-tight" style={{ fontFamily: "var(--font-heading, serif)" }}>
+                {user.name}
+              </h1>
+              <div className="px-3 py-1 bg-[#1E1B2E] text-[#C9A96E] text-xs font-bold rounded-full uppercase tracking-wider shadow-2xs">
                 {user.role}
               </div>
-              <div className="px-3 py-1 bg-black text-white text-[10px] font-black border-2 border-black rounded-full uppercase tracking-widest shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]">
+              <div className="px-3 py-1 bg-[#1E1B2E]/10 text-[#1E1B2E] text-xs font-bold rounded-full">
                 @{user.username || "no_username"}
               </div>
               {user.isProfilePublic ? (
-                <div className="px-2.5 py-1 bg-green-100 text-green-700 text-[8px] font-black border-2 border-black rounded-full uppercase flex items-center gap-1">
-                  <Globe size={10} /> Public
+                <div className="px-2.5 py-1 bg-[#22C55E]/15 text-[#22C55E] text-[11px] font-bold rounded-full uppercase flex items-center gap-1 border border-[#22C55E]/30">
+                  <Globe size={12} /> Public
                 </div>
               ) : (
-                <div className="px-2.5 py-1 bg-orange-100 text-orange-700 text-[8px] font-black border-2 border-black rounded-full uppercase flex items-center gap-1">
-                  <EyeOff size={10} /> Private
+                <div className="px-2.5 py-1 bg-[#F97316]/15 text-[#F97316] text-[11px] font-bold rounded-full uppercase flex items-center gap-1 border border-[#F97316]/30">
+                  <EyeOff size={12} /> Private
                 </div>
               )}
             </div>
-            <div className="flex flex-wrap items-center gap-4 text-muted-foreground font-bold text-sm">
-              <span className="flex items-center gap-1.5 font-black text-black/70"><Mail size={16} /> {user.email}</span>
+            <div className="flex flex-wrap items-center gap-4 text-[#8E8E93] font-medium text-sm">
+              <span className="flex items-center gap-1.5 text-[#1E1B2E]"><Mail size={16} className="text-[#C9A96E]" /> {user.email}</span>
               {user.institution && (
-                <span className="flex items-center gap-1.5 font-black text-black/70"><Building2 size={16} /> {user.institution.name}</span>
+                <span className="flex items-center gap-1.5 text-[#1E1B2E]"><Building2 size={16} className="text-[#C9A96E]" /> {user.institution.name}</span>
               )}
-              <span className="flex items-center gap-1.5 font-black text-black/70"><Calendar size={16} /> Joined {new Date(user.createdAt).getFullYear()}</span>
+              <span className="flex items-center gap-1.5 text-[#1E1B2E]"><Calendar size={16} className="text-[#C9A96E]" /> Joined {new Date(user.createdAt).getFullYear()}</span>
             </div>
           </div>
         </div>
-        <div className="flex gap-3">
+        <div className="flex gap-3 shrink-0">
           {!isEditing ? (
-            <Button onClick={() => setIsEditing(true)} className="neo-brutalism bg-[#F5C84C] text-black font-black h-14 px-8 text-lg">
-              <Edit3 className="mr-2" /> Complete Profile
-            </Button>
+            <motion.button
+              type="button"
+              whileHover={shouldReduceMotion ? {} : { scale: 1.03 }}
+              whileTap={shouldReduceMotion ? {} : { scale: 0.97 }}
+              onClick={() => setIsEditing(true)}
+              className="h-12 px-6 rounded-xl bg-[#C9A96E] hover:bg-[#D6B87D] text-[#1E1B2E] font-bold text-sm flex items-center justify-center gap-2 shadow-[0_4px_14px_rgba(201,169,110,0.3)] hover:shadow-[0_0_18px_rgba(201,169,110,0.6)] transition-all cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#C9A96E]"
+            >
+              <Edit3 className="w-4 h-4" />
+              <span>Edit Profile</span>
+            </motion.button>
           ) : (
-            <Button onClick={() => setIsEditing(false)} variant="outline" className="h-14 px-8 font-black border-4 border-black text-lg">
+            <button
+              type="button"
+              onClick={() => setIsEditing(false)}
+              className="h-12 px-6 rounded-xl bg-[#1E1B2E]/10 hover:bg-[#1E1B2E]/15 text-[#1E1B2E] font-bold text-sm transition-colors cursor-pointer"
+            >
               Cancel
-            </Button>
+            </button>
           )}
         </div>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-10">
-        {/* Left Column: Role-Specific Identity & Stats */}
-        <div className="lg:col-span-8 space-y-10">
-          
-          {/* Bio & Skills (Common) */}
-          <div className="bg-white border-4 border-black rounded-[2.5rem] p-8 md:p-10 shadow-[12px_12px_0px_0px_rgba(0,0,0,1)]">
-            <h3 className="text-3xl font-black uppercase tracking-tighter mb-6 flex items-center gap-3">
-               <Info className="text-primary" /> About Me
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
+        {/* Left Column: Bio, Skills & Timeline */}
+        <div className="lg:col-span-8 space-y-8">
+          {/* Bio & Skills */}
+          <motion.div
+            variants={microVariant}
+            initial="hidden"
+            animate="show"
+            className="bg-white/70 backdrop-blur-xl border border-white/80 rounded-2xl p-6 md:p-8 shadow-[0_8px_30px_rgba(30,27,46,0.05)]"
+          >
+            <h3 className="text-xl font-bold text-[#1E1B2E] mb-4 flex items-center gap-2" style={{ fontFamily: "var(--font-heading, serif)" }}>
+              <Info className="text-[#C9A96E] w-5 h-5" /> About Me
             </h3>
-            <p className="text-lg font-bold text-muted-foreground leading-relaxed mb-8">
-              {user.bio || "No bio added yet. Click 'Complete Profile' to introduce yourself!"}
+            <p className="text-sm font-medium text-[#1E1B2E]/80 leading-relaxed mb-6">
+              {user.bio || "No bio added yet. Click 'Edit Profile' to introduce yourself!"}
             </p>
-            <div className="flex flex-wrap gap-3">
+            <div className="flex flex-wrap gap-2">
               {skillsArray.length > 0 ? skillsArray.map((skill: string, i: number) => (
-                <span key={i} className="px-4 py-2 bg-secondary/20 border-2 border-black rounded-xl font-black uppercase text-xs shadow-[3px_3px_0px_0px_rgba(0,0,0,1)]">
+                <span key={i} className="px-3 py-1 rounded-full bg-[#1E1B2E]/5 border border-[#1E1B2E]/10 text-[#1E1B2E] font-bold text-xs">
                    {skill}
                 </span>
               )) : (
-                <p className="text-xs font-bold opacity-40">No skills listed yet.</p>
+                <p className="text-xs font-medium text-[#8E8E93]">No skills listed yet.</p>
               )}
             </div>
-          </div>
+          </motion.div>
 
           {/* Role Specific Sections */}
           {user.role === "student" && (
-            <div className="space-y-10">
-              {/* Learning Identity */}
+            <motion.div variants={microVariant} initial="hidden" animate="show" className="space-y-8">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div className="bg-[#4F7DF3] text-white p-8 border-4 border-black rounded-[2rem] shadow-[8px_8px_0px_0px_rgba(0,0,0,1)]">
-                  <div className="flex items-center gap-3 mb-4">
-                    <Target size={24} className="text-[#F5C84C]" />
-                    <h4 className="text-xl font-black uppercase">Learning Goal</h4>
-                  </div>
-                  <p className="font-bold text-lg leading-tight">
-                    {user.learningGoal || "What's your 6-month goal?"}
+                <div className="bg-gradient-to-tr from-[#1E1B2E] to-[#2D2844] text-white p-6 rounded-2xl border border-white/10 shadow-md">
+                  <span className="text-xs font-bold text-[#C9A96E] uppercase tracking-wider">Target Goal</span>
+                  <p className="text-xl font-bold mt-1 mb-2" style={{ fontFamily: "var(--font-heading, serif)" }}>
+                    {user.learningGoal || "Not specified yet"}
                   </p>
+                  <span className="text-xs text-white/60 font-medium">6-Month Academic Roadmap</span>
                 </div>
-                <div className="bg-[#34D399] text-black p-8 border-4 border-black rounded-[2rem] shadow-[8px_8px_0px_0px_rgba(0,0,0,1)]">
-                  <div className="flex items-center gap-3 mb-4">
-                    <GraduationCap size={24} />
-                    <h4 className="text-xl font-black uppercase">Current Degree</h4>
-                  </div>
-                  <p className="font-bold text-lg leading-tight">
-                    {user.degree || "Not set"} {user.specialization ? `(${user.specialization})` : ""}
+                <div className="bg-white/70 backdrop-blur-xl border border-white/80 p-6 rounded-2xl shadow-2xs">
+                  <span className="text-xs font-bold text-[#8E8E93] uppercase tracking-wider">Current Degree Program</span>
+                  <p className="text-xl font-bold text-[#1E1B2E] mt-1 mb-2" style={{ fontFamily: "var(--font-heading, serif)" }}>
+                    {user.degree || "B.Tech"}
                   </p>
+                  <span className="text-xs font-semibold text-[#1E1B2E]">Specialization: {user.specialization || "General"}</span>
                 </div>
               </div>
-
-              {/* Streaks & Time */}
-              <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                 <div className="bg-white border-4 border-black p-6 rounded-2xl shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] flex flex-col items-center">
-                    <Flame className="text-orange-500 mb-2" />
-                    <span className="text-2xl font-black">{user.currentStreak}</span>
-                    <span className="text-[10px] font-black uppercase opacity-60">Current Streak</span>
-                 </div>
-                 <div className="bg-white border-4 border-black p-6 rounded-2xl shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] flex flex-col items-center">
-                    <TrendingUp className="text-green-500 mb-2" />
-                    <span className="text-2xl font-black">{user.longestStreak}</span>
-                    <span className="text-[10px] font-black uppercase opacity-60">Best Streak</span>
-                 </div>
-                 <div className="bg-white border-4 border-black p-6 rounded-2xl shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] flex flex-col items-center">
-                    <Clock className="text-blue-500 mb-2" />
-                    <span className="text-2xl font-black">{user.studyHours.toFixed(1)}</span>
-                    <span className="text-[10px] font-black uppercase opacity-60">Total Hours</span>
-                 </div>
-                 <div className="bg-white border-4 border-black p-6 rounded-2xl shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] flex flex-col items-center">
-                    <BarChart3 className="text-primary mb-2" />
-                    <span className="text-2xl font-black">{roleData.averageScore || 0}%</span>
-                    <span className="text-[10px] font-black uppercase opacity-60">Avg Score</span>
-                 </div>
-              </div>
-
-              {/* Certificates */}
-              <div className="bg-white border-4 border-black rounded-[2.5rem] p-8 md:p-10 shadow-[12px_12px_0px_0px_rgba(0,0,0,1)]">
-                <div className="flex items-center justify-between mb-8">
-                  <h3 className="text-3xl font-black uppercase tracking-tighter">My Certificates</h3>
-                  <CertIcon className="text-muted-foreground" />
-                </div>
-                {user.certificates.length > 0 ? (
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    {user.certificates.map((cert: any, i: number) => (
-                      <div key={i} className="p-4 border-2 border-black rounded-xl flex items-center justify-between group hover:bg-muted/10 transition-colors">
-                        <div className="flex items-center gap-3">
-                           <CheckCircle2 className="text-green-500" />
-                           <div>
-                              <p className="font-black text-sm uppercase">{cert.title}</p>
-                              <p className="text-[10px] font-bold text-muted-foreground uppercase">{new Date(cert.issueDate).toLocaleDateString()}</p>
-                           </div>
-                        </div>
-                        <Button size="icon" variant="ghost" onClick={() => window.open(`/certificates/${cert.id}`, '_blank')} className="border-2 border-black hover:bg-black hover:text-white transition-all">
-                           <Download size={16} />
-                        </Button>
-                      </div>
-                    ))}
-                  </div>
-                ) : (
-                  <p className="text-center py-10 font-bold opacity-30 italic">Finish a course to earn your first certificate!</p>
-                )}
-              </div>
-            </div>
+            </motion.div>
           )}
 
           {user.role === "teacher" && (
-            <div className="space-y-10">
-              {/* Professional Identity */}
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                <div className="bg-[#4F7DF3] text-white p-8 border-4 border-black rounded-[2rem] shadow-[8px_8px_0px_0px_rgba(0,0,0,1)]">
-                  <div className="flex items-center gap-3 mb-4">
-                    <Briefcase size={20} />
-                    <h4 className="text-sm font-black uppercase">Expertise</h4>
-                  </div>
-                  <p className="font-bold text-lg leading-tight">{user.expertise || "Not set"}</p>
+            <motion.div variants={microVariant} initial="hidden" animate="show" className="bg-white/70 backdrop-blur-xl border border-white/80 rounded-2xl p-6 md:p-8 shadow-2xs space-y-4">
+              <h3 className="text-xl font-bold text-[#1E1B2E]" style={{ fontFamily: "var(--font-heading, serif)" }}>Teaching Portfolio</h3>
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 pt-2">
+                <div className="p-4 rounded-xl bg-white/80 border border-[#1E1B2E]/10">
+                  <span className="text-xs font-bold text-[#8E8E93]">Expertise</span>
+                  <p className="font-bold text-sm text-[#1E1B2E] mt-1">{user.expertise || "General"}</p>
                 </div>
-                <div className="bg-[#34D399] text-black p-8 border-4 border-black rounded-[2rem] shadow-[8px_8px_0px_0px_rgba(0,0,0,1)]">
-                  <div className="flex items-center gap-3 mb-4">
-                    <Calendar size={20} />
-                    <h4 className="text-sm font-black uppercase">Experience</h4>
-                  </div>
-                  <p className="font-bold text-lg leading-tight">{user.experienceYears || 0} Years</p>
+                <div className="p-4 rounded-xl bg-white/80 border border-[#1E1B2E]/10">
+                  <span className="text-xs font-bold text-[#8E8E93]">Experience</span>
+                  <p className="font-bold text-sm text-[#1E1B2E] mt-1">{user.experienceYears || 0} Years</p>
                 </div>
-                <div className="bg-[#F5C84C] text-black p-8 border-4 border-black rounded-[2rem] shadow-[8px_8px_0px_0px_rgba(0,0,0,1)]">
-                  <div className="flex items-center gap-3 mb-4">
-                    <GraduationCap size={20} />
-                    <h4 className="text-sm font-black uppercase">Qualification</h4>
-                  </div>
-                  <p className="font-bold text-lg leading-tight truncate">{user.qualification || "Not set"}</p>
+                <div className="p-4 rounded-xl bg-white/80 border border-[#1E1B2E]/10">
+                  <span className="text-xs font-bold text-[#8E8E93]">Qualification</span>
+                  <p className="font-bold text-sm text-[#1E1B2E] mt-1">{user.qualification || "Postgrad"}</p>
                 </div>
               </div>
-
-              {/* Teaching Stats */}
-              <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                 <div className="bg-white border-4 border-black p-6 rounded-2xl shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] flex flex-col items-center">
-                    <Users className="text-primary mb-2" />
-                    <span className="text-2xl font-black">{roleData.totalStudentsTaught}</span>
-                    <span className="text-[10px] font-black uppercase opacity-60">Taught</span>
-                 </div>
-                 <div className="bg-white border-4 border-black p-6 rounded-2xl shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] flex flex-col items-center">
-                    <Star className="text-yellow-500 mb-2" />
-                    <span className="text-2xl font-black">{user.rating.toFixed(1)}</span>
-                    <span className="text-[10px] font-black uppercase opacity-60">Rating</span>
-                 </div>
-                 <div className="bg-white border-4 border-black p-6 rounded-2xl shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] flex flex-col items-center">
-                    <BookOpen className="text-green-500 mb-2" />
-                    <span className="text-2xl font-black">{user._count.courses}</span>
-                    <span className="text-[10px] font-black uppercase opacity-60">Courses</span>
-                 </div>
-                 <div className="bg-white border-4 border-black p-6 rounded-2xl shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] flex flex-col items-center">
-                    <Clock className="text-blue-500 mb-2" />
-                    <span className="text-2xl font-black">120+</span>
-                    <span className="text-[10px] font-black uppercase opacity-60">Hours</span>
-                 </div>
-              </div>
-            </div>
+            </motion.div>
           )}
 
-          {user.role === "parent" && (
-            <div className="space-y-10">
-               <div className="bg-white border-4 border-black rounded-[2.5rem] p-8 shadow-[12px_12px_0px_0px_rgba(0,0,0,1)]">
-                 <h3 className="text-3xl font-black uppercase tracking-tighter mb-6 flex items-center gap-3">
-                   <Edit3 className="text-primary" /> Parenting Notes
-                 </h3>
-                 <p className="text-lg font-bold text-muted-foreground leading-relaxed italic">
-                   "{user.parentNotes || "No personal notes for child tracking yet."}"
-                 </p>
-               </div>
-               
-               <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-                 {roleData.childrenDetails?.map((child: any, i: number) => (
-                   <div key={i} className="bg-white border-4 border-black rounded-[2rem] p-8 shadow-[8px_8px_0px_0px_rgba(0,0,0,1)]">
-                      <div className="flex items-center gap-4 mb-6">
-                        <div className="w-12 h-12 bg-secondary border-2 border-black rounded-full flex items-center justify-center font-black">
-                          {child.name.charAt(0)}
-                        </div>
-                        <div>
-                          <h4 className="text-xl font-black uppercase leading-none mb-1">{child.name}</h4>
-                          <div className="flex gap-2">
-                             <span className="text-[10px] font-black bg-green-100 px-2 rounded-full border border-black">↑ Improving</span>
-                          </div>
-                        </div>
-                      </div>
-                      <div className="grid grid-cols-2 gap-4 mb-6">
-                         <div className="p-3 bg-muted/20 border-2 border-black rounded-xl text-center">
-                            <p className="text-[10px] font-black uppercase opacity-60">Enrolled</p>
-                            <p className="text-xl font-black">{child._count.enrollments}</p>
-                         </div>
-                         <div className="p-3 bg-muted/20 border-2 border-black rounded-xl text-center">
-                            <p className="text-[10px] font-black uppercase opacity-60">Avg Score</p>
-                            <p className="text-xl font-black">82%</p>
-                         </div>
-                      </div>
-                      <div className="space-y-2">
-                         <p className="text-[10px] font-black uppercase opacity-60">Last Activity:</p>
-                         <div className="p-3 bg-black text-white rounded-xl text-xs font-bold flex justify-between">
-                            <span>Python Basics</span>
-                            <span>2h ago</span>
-                         </div>
-                      </div>
-                   </div>
-                 ))}
-               </div>
-            </div>
-          )}
-
-          {/* Activity Timeline (Common) */}
-          <div className="bg-white border-4 border-black rounded-[2.5rem] p-8 md:p-10 shadow-[12px_12px_0px_0px_rgba(0,0,0,1)]">
-            <h3 className="text-3xl font-black uppercase tracking-tighter mb-8 flex items-center gap-3">
-               <Activity className="text-primary" /> Activity Feed
+          {/* Activity Timeline */}
+          <motion.div
+            variants={microVariant}
+            initial="hidden"
+            animate="show"
+            className="bg-white/70 backdrop-blur-xl border border-white/80 rounded-2xl p-6 md:p-8 shadow-[0_8px_30px_rgba(30,27,46,0.05)]"
+          >
+            <h3 className="text-xl font-bold text-[#1E1B2E] mb-6 flex items-center gap-2" style={{ fontFamily: "var(--font-heading, serif)" }}>
+               <Activity className="text-[#C9A96E] w-5 h-5" /> Activity Feed
             </h3>
             <div className="space-y-6">
                <div className="flex gap-4">
                   <div className="relative">
-                     <div className="w-10 h-10 bg-[#34D399] border-2 border-black rounded-full flex items-center justify-center z-10 relative">
-                        <CheckCircle2 size={20} />
+                     <div className="w-9 h-9 bg-[#22C55E]/15 border border-[#22C55E]/30 rounded-full flex items-center justify-center text-[#22C55E] z-10 relative">
+                        <CheckCircle2 size={18} />
                      </div>
-                     <div className="absolute top-10 left-1/2 -translate-x-1/2 w-1 h-12 bg-black/10"></div>
+                     <div className="absolute top-9 left-1/2 -translate-x-1/2 w-0.5 h-10 bg-[#1E1B2E]/10" />
                   </div>
                   <div>
-                     <p className="font-black text-sm uppercase">Last Login Session</p>
-                     <p className="text-xs font-bold text-muted-foreground uppercase">{new Date(user.lastActiveAt).toLocaleString()}</p>
+                     <p className="font-bold text-xs uppercase text-[#1E1B2E]">Last Login Session</p>
+                     <p className="text-xs font-medium text-[#8E8E93]">{new Date(user.lastActiveAt).toLocaleString()}</p>
                   </div>
                </div>
                {user.enrollments && user.enrollments.length > 0 && (
                  <div className="flex gap-4">
                     <div className="relative">
-                       <div className="w-10 h-10 bg-[#4F7DF3] text-white border-2 border-black rounded-full flex items-center justify-center z-10 relative">
-                          <BookOpen size={20} />
+                       <div className="w-9 h-9 bg-[#1E1B2E] text-[#C9A96E] rounded-full flex items-center justify-center z-10 relative shadow-2xs">
+                          <BookOpen size={18} />
                        </div>
-                       <div className="absolute top-10 left-1/2 -translate-x-1/2 w-1 h-12 bg-black/10"></div>
+                       <div className="absolute top-9 left-1/2 -translate-x-1/2 w-0.5 h-10 bg-[#1E1B2E]/10" />
                     </div>
                     <div>
-                       <p className="font-black text-sm uppercase">Enrolled in Course</p>
-                       <p className="text-xs font-bold text-muted-foreground uppercase">{user.enrollments[0].course?.title || "A new course"}</p>
+                       <p className="font-bold text-xs uppercase text-[#1E1B2E]">Enrolled in Course</p>
+                       <p className="text-xs font-medium text-[#8E8E93]">{user.enrollments[0].course?.title || "A new course"}</p>
                     </div>
                  </div>
                )}
-               <div className="flex gap-4 opacity-50">
+               <div className="flex gap-4 opacity-70">
                   <div className="relative">
-                     <div className="w-10 h-10 bg-primary/20 border-2 border-black rounded-full flex items-center justify-center">
-                        <Calendar size={20} />
+                     <div className="w-9 h-9 bg-[#C9A96E]/20 border border-[#C9A96E]/40 rounded-full flex items-center justify-center text-[#1E1B2E]">
+                        <Calendar size={18} />
                      </div>
                   </div>
                   <div>
-                     <p className="font-black text-sm uppercase">Account Created</p>
-                     <p className="text-xs font-bold text-muted-foreground uppercase">{new Date(user.createdAt).toLocaleDateString()}</p>
+                     <p className="font-bold text-xs uppercase text-[#1E1B2E]">Account Created</p>
+                     <p className="text-xs font-medium text-[#8E8E93]">{new Date(user.createdAt).toLocaleDateString()}</p>
                   </div>
                </div>
             </div>
-          </div>
-
+          </motion.div>
         </div>
 
         {/* Right Column: Settings & Account Management */}
-        <div className="lg:col-span-4 space-y-10">
-          
-          <div className={`bg-white border-4 border-black rounded-[2.5rem] p-8 shadow-[12px_12px_0px_0px_rgba(0,0,0,1)] ${isEditing ? 'ring-8 ring-primary/20 transition-all' : ''}`}>
-            <h3 className="text-2xl font-black uppercase tracking-tighter mb-6 flex items-center gap-2">
-              {isEditing ? <Edit3 size={24} className="text-primary" /> : <Shield size={24} className="text-muted-foreground" />} 
+        <div className="lg:col-span-4 space-y-8">
+          <motion.div
+            variants={microVariant}
+            initial="hidden"
+            animate="show"
+            className={`bg-white/70 backdrop-blur-xl border border-white/80 rounded-2xl p-6 md:p-8 shadow-[0_8px_30px_rgba(30,27,46,0.05)] ${
+              isEditing ? "ring-2 ring-[#C9A96E] transition-all" : ""
+            }`}
+          >
+            <h3 className="text-lg font-bold text-[#1E1B2E] mb-5 flex items-center gap-2" style={{ fontFamily: "var(--font-heading, serif)" }}>
+              {isEditing ? <Edit3 size={20} className="text-[#C9A96E]" /> : <Shield size={20} className="text-[#8E8E93]" />} 
               Manage Account
             </h3>
             
-            <form onSubmit={handleUpdate} className="space-y-6">
+            <form onSubmit={handleUpdate} className="space-y-5">
               {/* Basic Info */}
-              <div className="space-y-4">
-                <div className="space-y-1.5">
-                  <label className="text-[10px] font-black uppercase tracking-widest text-muted-foreground">Display Name</label>
+              <div className="space-y-3.5">
+                <div>
+                  <label className="block text-xs font-bold uppercase tracking-wider text-[#8E8E93] mb-1">Display Name</label>
                   <Input 
                     disabled={!isEditing}
-                    className="h-12 border-2 border-black font-bold disabled:bg-muted/20 disabled:opacity-100"
+                    className="h-11 rounded-xl bg-white/90 border border-[#1E1B2E]/20 text-[#1E1B2E] font-medium text-sm focus-visible:ring-2 focus-visible:ring-[#C9A96E] disabled:opacity-80"
                     value={formData.name}
                     onChange={e => setFormData({...formData, name: e.target.value})}
                   />
                 </div>
-                <div className="space-y-1.5">
-                  <label className="text-[10px] font-black uppercase tracking-widest text-muted-foreground">Gmail Address</label>
+                <div>
+                  <label className="block text-xs font-bold uppercase tracking-wider text-[#8E8E93] mb-1">Gmail Address</label>
                   <Input 
                     type="email"
                     disabled={!isEditing}
-                    className="h-12 border-2 border-black font-bold disabled:bg-muted/20 disabled:opacity-100"
+                    className="h-11 rounded-xl bg-white/90 border border-[#1E1B2E]/20 text-[#1E1B2E] font-medium text-sm focus-visible:ring-2 focus-visible:ring-[#C9A96E] disabled:opacity-80"
                     value={formData.email}
                     onChange={e => {
                       setFormData({...formData, email: e.target.value});
@@ -434,31 +361,31 @@ export default function ProfileClient({ user, roleData }: { user: any, roleData:
                     }}
                   />
                 </div>
-                <div className="space-y-1.5">
-                  <label className="text-[10px] font-black uppercase tracking-widest text-muted-foreground">Unique Username (@)</label>
+                <div>
+                  <label className="block text-xs font-bold uppercase tracking-wider text-[#8E8E93] mb-1">Unique Username (@)</label>
                   <Input 
                     disabled={!isEditing}
-                    className="h-12 border-2 border-black font-bold disabled:bg-muted/20 disabled:opacity-100"
+                    className="h-11 rounded-xl bg-white/90 border border-[#1E1B2E]/20 text-[#1E1B2E] font-medium text-sm focus-visible:ring-2 focus-visible:ring-[#C9A96E] disabled:opacity-80"
                     value={formData.username}
                     onChange={e => setFormData({...formData, username: e.target.value.replace(/[^a-zA-Z0-9_]/g, "").toLowerCase()})}
                     placeholder="e.g. alex_dev"
                   />
                 </div>
-                <div className="space-y-1.5">
-                  <label className="text-[10px] font-black uppercase tracking-widest text-muted-foreground">Bio / Intro</label>
+                <div>
+                  <label className="block text-xs font-bold uppercase tracking-wider text-[#8E8E93] mb-1">Bio / Intro</label>
                   <textarea 
                     disabled={!isEditing}
-                    className="w-full p-3 border-2 border-black rounded-xl font-bold text-sm min-h-[100px] disabled:bg-muted/20 disabled:opacity-100 resize-none"
+                    className="w-full p-3 border border-[#1E1B2E]/20 rounded-xl font-medium text-sm min-h-[90px] disabled:opacity-80 bg-white/90 focus:outline-none focus:ring-2 focus:ring-[#C9A96E] resize-none"
                     value={formData.bio}
                     onChange={e => setFormData({...formData, bio: e.target.value})}
                     placeholder="Tell the community about yourself..."
                   />
                 </div>
-                <div className="space-y-1.5">
-                  <label className="text-[10px] font-black uppercase tracking-widest text-muted-foreground">Skills (Comma separated)</label>
+                <div>
+                  <label className="block text-xs font-bold uppercase tracking-wider text-[#8E8E93] mb-1">Skills (Comma separated)</label>
                   <Input 
                     disabled={!isEditing}
-                    className="h-12 border-2 border-black font-bold disabled:bg-muted/20"
+                    className="h-11 rounded-xl bg-white/90 border border-[#1E1B2E]/20 text-[#1E1B2E] font-medium text-sm focus-visible:ring-2 focus-visible:ring-[#C9A96E] disabled:opacity-80"
                     value={formData.skills}
                     onChange={e => setFormData({...formData, skills: e.target.value})}
                     placeholder="Python, React, Machine Learning"
@@ -468,22 +395,22 @@ export default function ProfileClient({ user, roleData }: { user: any, roleData:
 
               {/* Role Specific Fields in Edit Mode */}
               {isEditing && (
-                <div className="space-y-4 pt-4 border-t-2 border-black border-dashed">
+                <div className="space-y-4 pt-4 border-t border-[#1E1B2E]/10">
                   {user.role === "student" && (
                     <>
-                      <div className="space-y-1.5">
-                        <label className="text-[10px] font-black uppercase tracking-widest text-primary">6-Month Learning Goal</label>
+                      <div>
+                        <label className="block text-xs font-bold uppercase tracking-wider text-[#C9A96E] mb-1">6-Month Learning Goal</label>
                         <Input 
-                          className="h-12 border-2 border-black font-bold"
+                          className="h-11 rounded-xl bg-white/90 border border-[#1E1B2E]/20 font-medium text-sm"
                           value={formData.learningGoal}
                           onChange={e => setFormData({...formData, learningGoal: e.target.value})}
                           placeholder="Become AI Engineer"
                         />
                       </div>
-                      <div className="space-y-1.5">
-                        <label className="text-[10px] font-black uppercase tracking-widest text-primary">Current Pursuing Degree</label>
+                      <div>
+                        <label className="block text-xs font-bold uppercase tracking-wider text-[#C9A96E] mb-1">Current Degree</label>
                         <select 
-                          className="w-full h-12 border-2 border-black rounded-xl px-3 font-bold bg-white"
+                          className="w-full h-11 border border-[#1E1B2E]/20 rounded-xl px-3 font-medium text-sm bg-white"
                           value={formData.degree}
                           onChange={e => setFormData({...formData, degree: e.target.value})}
                         >
@@ -505,15 +432,14 @@ export default function ProfileClient({ user, roleData }: { user: any, roleData:
                           <option>Other</option>
                         </select>
                       </div>
-                      <div className="space-y-1.5">
-                        <label className="text-[10px] font-black uppercase tracking-widest text-primary">Specialization / Branch</label>
+                      <div>
+                        <label className="block text-xs font-bold uppercase tracking-wider text-[#C9A96E] mb-1">Specialization / Branch</label>
                         <select 
-                          className="w-full h-12 border-2 border-black rounded-xl px-3 font-bold bg-white"
+                          className="w-full h-11 border border-[#1E1B2E]/20 rounded-xl px-3 font-medium text-sm bg-white"
                           value={formData.specialization}
                           onChange={e => setFormData({...formData, specialization: e.target.value})}
                         >
                           <option value="">Select Specialization</option>
-                          {/* Engineering */}
                           {["B.Tech", "M.Tech", "Diploma"].includes(formData.degree) && (
                             <>
                               <option>Computer Science (CSE)</option>
@@ -525,7 +451,6 @@ export default function ProfileClient({ user, roleData }: { user: any, roleData:
                               <option>Information Technology (IT)</option>
                             </>
                           )}
-                          {/* Science */}
                           {["B.Sc", "M.Sc", "PhD"].includes(formData.degree) && (
                             <>
                               <option>Physics</option>
@@ -536,7 +461,6 @@ export default function ProfileClient({ user, roleData }: { user: any, roleData:
                               <option>Biotechnology</option>
                             </>
                           )}
-                          {/* Commerce/Business */}
                           {["B.Com", "MBA", "M.A", "B.A"].includes(formData.degree) && (
                             <>
                               <option>Finance</option>
@@ -547,7 +471,6 @@ export default function ProfileClient({ user, roleData }: { user: any, roleData:
                               <option>Accounting</option>
                             </>
                           )}
-                          {/* Computer Apps */}
                           {["BCA", "MCA"].includes(formData.degree) && (
                             <>
                               <option>Software Development</option>
@@ -565,28 +488,28 @@ export default function ProfileClient({ user, roleData }: { user: any, roleData:
 
                   {user.role === "teacher" && (
                     <>
-                      <div className="space-y-1.5">
-                        <label className="text-[10px] font-black uppercase tracking-widest text-primary">Primary Expertise</label>
+                      <div>
+                        <label className="block text-xs font-bold uppercase tracking-wider text-[#C9A96E] mb-1">Primary Expertise</label>
                         <Input 
-                          className="h-12 border-2 border-black font-bold"
+                          className="h-11 rounded-xl bg-white/90 border border-[#1E1B2E]/20 font-medium text-sm"
                           value={formData.expertise}
                           onChange={e => setFormData({...formData, expertise: e.target.value})}
                           placeholder="Web Dev, AI, Data Science"
                         />
                       </div>
-                      <div className="space-y-1.5">
-                        <label className="text-[10px] font-black uppercase tracking-widest text-primary">Years of Experience</label>
+                      <div>
+                        <label className="block text-xs font-bold uppercase tracking-wider text-[#C9A96E] mb-1">Years of Experience</label>
                         <Input 
                           type="number"
-                          className="h-12 border-2 border-black font-bold"
+                          className="h-11 rounded-xl bg-white/90 border border-[#1E1B2E]/20 font-medium text-sm"
                           value={formData.experienceYears}
                           onChange={e => setFormData({...formData, experienceYears: parseInt(e.target.value) || 0})}
                         />
                       </div>
-                      <div className="space-y-1.5">
-                        <label className="text-[10px] font-black uppercase tracking-widest text-primary">Top Qualification</label>
+                      <div>
+                        <label className="block text-xs font-bold uppercase tracking-wider text-[#C9A96E] mb-1">Top Qualification</label>
                         <Input 
-                          className="h-12 border-2 border-black font-bold"
+                          className="h-11 rounded-xl bg-white/90 border border-[#1E1B2E]/20 font-medium text-sm"
                           value={formData.qualification}
                           onChange={e => setFormData({...formData, qualification: e.target.value})}
                           placeholder="PhD in CS, M.Tech, etc."
@@ -596,10 +519,10 @@ export default function ProfileClient({ user, roleData }: { user: any, roleData:
                   )}
 
                   {user.role === "parent" && (
-                    <div className="space-y-1.5">
-                      <label className="text-[10px] font-black uppercase tracking-widest text-primary">Parenting Notes</label>
+                    <div>
+                      <label className="block text-xs font-bold uppercase tracking-wider text-[#C9A96E] mb-1">Parenting Notes</label>
                       <textarea 
-                        className="w-full p-3 border-2 border-black rounded-xl font-bold text-sm min-h-[100px] resize-none"
+                        className="w-full p-3 border border-[#1E1B2E]/20 rounded-xl font-medium text-sm min-h-[90px] resize-none"
                         value={formData.parentNotes}
                         onChange={e => setFormData({...formData, parentNotes: e.target.value})}
                         placeholder="Notes on child progress..."
@@ -608,25 +531,25 @@ export default function ProfileClient({ user, roleData }: { user: any, roleData:
                   )}
 
                   {isEmailChanged && (
-                    <div className="p-5 bg-red-50 border-4 border-black border-dashed rounded-2xl space-y-4">
-                      <p className="text-[10px] font-black uppercase text-red-600 flex items-center gap-1.5">
+                    <div className="p-4 bg-[#EF4444]/10 border border-[#EF4444]/30 rounded-xl space-y-3">
+                      <p className="text-xs font-bold uppercase text-[#EF4444] flex items-center gap-1.5">
                         <ShieldCheck size={14} /> Security Required
                       </p>
                       <Input 
                         type="password" required
-                        className="h-11 border-2 border-black font-bold bg-white"
+                        className="h-10 rounded-lg bg-white border border-[#1E1B2E]/20 text-sm font-medium"
                         placeholder="Current Password"
                         value={formData.password}
                         onChange={e => setFormData({...formData, password: e.target.value})}
                       />
                       {!otpSent ? (
-                        <Button type="button" onClick={handleSendOtp} disabled={loading} className="w-full bg-primary text-white font-black border-2 border-black">
+                        <Button type="button" onClick={handleSendOtp} disabled={loading} className="w-full bg-[#1E1B2E] text-white font-bold h-10 rounded-lg">
                           Verify New Gmail
                         </Button>
                       ) : (
                         <Input 
                           required maxLength={6}
-                          className="h-11 border-2 border-black font-bold bg-white text-center tracking-[0.5em]"
+                          className="h-10 rounded-lg bg-white border border-[#1E1B2E]/20 font-bold text-center tracking-[0.4em]"
                           placeholder="OTP"
                           value={formData.otpCode}
                           onChange={e => setFormData({...formData, otpCode: e.target.value})}
@@ -635,26 +558,28 @@ export default function ProfileClient({ user, roleData }: { user: any, roleData:
                     </div>
                   )}
 
-                  <Button 
+                  <motion.button 
                     type="submit" 
                     disabled={loading || (isEmailChanged && !otpSent)}
-                    className="w-full h-14 text-lg font-black neo-brutalism bg-[#34D399] text-black"
+                    whileHover={{ scale: 1.02 }}
+                    whileTap={{ scale: 0.98 }}
+                    className="w-full h-12 rounded-xl bg-[#22C55E] hover:bg-[#16A34A] text-white font-bold text-sm flex items-center justify-center gap-2 shadow-md transition-all cursor-pointer disabled:opacity-50"
                   >
-                    {loading ? <Loader2 className="animate-spin" /> : <Save className="mr-2" />}
-                    Save Everything
-                  </Button>
+                    {loading ? <Loader2 className="animate-spin w-4 h-4" /> : <Save className="w-4 h-4" />}
+                    <span>Save Changes</span>
+                  </motion.button>
                 </div>
               )}
 
               {!isEditing && (
                 <div className="space-y-4">
-                  <div className="pt-4 border-t-2 border-black border-dashed">
-                    <h4 className="text-[10px] font-black uppercase tracking-widest text-muted-foreground mb-4">Security Settings</h4>
+                  <div className="pt-4 border-t border-[#1E1B2E]/10">
+                    <h4 className="text-xs font-bold uppercase tracking-wider text-[#8E8E93] mb-3">Security Settings</h4>
                     <PasswordChangeSection />
                   </div>
 
-                  <div className="pt-4 border-t-2 border-black border-dashed">
-                    <h4 className="text-[10px] font-black uppercase tracking-widest text-muted-foreground mb-4">Privacy</h4>
+                  <div className="pt-4 border-t border-[#1E1B2E]/10">
+                    <h4 className="text-xs font-bold uppercase tracking-wider text-[#8E8E93] mb-3">Privacy</h4>
                     {["student", "parent"].includes(user.role) ? (
                       <PrivacyToggle isPublic={formData.isProfilePublic} onToggle={async (val: boolean) => {
                         setFormData({...formData, isProfilePublic: val});
@@ -668,30 +593,27 @@ export default function ProfileClient({ user, roleData }: { user: any, roleData:
                         } catch (err) { console.error(err); }
                       }} />
                     ) : (
-                      <div className="p-4 border-2 border-black rounded-2xl bg-orange-50 space-y-2">
+                      <div className="p-4 border border-[#F97316]/30 rounded-xl bg-[#F97316]/10 space-y-1.5">
                         <div className="flex items-center gap-2">
-                          <Lock size={16} className="text-orange-600" />
-                          <span className="text-xs font-black uppercase text-orange-700">Always Private</span>
+                          <Lock size={16} className="text-[#F97316]" />
+                          <span className="text-xs font-bold uppercase text-[#F97316]">Always Private</span>
                         </div>
-                        <p className="text-[8px] font-bold text-orange-600/70 leading-relaxed">
+                        <p className="text-xs font-medium text-[#1E1B2E]/70 leading-relaxed">
                           As a {user.role}, your profile is permanently private. Users must send a chat request before messaging you.
                         </p>
                       </div>
                     )}
                   </div>
-                  
-
                 </div>
               )}
             </form>
-          </div>
+          </motion.div>
         </div>
       </div>
-    </div>
+    </motion.div>
   );
 }
 
-// Keep your PasswordChangeSection from previous version
 function PasswordChangeSection() {
   const [show, setShow] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -713,39 +635,41 @@ function PasswordChangeSection() {
       });
       const data = await res.json();
       if (res.ok) {
-        setStatus({ type: "success", message: "Success!" });
+        setStatus({ type: "success", message: "Password updated successfully!" });
         setPasswords({ oldPassword: "", newPassword: "", confirmPassword: "" });
         setTimeout(() => setShow(false), 2000);
       } else { setStatus({ type: "error", message: data.message }); }
-    } catch (err) { setStatus({ type: "error", message: "Failed" }); }
+    } catch (err) { setStatus({ type: "error", message: "Failed to change password" }); }
     finally { setLoading(false); }
   };
 
   if (!show) {
     return (
-      <Button 
-        onClick={() => setShow(true)} variant="outline" 
-        className="w-full h-11 border-2 border-black font-black uppercase text-xs shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] hover:shadow-none transition-all"
+      <button 
+        type="button"
+        onClick={() => setShow(true)}
+        className="w-full h-11 rounded-xl border border-[#1E1B2E]/20 bg-white/80 hover:bg-white text-[#1E1B2E] font-bold text-xs flex items-center justify-center gap-2 shadow-2xs transition-all cursor-pointer focus-visible:ring-2 focus-visible:ring-[#C9A96E]"
       >
-        <Lock size={14} className="mr-2" /> Change Password
-      </Button>
+        <Lock size={14} />
+        <span>Change Password</span>
+      </button>
     );
   }
 
   return (
-    <div className="p-5 bg-muted/20 border-2 border-black rounded-2xl space-y-4">
+    <div className="p-4 bg-white/80 border border-[#1E1B2E]/15 rounded-xl space-y-3">
       <div className="flex items-center justify-between">
-        <h4 className="text-[10px] font-black uppercase tracking-widest text-primary">Security Update</h4>
-        <button onClick={() => setShow(false)}><X size={16} /></button>
+        <h4 className="text-xs font-bold uppercase tracking-wider text-[#1E1B2E]">Update Password</h4>
+        <button type="button" onClick={() => setShow(false)} className="text-[#8E8E93] hover:text-[#1E1B2E]"><X size={16} /></button>
       </div>
-      <form onSubmit={handlePasswordChange} className="space-y-3">
-        <Input type="password" required className="h-9 border-2 border-black font-bold" placeholder="Old Password" value={passwords.oldPassword} onChange={e => setPasswords({...passwords, oldPassword: e.target.value})} />
-        <Input type="password" required className="h-9 border-2 border-black font-bold" placeholder="New Password" value={passwords.newPassword} onChange={e => setPasswords({...passwords, newPassword: e.target.value})} />
-        <Input type="password" required className="h-9 border-2 border-black font-bold" placeholder="Confirm" value={passwords.confirmPassword} onChange={e => setPasswords({...passwords, confirmPassword: e.target.value})} />
-        {status && <p className={`text-[10px] font-black uppercase ${status.type === "success" ? "text-green-600" : "text-red-600"}`}>{status.message}</p>}
-        <Button type="submit" disabled={loading} className="w-full bg-black text-white font-black border-2 border-black h-9 uppercase text-xs">
-          {loading ? "..." : "Update"}
-        </Button>
+      <form onSubmit={handlePasswordChange} className="space-y-2.5">
+        <Input type="password" required className="h-10 rounded-lg bg-white border border-[#1E1B2E]/20 text-sm font-medium" placeholder="Old Password" value={passwords.oldPassword} onChange={e => setPasswords({...passwords, oldPassword: e.target.value})} />
+        <Input type="password" required className="h-10 rounded-lg bg-white border border-[#1E1B2E]/20 text-sm font-medium" placeholder="New Password" value={passwords.newPassword} onChange={e => setPasswords({...passwords, newPassword: e.target.value})} />
+        <Input type="password" required className="h-10 rounded-lg bg-white border border-[#1E1B2E]/20 text-sm font-medium" placeholder="Confirm New Password" value={passwords.confirmPassword} onChange={e => setPasswords({...passwords, confirmPassword: e.target.value})} />
+        {status && <p className={`text-xs font-bold ${status.type === "success" ? "text-[#22C55E]" : "text-[#EF4444]"}`}>{status.message}</p>}
+        <button type="submit" disabled={loading} className="w-full h-10 rounded-lg bg-[#1E1B2E] text-white font-bold text-xs cursor-pointer disabled:opacity-50">
+          {loading ? "Updating…" : "Update Password"}
+        </button>
       </form>
     </div>
   );
@@ -753,20 +677,21 @@ function PasswordChangeSection() {
 
 function PrivacyToggle({ isPublic, onToggle }: { isPublic: boolean, onToggle: (val: boolean) => void }) {
   return (
-    <div className="p-4 border-2 border-black rounded-2xl bg-muted/10 space-y-3">
+    <div className="p-4 border border-[#1E1B2E]/15 rounded-xl bg-white/80 space-y-2.5">
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-2">
-          {isPublic ? <Globe size={16} className="text-green-600" /> : <EyeOff size={16} className="text-orange-600" />}
-          <span className="text-xs font-black uppercase">{isPublic ? "Public Profile" : "Private Profile"}</span>
+          {isPublic ? <Globe size={16} className="text-[#22C55E]" /> : <EyeOff size={16} className="text-[#F97316]" />}
+          <span className="text-xs font-bold uppercase text-[#1E1B2E]">{isPublic ? "Public Profile" : "Private Profile"}</span>
         </div>
         <button
+          type="button"
           onClick={() => onToggle(!isPublic)}
-          className={`relative w-12 h-7 rounded-full border-2 border-black transition-colors ${isPublic ? "bg-green-400" : "bg-orange-400"}`}
+          className={`relative w-12 h-6 rounded-full transition-colors cursor-pointer focus-visible:ring-2 focus-visible:ring-[#C9A96E] ${isPublic ? "bg-[#22C55E]" : "bg-[#8E8E93]"}`}
         >
-          <div className={`absolute top-0.5 w-5 h-5 bg-white border-2 border-black rounded-full transition-transform ${isPublic ? "left-5" : "left-0.5"}`} />
+          <div className={`absolute top-0.5 w-5 h-5 bg-white rounded-full shadow-sm transition-transform ${isPublic ? "left-6.5" : "left-0.5"}`} />
         </button>
       </div>
-      <p className="text-[8px] font-bold text-muted-foreground leading-relaxed">
+      <p className="text-xs font-medium text-[#8E8E93] leading-relaxed">
         {isPublic 
           ? "Anyone can send you direct messages without approval." 
           : "Users must send a chat request that you approve before they can message you."}

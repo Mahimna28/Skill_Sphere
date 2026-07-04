@@ -61,6 +61,8 @@ export default function CommunityHubClient({ enrollments, currentUser }: Props) 
   const [showLeftPanel, setShowLeftPanel] = useState(false);
   const [showRightPanel, setShowRightPanel] = useState(false);
   const [panelSearchQuery, setPanelSearchQuery] = useState("");
+  // Deep-linking: track which room was selected from the slide-over panel
+  const [selectedRoomId, setSelectedRoomId] = useState<string | null>(roomParam || null);
 
   // Sync tab with URL search params when activeTab changes
   useEffect(() => {
@@ -78,17 +80,20 @@ export default function CommunityHubClient({ enrollments, currentUser }: Props) 
     router.replace(`${pathname}?${params.toString()}`, { scroll: false });
   };
 
-  // Dev telemetry removed after QA sign-off.
-  // If you need lightweight dev-only telemetry in the future, guard it with:
-  // if (process.env.NODE_ENV !== "production") { console.log(...) }
+  // Temporary diagnostic log for feature flag and mount verification (QA review)
+  useEffect(() => {
+    console.log("CommunityHub mounted", { flag: isCommunityHubEnabled(), tab: activeTab });
+  }, [activeTab]);
 
   // Socket lifecycle subscription for community hub room
   useEffect(() => {
     if (!isCommunityHubEnabled()) return;
+    console.log("[CommunityHub Socket] Joining community hub room...", { userId: currentUser?.id });
     const socket: Socket = io();
     socket.emit("join_community_hub", { userId: currentUser?.id });
 
     return () => {
+      console.log("[CommunityHub Socket] Leaving community hub room...", { userId: currentUser?.id });
       socket.emit("leave_community_hub", { userId: currentUser?.id });
       socket.disconnect();
     };
@@ -113,7 +118,6 @@ export default function CommunityHubClient({ enrollments, currentUser }: Props) 
       }
       if (e.key === "/") {
         e.preventDefault();
-        // TODO: When StudentChatClient exposes a forwarded ref (composerRef), replace this DOM query with composerRef.current?.focus()
         const wrapper = document.querySelector(".hub-content-wrapper");
         if (wrapper) {
           const input = wrapper.querySelector(
@@ -355,8 +359,9 @@ export default function CommunityHubClient({ enrollments, currentUser }: Props) 
                       <div
                         key={enr.course.id}
                         onClick={() => {
+                          setSelectedRoomId(enr.course.id);
+                          handleTabChange("chat");
                           setShowLeftPanel(false);
-                          // Option to set active course room or deep link
                         }}
                         className="p-3 rounded-xl bg-white/80 border border-black/5 hover:border-[#C9A96E]/50 shadow-2xs hover:shadow-sm cursor-pointer transition-all space-y-1"
                       >
@@ -492,7 +497,7 @@ export default function CommunityHubClient({ enrollments, currentUser }: Props) 
                     </button>
                   </div>
                 ) : (
-                  <HubCourseChat enrollments={enrollments} currentUser={currentUser} />
+                  <HubCourseChat enrollments={enrollments} currentUser={currentUser} initialRoomId={selectedRoomId} />
                 )}
               </motion.div>
             )}

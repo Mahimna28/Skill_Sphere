@@ -24,9 +24,10 @@ import StudentChatClient from "../../chat/StudentChatClient";
 interface HubCourseChatProps {
   enrollments: any[];
   currentUser: { id: string; name: string };
+  initialRoomId?: string | null;
 }
 
-export default function HubCourseChat({ enrollments, currentUser }: HubCourseChatProps) {
+export default function HubCourseChat({ enrollments, currentUser, initialRoomId }: HubCourseChatProps) {
   const prefersReduced = useReducedMotion() ?? false;
   const [filter, setFilter] = useState<"all" | "live" | "favorites">("all");
   const [favorites, setFavorites] = useState<string[]>([]);
@@ -170,7 +171,7 @@ export default function HubCourseChat({ enrollments, currentUser }: HubCourseCha
 
       {/* Wrapped Child Component Layer */}
       <div className="flex-1 min-h-[560px] wrapped-child-page hub-legacy-chat relative overflow-hidden rounded-2xl">
-        <StudentChatClient enrollments={filteredRooms.length > 0 ? filteredRooms : allRooms} currentUser={currentUser} />
+        <StudentChatClient enrollments={filteredRooms.length > 0 ? filteredRooms : allRooms} currentUser={currentUser} initialCourseId={initialRoomId} />
       </div>
 
       {/* Create Room Modal */}
