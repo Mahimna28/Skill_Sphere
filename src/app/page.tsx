@@ -8,88 +8,20 @@ import {
 } from "lucide-react";
 import { Header } from "@/components/layout/Header";
 import { Footer } from "@/components/layout/Footer";
+import { CommunityFeedbackSection } from "@/components/home/CommunityFeedback";
+import Link from "next/link";
+import { useState, useEffect } from "react";
 
-function ProblemSection() {
-  return (
-    <section className="relative py-32 bg-[#1E1B2E] overflow-hidden">
-      {/* Animated background grid */}
-      <div className="absolute inset-0 opacity-5">
-        <div className="absolute inset-0" style={{
-          backgroundImage: 'linear-gradient(rgba(201,169,110,0.3) 1px, transparent 1px), linear-gradient(90deg, rgba(201,169,110,0.3) 1px, transparent 1px)',
-          backgroundSize: '60px 60px'
-        }} />
-      </div>
-
-      <div className="max-w-7xl mx-auto px-6">
-        <motion.div
-          initial={{ opacity: 0, y: 40 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.8 }}
-          className="text-center max-w-3xl mx-auto"
-        >
-          <motion.div
-            initial={{ opacity: 0, scale: 0.8 }}
-            whileInView={{ opacity: 1, scale: 1 }}
-            viewport={{ once: true }}
-            transition={{ delay: 0.2 }}
-            className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-red-500/10 border border-red-500/20 text-red-400 text-sm font-medium mb-8"
-          >
-            <AlertCircle className="w-4 h-4" />
-            The Problem
-          </motion.div>
-
-          <h2 className="font-heading text-5xl md:text-6xl text-white leading-tight mb-8">
-            73% of online learners<br />
-            <span className="text-[#C9A96E]">quit within 30 days</span>
-          </h2>
-
-          <p className="text-white/60 text-xl leading-relaxed mb-12">
-            Not because they're not smart. Because they're alone, overwhelmed, and have no one to ask when stuck. YouTube tutorials don't answer back. Textbooks don't adapt to you.
-          </p>
-
-          {/* Pain Point Cards */}
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            {[
-              { 
-                icon: Frown, 
-                title: "No Guidance", 
-                desc: "Staring at a screen with no idea what to do next" 
-              },
-              { 
-                icon: MessageSquareOff, 
-                title: "No Support", 
-                desc: "Questions go unanswered for days, if ever" 
-              },
-              { 
-                icon: TrendingDown, 
-                title: "No Progress", 
-                desc: "Start strong, lose motivation, give up" 
-              },
-            ].map((pain, i) => (
-              <motion.div
-                key={i}
-                initial={{ opacity: 0, y: 30 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ delay: 0.3 + i * 0.15 }}
-                className="bg-white/5 backdrop-blur-sm border border-white/10 rounded-2xl p-6 text-left"
-              >
-                <pain.icon className="w-8 h-8 text-red-400 mb-4" />
-                <h3 className="text-white font-medium text-lg mb-2">{pain.title}</h3>
-                <p className="text-white/50 text-sm">{pain.desc}</p>
-              </motion.div>
-            ))}
-          </div>
-        </motion.div>
-      </div>
-    </section>
-  );
-}
 
 function SolutionSection() {
   return (
-    <section className="py-32 bg-[#F5F1EB] relative overflow-hidden">
+    <motion.section 
+      initial={{ opacity: 0, y: 24 }}
+      whileInView={{ opacity: 1, y: 0 }}
+      viewport={{ once: true, margin: "-100px" }}
+      transition={{ duration: 0.5, ease: [0.25, 0.1, 0.25, 1.0] }}
+      className="py-32 bg-[#F5F1EB] relative overflow-hidden"
+    >
       {/* Decorative element */}
       <motion.div
         animate={{ rotate: 360 }}
@@ -171,13 +103,19 @@ function SolutionSection() {
           </motion.div>
         </motion.div>
       </div>
-    </section>
+    </motion.section>
   );
 }
 
 function FeaturesBentoSection() {
   return (
-    <section className="py-32 bg-white">
+    <motion.section 
+      initial={{ opacity: 0, y: 24 }}
+      whileInView={{ opacity: 1, y: 0 }}
+      viewport={{ once: true, margin: "-100px" }}
+      transition={{ duration: 0.5, ease: [0.25, 0.1, 0.25, 1.0] }}
+      className="py-32 bg-white"
+    >
       <div className="max-w-7xl mx-auto px-6">
         <motion.div
           initial={{ opacity: 0, y: 30 }}
@@ -210,9 +148,9 @@ function FeaturesBentoSection() {
               <p className="text-white/60 mb-6 max-w-sm">
                 Ask anything, get instant explanations. Available 24/7 for every course and topic.
               </p>
-              <div className="flex items-center gap-2 text-[#C9A96E] text-sm font-medium group-hover:gap-3 transition-all">
+              <Link href="/features" className="flex items-center gap-2 text-[#C9A96E] text-sm font-medium group-hover:gap-3 transition-all">
                 Learn more <ArrowRight className="w-4 h-4" />
-              </div>
+              </Link>
             </div>
             <img 
               src="/images/ai-tutor-preview.jpg" 
@@ -274,13 +212,19 @@ function FeaturesBentoSection() {
           </motion.div>
         </div>
       </div>
-    </section>
+    </motion.section>
   );
 }
 
 function HowItWorksSection() {
   return (
-    <section className="py-32 bg-[#F5F1EB]">
+    <motion.section 
+      initial={{ opacity: 0, y: 24 }}
+      whileInView={{ opacity: 1, y: 0 }}
+      viewport={{ once: true, margin: "-100px" }}
+      transition={{ duration: 0.5, ease: [0.25, 0.1, 0.25, 1.0] }}
+      className="py-32 bg-[#F5F1EB]"
+    >
       <div className="max-w-7xl mx-auto px-6">
         <motion.div
           initial={{ opacity: 0, y: 30 }}
@@ -347,13 +291,19 @@ function HowItWorksSection() {
           ))}
         </div>
       </div>
-    </section>
+    </motion.section>
   );
 }
 
 function BenefitsSection() {
   return (
-    <section className="py-32 bg-[#1E1B2E]">
+    <motion.section 
+      initial={{ opacity: 0, y: 24 }}
+      whileInView={{ opacity: 1, y: 0 }}
+      viewport={{ once: true, margin: "-100px" }}
+      transition={{ duration: 0.5, ease: [0.25, 0.1, 0.25, 1.0] }}
+      className="py-32 bg-[#1E1B2E]"
+    >
       <div className="max-w-7xl mx-auto px-6">
         <motion.div
           initial={{ opacity: 0, y: 30 }}
@@ -436,95 +386,41 @@ function BenefitsSection() {
           </motion.div>
         </div>
       </div>
-    </section>
+    </motion.section>
   );
 }
 
-function SuccessStoriesSection() {
-  return (
-    <section className="py-32 bg-[#F5F1EB]">
-      <div className="max-w-7xl mx-auto px-6">
-        <motion.div
-          initial={{ opacity: 0, y: 30 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          className="text-center mb-16"
-        >
-          <span className="text-[#C9A96E] text-sm font-medium uppercase tracking-wider">Success Stories</span>
-          <h2 className="font-heading text-4xl text-[#1E1B2E] mt-3">From zero to hired</h2>
-        </motion.div>
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-          {[
-            {
-              name: "Jal Patel",
-              role: "Frontend Developer @ Google",
-              before: "Complete beginner, no coding experience",
-              after: "Built 5 projects, hired in 6 months",
-              image: "/testimonials/jal.jpg",
-              stat: "6 months"
-            },
-            {
-              name: "Sarah Chen",
-              role: "Data Scientist @ Netflix",
-              before: "Struggled with self-paced courses",
-              after: "Mastered Python & ML with AI tutor help",
-              image: "/testimonials/sarah.jpg",
-              stat: "4 months"
-            },
-            {
-              name: "Mike Ross",
-              role: "Full Stack Developer",
-              before: "Gave up on 3 other platforms",
-              after: "Completed 12 courses, 94% avg score",
-              image: "/testimonials/mike.jpg",
-              stat: "8 months"
-            }
-          ].map((story, i) => (
-            <motion.div
-              key={i}
-              initial={{ opacity: 0, y: 40 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ delay: i * 0.2 }}
-              whileHover={{ y: -6 }}
-              className="bg-white rounded-2xl overflow-hidden shadow-[0_4px_20px_rgba(0,0,0,0.06)] border border-[rgba(30,27,46,0.04)]"
-            >
-              <div className="h-48 bg-gradient-to-br from-[#1E1B2E] to-[#2d2a3d] relative p-6 flex flex-col justify-end">
-                <div className="absolute top-4 right-4 px-3 py-1 rounded-full bg-[#C9A96E] text-[#1E1B2E] text-xs font-bold shadow-sm">
-                  {story.stat}
-                </div>
-                <div className="w-16 h-16 rounded-full border-4 border-white bg-white/20 flex items-center justify-center overflow-hidden">
-                  <img src={story.image} alt={story.name} className="w-full h-full object-cover" onError={(e) => (e.currentTarget.style.display = 'none')} />
-                </div>
-              </div>
-              <div className="p-6">
-                <h3 className="font-heading text-xl text-[#1E1B2E] mb-1">{story.name}</h3>
-                <p className="text-[#C9A96E] text-sm mb-4 font-medium">{story.role}</p>
-                
-                <div className="space-y-3">
-                  <div className="flex items-start gap-2">
-                    <span className="text-[10px] text-red-400 font-bold uppercase tracking-wider bg-red-50 px-2 py-0.5 rounded mt-0.5">Before</span>
-                    <p className="text-sm text-[#8E8E93]">{story.before}</p>
-                  </div>
-                  <div className="w-full h-px bg-[rgba(30,27,46,0.06)]" />
-                  <div className="flex items-start gap-2">
-                    <span className="text-[10px] text-green-600 font-bold uppercase tracking-wider bg-green-50 px-2 py-0.5 rounded mt-0.5">After</span>
-                    <p className="text-sm text-[#1E1B2E] font-medium">{story.after}</p>
-                  </div>
-                </div>
-              </div>
-            </motion.div>
-          ))}
-        </div>
-      </div>
-    </section>
-  );
-}
 
-function CoursesPreviewSection() {
+function PopularLearningPathsSection() {
+  const [courses, setCourses] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchCourses = async () => {
+      try {
+        const res = await fetch("/api/courses/popular?limit=4");
+        if (res.ok) {
+          const data = await res.json();
+          setCourses(data.courses || []);
+        }
+      } catch (err) {
+        console.error("Failed to fetch popular courses", err);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchCourses();
+  }, []);
+
   return (
-    <section className="py-32 bg-white">
+    <motion.section 
+      initial={{ opacity: 0, y: 24 }}
+      whileInView={{ opacity: 1, y: 0 }}
+      viewport={{ once: true, margin: "-100px" }}
+      transition={{ duration: 0.5, ease: [0.25, 0.1, 0.25, 1.0] }}
+      className="py-32 bg-white"
+    >
       <div className="max-w-7xl mx-auto px-6">
         <motion.div
           initial={{ opacity: 0, y: 30 }}
@@ -536,242 +432,88 @@ function CoursesPreviewSection() {
             <span className="text-[#C9A96E] text-sm font-medium uppercase tracking-wider">Courses</span>
             <h2 className="font-heading text-4xl text-[#1E1B2E] mt-3">Popular learning paths</h2>
           </div>
-          <motion.button
-            whileHover={{ scale: 1.02 }}
-            whileTap={{ scale: 0.98 }}
-            className="px-6 py-3 rounded-xl border border-[rgba(30,27,46,0.1)] text-[#1E1B2E] font-medium hover:border-[#C9A96E] hover:bg-[rgba(201,169,110,0.06)] transition-all"
-          >
-            View All Courses
-          </motion.button>
+          <Link href="/courses">
+            <motion.button
+              whileHover={{ scale: 1.02 }}
+              whileTap={{ scale: 0.98 }}
+              className="px-6 py-3 rounded-xl border border-[rgba(30,27,46,0.1)] text-[#1E1B2E] font-medium hover:border-[#C9A96E] hover:bg-[rgba(201,169,110,0.06)] transition-all"
+            >
+              View All Courses
+            </motion.button>
+          </Link>
         </motion.div>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-          {[
-            { title: "Python Programming", students: "12.5K", lessons: 24, image: "/courses/python.jpg", color: "from-blue-500/20 to-blue-600/20" },
-            { title: "AI & Machine Learning", students: "8.2K", lessons: 32, image: "/courses/ai.jpg", color: "from-purple-500/20 to-purple-600/20" },
-            { title: "Web Development", students: "15K", lessons: 28, image: "/courses/web.jpg", color: "from-green-500/20 to-green-600/20" },
-            { title: "Data Science", students: "6.8K", lessons: 20, image: "/courses/data.jpg", color: "from-orange-500/20 to-orange-600/20" },
-          ].map((course, i) => (
-            <motion.div
-              key={i}
-              initial={{ opacity: 0, y: 30 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ delay: i * 0.1 }}
-              whileHover={{ y: -8 }}
-              className="group cursor-pointer"
-            >
-              <div className="relative rounded-2xl overflow-hidden mb-4 aspect-[4/3] bg-[rgba(30,27,46,0.03)] border border-[rgba(30,27,46,0.04)]">
-                <img src={course.image} alt={course.title} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" onError={(e) => (e.currentTarget.style.display = 'none')} />
-                <div className={`absolute inset-0 bg-gradient-to-t ${course.color} opacity-0 group-hover:opacity-100 transition-opacity`} />
-                <div className="absolute bottom-3 left-3 px-2 py-1 rounded-lg bg-[rgba(30,27,46,0.7)] text-white text-xs backdrop-blur-sm">
-                  {course.lessons} lessons
-                </div>
+        {loading ? (
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+            {[1, 2, 3, 4].map(i => (
+              <div key={i} className="animate-pulse">
+                <div className="rounded-2xl bg-gray-200 aspect-[4/3] mb-4" />
+                <div className="h-4 bg-gray-200 rounded w-3/4 mb-2" />
+                <div className="h-3 bg-gray-200 rounded w-1/2" />
               </div>
-              <h3 className="font-medium text-[#1E1B2E] mb-1 group-hover:text-[#C9A96E] transition-colors">{course.title}</h3>
-              <p className="text-sm text-[#8E8E93]">{course.students} students enrolled</p>
-            </motion.div>
-          ))}
-        </div>
-      </div>
-    </section>
-  );
-}
-
-function TestimonialsSection() {
-  return (
-    <section className="py-32 bg-[#1E1B2E]">
-      <div className="max-w-7xl mx-auto px-6">
-        <motion.div
-          initial={{ opacity: 0, y: 30 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          className="text-center mb-16"
-        >
-          <span className="text-[#C9A96E] text-sm font-medium uppercase tracking-wider">Testimonials</span>
-          <h2 className="font-heading text-4xl text-white mt-3">Loved by learners worldwide</h2>
-        </motion.div>
-
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          {[
-            {
-              quote: "The AI tutor is a game-changer. I went from struggling with Python basics to building my first app in 3 months.",
-              author: "Alex Chen",
-              role: "Computer Science Student",
-              rating: 5
-            },
-            {
-              quote: "Finally, a platform that understands I'm a human, not a robot. The community kept me going when I wanted to quit.",
-              author: "Maria Garcia",
-              role: "Career Switcher",
-              rating: 5
-            },
-            {
-              quote: "I've tried Coursera, Udemy, YouTube — Skill Sphere is the only one where I actually finished the course.",
-              author: "James Wilson",
-              role: "Self-Taught Developer",
-              rating: 5
-            }
-          ].map((t, i) => (
-            <motion.div
-              key={i}
-              initial={{ opacity: 0, y: 30 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ delay: i * 0.15 }}
-              className="bg-white/5 border border-white/10 rounded-2xl p-8"
-            >
-              <div className="flex gap-1 mb-4">
-                {[...Array(t.rating)].map((_, j) => (
-                  <Star key={j} className="w-4 h-4 text-[#C9A96E] fill-[#C9A96E]" />
-                ))}
-              </div>
-              <p className="text-white/80 leading-relaxed mb-6">"{t.quote}"</p>
-              <div className="flex items-center gap-3">
-                <div className="w-10 h-10 rounded-full bg-[#C9A96E]/20 flex items-center justify-center">
-                  <span className="text-[#C9A96E] font-medium">{t.author[0]}</span>
-                </div>
-                <div>
-                  <p className="text-white font-medium text-sm">{t.author}</p>
-                  <p className="text-white/40 text-xs">{t.role}</p>
-                </div>
-              </div>
-            </motion.div>
-          ))}
-        </div>
-      </div>
-    </section>
-  );
-}
-
-function PricingSection() {
-  return (
-    <section className="py-32 bg-[#F5F1EB]">
-      <div className="max-w-5xl mx-auto px-6">
-        <motion.div
-          initial={{ opacity: 0, y: 30 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          className="text-center mb-16"
-        >
-          <span className="text-[#C9A96E] text-sm font-medium uppercase tracking-wider">Pricing</span>
-          <h2 className="font-heading text-4xl text-[#1E1B2E] mt-3 mb-4">Start free, upgrade when ready</h2>
-          <p className="text-[#8E8E93]">No credit card required to start.</p>
-        </motion.div>
-
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8 items-center">
-          {[
-            {
-              name: "Free",
-              price: "$0",
-              period: "forever",
-              description: "Perfect for trying out",
-              features: [
-                "Access to 5 free courses",
-                "AI Tutor (10 messages/day)",
-                "Community access",
-                "Basic progress tracking"
-              ],
-              cta: "Get Started",
-              highlighted: false
-            },
-            {
-              name: "Pro",
-              price: "$12",
-              period: "/month",
-              description: "For serious learners",
-              features: [
-                "Unlimited course access",
-                "Unlimited AI Tutor",
-                "Priority community support",
-                "Certificates & skill trees",
-                "Downloadable resources",
-                "Offline mobile access"
-              ],
-              cta: "Start Pro Trial",
-              highlighted: true
-            },
-            {
-              name: "Team",
-              price: "$39",
-              period: "/user/month",
-              description: "For institutions",
-              features: [
-                "Everything in Pro",
-                "Admin dashboard",
-                "Progress reports",
-                "Custom learning paths",
-                "SSO & API access",
-                "Dedicated support"
-              ],
-              cta: "Contact Sales",
-              highlighted: false
-            }
-          ].map((plan, i) => (
-            <motion.div
-              key={i}
-              initial={{ opacity: 0, y: 30 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ delay: i * 0.15 }}
-              whileHover={{ y: plan.highlighted ? -10 : -6 }}
-              className={`rounded-2xl p-8 ${
-                plan.highlighted
-                  ? "bg-[#1E1B2E] text-white shadow-[0_16px_40px_rgba(0,0,0,0.2)] md:scale-105 relative z-10"
-                  : "bg-white border border-[rgba(30,27,46,0.08)]"
-              }`}
-            >
-              {plan.highlighted && (
-                <div className="absolute top-0 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-[#C9A96E] text-[#1E1B2E] px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider">
-                  Most Popular
-                </div>
-              )}
-              <h3 className={`font-heading text-xl mb-2 ${plan.highlighted ? "text-white" : "text-[#1E1B2E]"}`}>
-                {plan.name}
-              </h3>
-              <div className="flex items-baseline gap-1 mb-2">
-                <span className={`font-heading text-4xl ${plan.highlighted ? "text-[#C9A96E]" : "text-[#1E1B2E]"}`}>
-                  {plan.price}
-                </span>
-                <span className={plan.highlighted ? "text-white/60" : "text-[#8E8E93]"}>{plan.period}</span>
-              </div>
-              <p className={`text-sm mb-6 ${plan.highlighted ? "text-white/60" : "text-[#8E8E93]"}`}>
-                {plan.description}
-              </p>
-
-              <motion.button
-                whileHover={{ scale: 1.03 }}
-                whileTap={{ scale: 0.97 }}
-                className={`w-full py-3 rounded-xl font-medium mb-8 transition-colors ${
-                  plan.highlighted
-                    ? "bg-[#C9A96E] text-[#1E1B2E] hover:bg-[#b59863]"
-                    : "bg-[#1E1B2E] text-white hover:bg-[#2d2a3d]"
-                }`}
+            ))}
+          </div>
+        ) : courses.length > 0 ? (
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+            {courses.map((course, i) => (
+              <motion.div
+                key={course.id}
+                initial={{ opacity: 0, y: 30 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ delay: i * 0.1 }}
+                whileHover={{ y: -8 }}
+                className="group cursor-pointer"
               >
-                {plan.cta}
-              </motion.button>
-
-              <div className="space-y-3">
-                {plan.features.map((feature, j) => (
-                  <div key={j} className="flex items-center gap-2">
-                    <Check className={`w-4 h-4 ${plan.highlighted ? "text-[#C9A96E]" : "text-green-500"}`} />
-                    <span className={`text-sm ${plan.highlighted ? "text-white/80" : "text-[#1E1B2E]"}`}>
-                      {feature}
-                    </span>
+                <Link href={`/courses/${course.id}`}>
+                  <div className="relative rounded-2xl overflow-hidden mb-4 aspect-[4/3] bg-[#F5F1EB] border border-[rgba(30,27,46,0.04)] flex flex-col items-center justify-center">
+                    {course.thumbnail ? (
+                      <img src={course.thumbnail} alt={course.title} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" />
+                    ) : (
+                      <div className="text-4xl text-[#C9A96E]/50 font-heading">
+                        {course.title.charAt(0).toUpperCase()}
+                      </div>
+                    )}
+                    <div className="absolute inset-0 bg-gradient-to-t from-[#1E1B2E]/60 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
+                    <div className="absolute top-3 left-3 px-2 py-1 rounded-lg bg-[rgba(255,255,255,0.9)] text-[#1E1B2E] text-xs font-medium shadow-sm">
+                      {course.subject}
+                    </div>
                   </div>
-                ))}
-              </div>
-            </motion.div>
-          ))}
-        </div>
+                  <h3 className="font-medium text-[#1E1B2E] mb-1 group-hover:text-[#C9A96E] transition-colors line-clamp-1">{course.title}</h3>
+                  <p className="text-sm text-[#8E8E93]">
+                    {course._count?.enrollments || 0} students enrolled
+                  </p>
+                </Link>
+              </motion.div>
+            ))}
+          </div>
+        ) : (
+          <div className="bg-[#F5F1EB] rounded-2xl p-12 text-center border border-[rgba(30,27,46,0.04)]">
+            <h3 className="font-heading text-2xl text-[#1E1B2E] mb-3">New courses coming soon</h3>
+            <p className="text-[#8E8E93] mb-6">Our instructors are working on exciting new content.</p>
+            <Link href="/courses" className="text-[#C9A96E] font-medium hover:underline flex items-center justify-center gap-2">
+              Explore all courses <ArrowRight className="w-4 h-4" />
+            </Link>
+          </div>
+        )}
       </div>
-    </section>
+    </motion.section>
   );
 }
+
+
+
+
 
 function FAQSection() {
   return (
-    <section className="py-32 bg-white">
+    <motion.section 
+      initial={{ opacity: 0, y: 24 }}
+      whileInView={{ opacity: 1, y: 0 }}
+      viewport={{ once: true, margin: "-100px" }}
+      transition={{ duration: 0.5, ease: [0.25, 0.1, 0.25, 1.0] }}
+      className="py-32 bg-white"
+    >
       <div className="max-w-3xl mx-auto px-6">
         <motion.div
           initial={{ opacity: 0, y: 30 }}
@@ -831,13 +573,19 @@ function FAQSection() {
           ))}
         </div>
       </div>
-    </section>
+    </motion.section>
   );
 }
 
 function FinalCTASection() {
   return (
-    <section className="py-32 bg-[#1E1B2E] relative overflow-hidden">
+    <motion.section 
+      initial={{ opacity: 0, y: 24 }}
+      whileInView={{ opacity: 1, y: 0 }}
+      viewport={{ once: true, margin: "-100px" }}
+      transition={{ duration: 0.5, ease: [0.25, 0.1, 0.25, 1.0] }}
+      className="py-32 bg-[#1E1B2E] relative overflow-hidden"
+    >
       {/* Background effects */}
       <div className="absolute inset-0">
         <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-[#C9A96E]/10 rounded-full blur-3xl pointer-events-none" />
@@ -867,148 +615,111 @@ function FinalCTASection() {
         </p>
 
         <div className="flex flex-wrap gap-4 justify-center">
-          <motion.button
-            whileHover={{ scale: 1.03 }}
-            whileTap={{ scale: 0.97 }}
-            className="px-10 py-4 rounded-xl bg-[#C9A96E] text-[#1E1B2E] font-medium text-lg"
-          >
-            Create Free Account
-          </motion.button>
-          <motion.button
-            whileHover={{ scale: 1.03 }}
-            whileTap={{ scale: 0.97 }}
-            className="px-10 py-4 rounded-xl border border-white/20 text-white font-medium text-lg hover:bg-white/10 transition-colors"
-          >
-            Explore Courses
-          </motion.button>
+          <Link href="/register">
+            <motion.button
+              whileHover={{ scale: 1.03 }}
+              whileTap={{ scale: 0.97 }}
+              className="px-10 py-4 rounded-xl bg-[#C9A96E] text-[#1E1B2E] font-medium text-lg"
+            >
+              Create Free Account
+            </motion.button>
+          </Link>
+          <Link href="/courses">
+            <motion.button
+              whileHover={{ scale: 1.03 }}
+              whileTap={{ scale: 0.97 }}
+              className="px-10 py-4 rounded-xl border border-white/20 text-white font-medium text-lg hover:bg-white/10 transition-colors"
+            >
+              Explore Courses
+            </motion.button>
+          </Link>
         </div>
 
         <p className="text-white/30 text-sm mt-6">No credit card required. Start learning in 30 seconds.</p>
       </motion.div>
-    </section>
+    </motion.section>
   );
 }
 
 function HeroSection() {
+  const appleEase: [number, number, number, number] = [0.25, 0.1, 0.25, 1.0];
   return (
-    <section className="relative min-h-[90vh] flex items-center pt-20 pb-16 overflow-hidden">
-      {/* Background Image & Overlay */}
-      <div className="absolute inset-0 z-0 bg-[#1E1B2E]">
-        <img 
-          src="/images/hero-bg.jpg" 
-          alt="Students learning" 
-          className="w-full h-full object-cover opacity-60" 
-          onError={(e) => {
-            e.currentTarget.style.display = 'none';
-          }}
+    <section className="relative h-screen min-h-[700px] flex items-center justify-center bg-[#1E1B2E] overflow-hidden">
+      {/* Ken Burns animated background */}
+      <motion.div
+        initial={{ scale: 1.0 }}
+        animate={{ scale: 1.05 }}
+        transition={{ duration: 20, ease: "linear", repeat: Infinity, repeatType: "reverse" }}
+        className="absolute inset-0 z-0 origin-center"
+      >
+        <img
+          src="/images/hero-workspace.jpg"
+          alt="Immersive workspace"
+          className="w-full h-full object-cover opacity-40"
+          onError={(e) => { e.currentTarget.src = "/images/hero-bg.jpg"; }}
         />
-        <div className="absolute inset-0 bg-[#1E1B2E]/60 backdrop-blur-[1px]" />
-        <div className="absolute inset-0 bg-gradient-to-t from-[#1E1B2E] via-transparent to-transparent" />
-      </div>
+      </motion.div>
 
-      <div className="max-w-7xl mx-auto px-6 relative z-10 w-full grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
-        {/* Text Content */}
+      {/* Centered content */}
+      <div className="relative z-10 w-full max-w-7xl mx-auto px-4 flex flex-col items-center text-center">
+        {/* Eyebrow label */}
         <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ duration: 0.8, ease: appleEase }}
+          className="mb-8"
+        >
+          <span className="font-sans text-[12px] uppercase tracking-[0.15em] text-[#C9A96E]">
+            AI-Powered Learning
+          </span>
+        </motion.div>
+
+        {/* Main heading */}
+        <motion.h1
           initial={{ opacity: 0, y: 30 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.8 }}
+          transition={{ duration: 0.8, delay: 0.4, ease: appleEase }}
+          className="font-heading font-bold text-[42px] md:text-[72px] lg:text-[96px] text-white leading-[0.95] mb-8 max-w-[1000px]"
         >
-          {/* Badge */}
-          <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/10 border border-white/20 text-white text-sm font-medium mb-8 backdrop-blur-md">
-            <Star className="w-4 h-4 text-[#C9A96E] fill-[#C9A96E]" />
-            Trusted by 500+ students
-          </div>
+          Education, crafted for how you think.
+        </motion.h1>
 
-          {/* Heading */}
-          <h1 className="font-heading text-5xl md:text-6xl text-white leading-[1.1] mb-6">
-            Unlock Your Potential<br />
-            with Skill Sphere
-          </h1>
+        {/* Subtitle */}
+        <motion.p
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.8, delay: 0.7, ease: appleEase }}
+          className="font-sans text-[17px] md:text-[20px] leading-[1.5] text-[#F5F1EB] mb-12 max-w-[560px]"
+        >
+          Unlock your potential with a premium learning platform designed for role-based education and real-time collaboration.
+        </motion.p>
 
-          {/* Subheading */}
-          <p className="text-white/80 text-lg md:text-xl leading-relaxed mb-10 max-w-lg">
-            Master in-demand skills with AI-powered tutoring, expert-led courses, and a thriving learning community.
-          </p>
-
-          {/* Buttons */}
-          <div className="flex flex-wrap gap-4 mb-16">
+        {/* CTA button */}
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ duration: 0.8, delay: 1.0, ease: appleEase }}
+        >
+          <Link href="/courses">
             <motion.button
-              whileHover={{ scale: 1.03 }}
+              whileHover={{ scale: 1.03, boxShadow: "0 6px 24px rgba(201,169,110,0.55)" }}
               whileTap={{ scale: 0.97 }}
-              className="px-8 py-3.5 rounded-xl bg-[#C9A96E] text-[#1E1B2E] font-medium text-lg"
+              transition={{ type: "spring", stiffness: 400, damping: 25 }}
+              className="bg-[#C9A96E] text-[#1E1B2E] font-sans font-medium text-[17px] rounded-full px-10 py-4 shadow-[0_4px_14px_rgba(201,169,110,0.4)] block"
             >
               Explore Courses
             </motion.button>
-            <motion.button
-              whileHover={{ scale: 1.03 }}
-              whileTap={{ scale: 0.97 }}
-              className="px-8 py-3.5 rounded-xl border border-white text-white font-medium text-lg hover:bg-white/10 transition-colors"
-            >
-              Try AI Tutor
-            </motion.button>
-          </div>
-
-          {/* Stats */}
-          <div className="flex items-center gap-8 md:gap-12">
-            <div>
-              <p className="font-heading text-3xl text-[#C9A96E] mb-1">500+</p>
-              <p className="text-white/60 text-sm">Students</p>
-            </div>
-            <div className="w-px h-10 bg-white/20" />
-            <div>
-              <p className="font-heading text-3xl text-[#C9A96E] mb-1">50+</p>
-              <p className="text-white/60 text-sm">Courses</p>
-            </div>
-            <div className="w-px h-10 bg-white/20" />
-            <div>
-              <p className="font-heading text-3xl text-[#C9A96E] mb-1">24/7</p>
-              <p className="text-white/60 text-sm">AI Support</p>
-            </div>
-          </div>
+          </Link>
         </motion.div>
+      </div>
 
-        {/* Floating Cards (Right Side) */}
-        <div className="relative h-[500px] hidden lg:block">
-          {/* Back Card: AI Tutor */}
-          <motion.div
-            initial={{ opacity: 0, x: 50, rotate: 0 }}
-            animate={{ opacity: 1, x: 0, rotate: 6 }}
-            transition={{ duration: 1, delay: 0.2 }}
-            className="absolute top-10 right-0 w-[350px] bg-white rounded-2xl p-5 shadow-2xl origin-bottom-right"
-          >
-            <div className="flex items-center gap-2 mb-4">
-              <Sparkles className="w-5 h-5 text-[#C9A96E]" />
-              <span className="font-heading text-[#1E1B2E] font-medium text-lg">AI Study Tutor</span>
-            </div>
-            <div className="space-y-3">
-              <div className="bg-[#1E1B2E] text-white p-3 rounded-xl rounded-tr-sm text-sm">
-                How does photosynthesis work?
-              </div>
-              <div className="bg-[rgba(201,169,110,0.1)] text-[#1E1B2E] p-3 rounded-xl rounded-tl-sm text-sm">
-                Photosynthesis is the process by which plants use sunlight...
-              </div>
-            </div>
-          </motion.div>
-
-          {/* Front Card: Video Player */}
-          <motion.div
-            initial={{ opacity: 0, y: 50 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 1, delay: 0.4 }}
-            className="absolute top-32 right-32 w-[380px] bg-white rounded-2xl p-4 shadow-[0_20px_60px_rgba(0,0,0,0.3)] z-10"
-          >
-            <div className="bg-[#1E1B2E] w-full h-[200px] rounded-xl mb-4 flex items-center justify-center relative overflow-hidden">
-              <div className="absolute inset-0 bg-gradient-to-tr from-[#1E1B2E] to-[#2d2a3d]" />
-              <div className="w-16 h-16 rounded-full border-2 border-white/30 flex items-center justify-center z-10 backdrop-blur-sm bg-white/10 cursor-pointer hover:scale-105 transition-transform">
-                <Play className="w-6 h-6 text-white ml-1" fill="white" />
-              </div>
-            </div>
-            <h3 className="font-heading text-[#1E1B2E] text-lg font-medium mb-3">Python Programming</h3>
-            <div className="w-full h-1.5 bg-[#F5F1EB] rounded-full overflow-hidden">
-              <div className="w-[65%] h-full bg-[#C9A96E]" />
-            </div>
-          </motion.div>
-        </div>
+      {/* Scroll indicator line */}
+      <div className="absolute bottom-10 left-1/2 -translate-x-1/2 z-10">
+        <motion.div
+          animate={{ y: [0, 8, 0] }}
+          transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
+          className="w-[1px] h-12 bg-gradient-to-b from-[#C9A96E] to-transparent"
+        />
       </div>
     </section>
   );
@@ -1017,47 +728,17 @@ function HeroSection() {
 export default function Homepage() {
   return (
     <div className="min-h-screen bg-[#F5F1EB]">
-      <Header />
-      
       <main>
-        {/* 0. Hero */}
         <HeroSection />
-
-        {/* 1. Problem */}
-        <ProblemSection />
-        
-        {/* 2. Solution */}
         <SolutionSection />
-        
-        {/* 3. Features (Bento Grid) */}
         <FeaturesBentoSection />
-        
-        {/* 4. How It Works */}
         <HowItWorksSection />
-        
-        {/* 5. Benefits (Before/After) */}
         <BenefitsSection />
-        
-        {/* 6. Student Success Stories */}
-        <SuccessStoriesSection />
-        
-        {/* 7. Courses Preview */}
-        <CoursesPreviewSection />
-        
-        {/* 8. Testimonials */}
-        <TestimonialsSection />
-        
-        {/* 9. Pricing */}
-        <PricingSection />
-        
-        {/* 10. FAQ */}
+        <PopularLearningPathsSection />
+        <CommunityFeedbackSection />
         <FAQSection />
-        
-        {/* 11. Final CTA */}
         <FinalCTASection />
       </main>
-      
-      <Footer />
     </div>
   );
 }

@@ -73,7 +73,6 @@ export function Footer() {
               links: [
                 { name: "All Courses", url: "/courses" },
                 { name: "Features", url: "/features" },
-                { name: "Pricing", url: "/#pricing" },
                 { name: "Institutions", url: "/#institutions" }
               ]
             },
@@ -90,9 +89,9 @@ export function Footer() {
               title: "Support",
               links: [
                 { name: "Help Center / FAQs", url: "/faq" },
-                { name: "Contact Us", url: "mailto:hello@skillsphere.com" },
-                { name: "Feedback", url: "/dashboard/feedback" },
-                { name: "System Status", url: "#" }
+                { name: "Contact Us", url: "/contact" },
+                { name: "Feedback", url: "/feedback" },
+                { name: "System Status", url: "/status" }
               ]
             },
             {

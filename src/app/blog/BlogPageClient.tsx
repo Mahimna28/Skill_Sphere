@@ -1,342 +1,296 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { motion, useScroll, useTransform } from "framer-motion";
+import { ArrowRight } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
-import { Search } from "lucide-react";
-import { motion } from "framer-motion";
 import { cn } from "@/lib/utils";
 
-import { useReducedMotion, useIsMobile } from "@/lib/animations";
-import { FadeIn } from "@/components/animations/FadeIn";
-import { SlideUp } from "@/components/animations/SlideUp";
-import { StaggerContainer, StaggerItem } from "@/components/animations/StaggerContainer";
+const appleEase = [0.4, 0, 0.2, 1];
 
-const FEATURED_POST = {
-  slug: "future-of-ai-education",
-  title: "The Future of AI in Modern Education",
-  excerpt: "Artificial Intelligence is no longer just a buzzword. Discover how AI-powered tutors and adaptive learning systems are fundamentally changing how students learn.",
-  category: "AI & ML",
-  author: "Swayam Chaudhari",
-  date: "Oct 24, 2026",
-  image: "https://images.unsplash.com/photo-1488590528505-98d2b5aba04b?auto=format&fit=crop&q=80&w=1200"
-};
+interface Article {
+  id: string;
+  title: string;
+  excerpt: string;
+  category: string;
+  thumbnail: string;
+  author: {
+    name: string;
+    avatar: string;
+  };
+  date: string;
+  readTime: string;
+}
 
-const LATEST_POSTS = [
-  {
-    slug: "mastering-react-hooks",
-    title: "Mastering React Hooks in 2026",
-    excerpt: "A deep dive into advanced hook patterns and performance optimization strategies for React Server Components.",
-    category: "Web Dev",
-    author: "Mahimna Mistry",
-    date: "Oct 20, 2026",
-    image: "https://images.unsplash.com/photo-1633356122544-f134324a6cee?auto=format&fit=crop&q=80&w=800"
-  },
-  {
-    slug: "design-system-basics",
-    title: "Building Scalable Design Systems",
-    excerpt: "Learn the core principles of creating design systems that bridge the gap between design and engineering.",
-    category: "Design",
-    author: "Jal Patel",
-    date: "Oct 18, 2026",
-    image: "https://images.unsplash.com/photo-1561070791-2526d30994b5?auto=format&fit=crop&q=80&w=800"
-  },
-  {
-    slug: "career-transition-tech",
-    title: "How to Transition into Tech Without a CS Degree",
-    excerpt: "Actionable advice on building a portfolio, networking, and landing your first tech role.",
-    category: "Career",
-    author: "Priya S.",
-    date: "Oct 15, 2026",
-    image: "https://images.unsplash.com/photo-1522071820081-009f0129c71c?auto=format&fit=crop&q=80&w=800"
-  }
-];
-
-const MAIN_TRENDING = {
-  slug: "python-vs-rust",
-  title: "Python vs Rust: Choosing the Right Backend Language",
-  excerpt: "An in-depth performance and developer experience comparison for modern web services.",
-  image: "https://images.unsplash.com/photo-1526374965328-7f61d4dc18c5?auto=format&fit=crop&q=80&w=1200"
-};
-
-const TRENDING_POSTS = [
-  {
-    slug: "top-10-vs-code-extensions",
-    title: "Top 10 VS Code Extensions for Productivity",
-    category: "Programming",
-    date: "Oct 12, 2026",
-    image: "https://images.unsplash.com/photo-1555066931-4365d14bab8c?auto=format&fit=crop&q=80&w=400"
-  },
-  {
-    slug: "understanding-typescript-generics",
-    title: "Understanding TypeScript Generics Once and For All",
-    category: "Web Dev",
-    date: "Oct 10, 2026",
-    image: "https://images.unsplash.com/photo-1516116216624-53e697fedbea?auto=format&fit=crop&q=80&w=400"
-  },
-  {
-    slug: "remote-work-habits",
-    title: "5 Habits of Highly Effective Remote Developers",
-    category: "Career",
-    date: "Oct 05, 2026",
-    image: "https://images.unsplash.com/photo-1593642532842-98d0fd5ebc1a?auto=format&fit=crop&q=80&w=400"
-  }
-];
+// We will fetch articles from /api/blog instead of using MOCK_ARTICLES
 
 export default function BlogPageClient() {
-  const isMobile = useIsMobile();
-  const shouldReduceMotion = useReducedMotion();
-  const [activeCategory, setActiveCategory] = useState("All");
-  const [searchQuery, setSearchQuery] = useState("");
+  const [selectedCategory, setSelectedCategory] = useState("All");
+  const [articles, setArticles] = useState<any[]>([]);
+  const { scrollY } = useScroll();
+  const yParallax = useTransform(scrollY, [0, 800], [0, 100]);
 
-  const categories = ["All", "Programming", "AI & ML", "Web Dev", "Career", "Tips"];
+  useEffect(() => {
+    fetch("/api/blog")
+      .then(res => res.json())
+      .then(data => {
+        if (data.posts) setArticles(data.posts);
+      })
+      .catch(console.error);
+  }, []);
 
-  const getStaggerDelay = (desktopDelay: number) => isMobile ? desktopDelay * 0.5 : desktopDelay;
+  const categories = ["All", "Learning Science", "Product Updates", "Student Stories", "Industry Trends"];
+  const featuredArticle = articles.length > 0 ? articles[0] : null;
+  const gridArticles = articles.length > 1 ? articles.slice(1) : [];
+
+  const filteredArticles = selectedCategory === "All" 
+    ? gridArticles 
+    : gridArticles.filter(a => a.category === selectedCategory);
 
   return (
     <div className="flex flex-col bg-[#F5F1EB] min-h-screen">
       
-      {/* 1. HERO SECTION */}
-      <section className="pt-[100px] pb-[60px] px-[32px] max-w-[800px] mx-auto text-center w-full">
-        <FadeIn delay={0.1}>
-          <span className="font-sans text-[12px] uppercase text-[#C9A96E] tracking-[0.08em] font-semibold block mb-4">OUR BLOG</span>
-        </FadeIn>
-        
-        <FadeIn delay={0.2} direction="up">
-          <h1 className="font-heading text-[42px] text-[#1E1B2E] leading-[1.15]">Insights & Updates</h1>
-        </FadeIn>
-        
-        <FadeIn delay={0.3}>
-          <p className="font-sans text-[16px] text-[#8E8E93] mt-[12px] mb-10 max-w-[600px] mx-auto">
-            Stay informed with the latest in education, technology, and learning strategies.
-          </p>
-        </FadeIn>
+      {/* 1. PAGE HEADER ΓÇö EDITORIAL MASTHEAD */}
+      <section className="pt-[140px] pb-[60px] bg-[#F5F1EB]">
+        <div className="max-w-7xl mx-auto px-4 md:px-8 flex flex-col items-center text-center">
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ duration: 0.8, ease: appleEase }}
+            className="mb-6"
+          >
+            <span className="font-sans text-[12px] uppercase tracking-[0.2em] text-[#C9A96E]">
+              Insights
+            </span>
+          </motion.div>
+          
+          <motion.h1
+            initial={{ opacity: 0, y: 30 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8, delay: 0.1, ease: appleEase }}
+            className="font-heading font-bold text-[32px] md:text-[56px] text-[#1E1B2E] leading-[0.95] max-w-[700px] mb-4"
+          >
+            Thoughts on learning, teaching, and growth.
+          </motion.h1>
 
-        <FadeIn delay={0.4}>
-          <div className="flex flex-row items-center bg-white rounded-full h-[56px] max-w-[600px] mx-auto shadow-[0_4px_20px_rgba(0,0,0,0.06)] overflow-hidden focus-within:shadow-inner transition-shadow">
-            <Search className="text-[#8E8E93] ml-[20px] shrink-0" size={20} />
-            <input
-              type="text"
-              placeholder="Search articles..."
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              className="flex-1 border-none h-full px-[16px] font-sans text-[16px] text-[#1E1B2E] placeholder:text-[#8E8E93] focus:outline-none bg-transparent"
-            />
-            <button className="w-[44px] h-[44px] rounded-full bg-[#1E1B2E] text-white flex items-center justify-center mr-[6px] hover:bg-[#C9A96E] transition-colors shrink-0">
-              <Search size={18} />
-            </button>
-          </div>
-        </FadeIn>
-      </section>
-
-      {/* 2. FEATURED ARTICLE */}
-      <section className="px-[32px] pb-[60px] max-w-[1200px] mx-auto w-full">
-        <SlideUp y={30}>
-          <Link href={`/blog/${FEATURED_POST.slug}`} className="block group">
-            <div className="bg-white rounded-[16px] overflow-hidden shadow-[0_4px_24px_rgba(0,0,0,0.08)] flex flex-col md:flex-row hover:shadow-[0_12px_40px_rgba(0,0,0,0.12)] hover:-translate-y-1 transition-all duration-300">
-              {/* Image side */}
-              <div className="w-full md:w-[55%] aspect-[16/10] relative overflow-hidden bg-[#1E1B2E]">
-                <motion.div
-                  className="w-full h-full relative"
-                  whileHover={!isMobile && !shouldReduceMotion ? { scale: 1.03 } : {}}
-                  transition={{ duration: 0.4 }}
-                >
-                  <Image src={FEATURED_POST.image} alt={FEATURED_POST.title} fill className="object-cover" />
-                </motion.div>
-              </div>
-
-              {/* Content side */}
-              <div className="w-full md:w-[45%] p-[40px] flex flex-col justify-center">
-                <div>
-                  <span className="inline-flex items-center px-2.5 py-1 rounded-full text-[11px] font-sans font-medium bg-[rgba(201,169,110,0.12)] text-[#C9A96E]">
-                    {FEATURED_POST.category}
-                  </span>
-                </div>
-                <h2 className="font-heading text-[28px] text-[#1E1B2E] leading-[1.2] mt-[12px] group-hover:text-[#C9A96E] transition-colors">
-                  {FEATURED_POST.title}
-                </h2>
-                <p className="font-sans text-[15px] text-[#8E8E93] leading-[1.7] mt-[12px] line-clamp-3">
-                  {FEATURED_POST.excerpt}
-                </p>
-
-                <div className="mt-[20px] flex items-center gap-[12px]">
-                  <div className="w-[32px] h-[32px] rounded-full bg-[#1E1B2E] text-white flex items-center justify-center font-sans text-[14px] font-medium shrink-0">
-                    {FEATURED_POST.author[0]}
-                  </div>
-                  <div className="flex flex-col">
-                    <span className="font-sans text-[14px] text-[#1E1B2E] leading-tight">{FEATURED_POST.author}</span>
-                    <span className="font-sans text-[13px] text-[#8E8E93]">{FEATURED_POST.date}</span>
-                  </div>
-                </div>
-
-                <div className="mt-[16px]">
-                  <span className="font-sans text-[14px] text-[#C9A96E] font-medium group-hover:underline">
-                    Read More &rarr;
-                  </span>
-                </div>
-              </div>
-            </div>
-          </Link>
-        </SlideUp>
-      </section>
-
-      {/* 3. STICKY CATEGORY FILTERS */}
-      <div className="sticky top-[72px] z-10 bg-[#F5F1EB] border-b border-[rgba(30,27,46,0.06)] py-[16px] px-[32px]">
-        <div className="max-w-[1200px] mx-auto overflow-x-auto scrollbar-hide">
-          <StaggerContainer staggerDelay={getStaggerDelay(0.05)} className="flex flex-row gap-[12px] min-w-max pb-1">
-            {categories.map((cat) => (
-              <StaggerItem key={cat}>
-                <button
-                  onClick={() => setActiveCategory(cat)}
-                  className={cn(
-                    "px-[16px] py-[8px] rounded-full font-sans text-[13px] transition-all duration-200 border whitespace-nowrap",
-                    activeCategory === cat
-                      ? "bg-[#1E1B2E] text-white border-[#1E1B2E]"
-                      : "bg-transparent text-[#8E8E93] border-[rgba(30,27,46,0.1)] hover:border-[#C9A96E] hover:bg-[rgba(201,169,110,0.06)] hover:text-[#1E1B2E]"
-                  )}
-                >
-                  {cat}
-                </button>
-              </StaggerItem>
-            ))}
-          </StaggerContainer>
-        </div>
-      </div>
-
-      {/* 4. LATEST ARTICLES GRID */}
-      <section className="px-[32px] py-[40px] max-w-[1200px] mx-auto w-full">
-        <FadeIn>
-          <h2 className="font-heading text-[24px] text-[#1E1B2E] mb-[24px]">Latest Articles</h2>
-        </FadeIn>
-        
-        <StaggerContainer key={activeCategory} staggerDelay={getStaggerDelay(0.15)} className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-[24px]">
-          {LATEST_POSTS.map((post) => (
-            <StaggerItem key={post.slug}>
-              <Link href={`/blog/${post.slug}`} className="block h-full group">
-                <div className="bg-white rounded-[16px] overflow-hidden shadow-[0_4px_16px_rgba(0,0,0,0.05)] h-full flex flex-col hover:shadow-[0_12px_32px_rgba(0,0,0,0.1)] hover:-translate-y-[6px] transition-all duration-300">
-                  
-                  {/* Image */}
-                  <div className="w-full aspect-[16/10] relative overflow-hidden bg-[#1E1B2E]">
-                    <motion.div
-                      className="w-full h-full relative"
-                      whileHover={!isMobile && !shouldReduceMotion ? { scale: 1.05 } : {}}
-                      transition={{ duration: 0.4 }}
-                    >
-                      <Image src={post.image} alt={post.title} fill className="object-cover" />
-                    </motion.div>
-                  </div>
-
-                  {/* Content */}
-                  <div className="p-[20px] flex flex-col flex-1">
-                    <div>
-                      <span className="inline-flex items-center px-2.5 py-1 rounded-full text-[11px] font-sans font-medium bg-[rgba(201,169,110,0.12)] text-[#C9A96E]">
-                        {post.category}
-                      </span>
-                    </div>
-                    <h3 className="font-heading text-[18px] text-[#1E1B2E] line-clamp-2 mt-[10px] group-hover:text-[#C9A96E] transition-colors">
-                      {post.title}
-                    </h3>
-                    <p className="font-sans text-[14px] text-[#8E8E93] line-clamp-2 mt-[6px]">
-                      {post.excerpt}
-                    </p>
-
-                    <div className="mt-auto pt-[12px] flex items-center justify-between">
-                      <span className="font-sans text-[12px] text-[#8E8E93]">{post.author}</span>
-                      <span className="font-sans text-[12px] text-[#8E8E93]">{post.date}</span>
-                    </div>
-                  </div>
-                </div>
-              </Link>
-            </StaggerItem>
-          ))}
-        </StaggerContainer>
-      </section>
-
-      {/* 5. TRENDING SECTION */}
-      <section className="px-[32px] pb-[60px] max-w-[1200px] mx-auto w-full">
-        <FadeIn>
-          <h2 className="font-heading text-[24px] text-[#1E1B2E] mb-[24px]">Trending Now</h2>
-        </FadeIn>
-
-        <div className="flex flex-col lg:flex-row gap-[24px]">
-          {/* Left: Main Trending */}
-          <div className="w-full lg:w-[60%]">
-            <SlideUp y={20} className="h-full">
-              <Link href={`/blog/${MAIN_TRENDING.slug}`} className="block h-full group">
-                <div className="bg-white rounded-[16px] overflow-hidden shadow-[0_4px_16px_rgba(0,0,0,0.05)] h-full flex flex-col hover:shadow-[0_12px_32px_rgba(0,0,0,0.1)] transition-all duration-300">
-                  <div className="w-full aspect-[16/9] relative overflow-hidden bg-[#1E1B2E]">
-                    <motion.div
-                      className="w-full h-full relative"
-                      whileHover={!isMobile && !shouldReduceMotion ? { scale: 1.05 } : {}}
-                      transition={{ duration: 0.4 }}
-                    >
-                      <Image src={MAIN_TRENDING.image} alt={MAIN_TRENDING.title} fill className="object-cover" />
-                    </motion.div>
-                  </div>
-                  <div className="p-[24px]">
-                    <h3 className="font-heading text-[22px] text-[#1E1B2E] group-hover:text-[#C9A96E] transition-colors">
-                      {MAIN_TRENDING.title}
-                    </h3>
-                    <p className="font-sans text-[15px] text-[#8E8E93] mt-[8px]">
-                      {MAIN_TRENDING.excerpt}
-                    </p>
-                  </div>
-                </div>
-              </Link>
-            </SlideUp>
-          </div>
-
-          {/* Right: Trending List */}
-          <div className="w-full lg:w-[40%] flex flex-col justify-center">
-            <StaggerContainer staggerDelay={getStaggerDelay(0.1)} className="flex flex-col gap-[16px]">
-              {TRENDING_POSTS.map((post) => (
-                <StaggerItem key={post.slug}>
-                  <Link href={`/blog/${post.slug}`} className="block group">
-                    <div className="bg-white rounded-xl p-[12px] flex flex-row gap-[12px] shadow-[0_4px_12px_rgba(0,0,0,0.03)] hover:shadow-[0_8px_24px_rgba(0,0,0,0.08)] hover:-translate-y-1 transition-all duration-300">
-                      <div className="w-[80px] h-[80px] shrink-0 relative rounded-lg overflow-hidden bg-[#1E1B2E]">
-                        <Image src={post.image} alt={post.title} fill className="object-cover group-hover:scale-105 transition-transform duration-500" />
-                      </div>
-                      <div className="flex flex-col justify-center">
-                        <span className="font-sans text-[11px] text-[#C9A96E] uppercase font-medium">{post.category}</span>
-                        <h4 className="font-sans text-[14px] text-[#1E1B2E] font-medium line-clamp-2 mt-[4px] leading-snug group-hover:text-[#C9A96E] transition-colors">
-                          {post.title}
-                        </h4>
-                        <span className="font-sans text-[12px] text-[#8E8E93] mt-[4px]">{post.date}</span>
-                      </div>
-                    </div>
-                  </Link>
-                </StaggerItem>
-              ))}
-            </StaggerContainer>
-          </div>
+          <motion.p
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8, delay: 0.15, ease: appleEase }}
+            className="font-sans text-[18px] text-[#8E8E93] leading-[1.5] max-w-[560px]"
+          >
+            Deep dives into pedagogical science, platform updates, and stories from our community.
+          </motion.p>
         </div>
       </section>
 
-      {/* 6. NEWSLETTER SECTION */}
-      <section className="px-[32px] pb-[80px] max-w-[800px] mx-auto w-full">
-        <SlideUp y={30}>
-          <div className="bg-[#1E1B2E] rounded-2xl p-[48px] text-center shadow-xl">
-            <h2 className="font-heading text-[28px] text-white">Stay in the loop</h2>
-            <p className="font-sans text-[15px] text-[rgba(255,255,255,0.7)] mt-[12px]">
-              Get weekly updates on new courses, tips, and exclusive offers.
-            </p>
+      {/* 2. FEATURED ARTICLE ΓÇö HERO POST */}
+      {featuredArticle && (
+      <section className="pb-[40px] bg-[#F5F1EB]">
+        <div className="max-w-7xl mx-auto px-4 md:px-8">
+          <div className="flex flex-col lg:flex-row gap-8 lg:gap-0 group cursor-pointer">
             
-            <form className="mt-[24px] flex flex-col sm:flex-row items-center justify-center gap-[12px]" onSubmit={(e) => e.preventDefault()}>
-              <input
-                type="email"
-                placeholder="Enter your email address"
-                required
-                className="w-full sm:w-auto flex-1 h-[52px] rounded-full px-[20px] bg-white border-none focus:outline-none font-sans text-[15px] text-[#1E1B2E]"
-              />
+            {/* Left Image */}
+            <motion.div 
+              initial={{ opacity: 0, x: -40 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ duration: 0.8, ease: appleEase }}
+              className="w-full lg:w-[55%] relative rounded-[16px] overflow-hidden shadow-[0_8px_32px_rgba(30,27,46,0.08)] aspect-[16/9] lg:aspect-auto lg:h-[500px]"
+            >
+              <motion.div style={{ y: yParallax }} className="absolute inset-0 -top-[100px] -bottom-[100px]">
+                  <img 
+                    src={featuredArticle.coverImage} 
+                    alt={featuredArticle.title} 
+                    className="w-full h-full object-cover transition-transform duration-700 ease-out group-hover:scale-[1.03]"
+                  />
+              </motion.div>
+            </motion.div>
+
+            {/* Right Content */}
+            <motion.div 
+              initial={{ opacity: 0, x: 40 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ duration: 0.8, delay: 0.2, ease: appleEase }}
+              className="w-full lg:w-[45%] flex flex-col justify-center lg:pl-12 py-6"
+            >
+              <span className="font-sans text-[11px] uppercase tracking-[0.1em] text-[#C9A96E] mb-4 block">
+                Featured Essay
+              </span>
+              <h2 className="font-heading text-[28px] md:text-[32px] text-[#1E1B2E] leading-[1.1] mb-4 group-hover:text-[#C9A96E] transition-colors duration-300">
+                {featuredArticle.title}
+              </h2>
+              <p className="font-sans text-[16px] text-[#8E8E93] leading-[1.6] mb-8 line-clamp-3">
+                {featuredArticle.excerpt}
+              </p>
+              
+              <div className="flex items-center gap-3 mb-8">
+                <div className="relative w-9 h-9 rounded-full overflow-hidden shrink-0 flex items-center justify-center bg-[#1E1B2E] text-[#C9A96E] font-bold text-sm">
+                  {featuredArticle.author?.image ? (
+                    <img src={featuredArticle.author.image} alt={featuredArticle.author.name} className="w-full h-full object-cover" />
+                  ) : (
+                    featuredArticle.author?.name?.charAt(0) || "A"
+                  )}
+                </div>
+                <div className="flex items-center flex-wrap gap-2 font-sans text-[14px]">
+                  <span className="text-[#1E1B2E] font-medium">{featuredArticle.author?.name || "Author"}</span>
+                  <span className="text-[#8E8E93]">&middot;</span>
+                  <span className="text-[#8E8E93]">{new Date(featuredArticle.publishedAt).toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })}</span>
+                  <span className="text-[#8E8E93]">&middot;</span>
+                  <span className="text-[#8E8E93]">{featuredArticle.readTime} min read</span>
+                </div>
+              </div>
+
+              <Link href={`/blog/${featuredArticle.slug}`} className="inline-flex items-center font-sans text-[14px] text-[#C9A96E] font-medium transition-colors group-hover:text-[#1E1B2E]">
+                Read Article <ArrowRight size={16} className="ml-1 transition-transform group-hover:translate-x-1.5" />
+              </Link>
+            </motion.div>
+
+          </div>
+        </div>
+      </section>
+      )}
+
+      {/* 3. CATEGORY FILTERS */}
+      <motion.div 
+        initial={{ opacity: 0, y: -10 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.6, delay: 0.5, ease: appleEase }}
+        className="sticky top-[72px] z-40 bg-[#F5F1EB]/90 backdrop-blur-md border-b border-[rgba(30,27,46,0.08)] py-4"
+      >
+        <div className="max-w-7xl mx-auto px-4 md:px-8">
+          <div className="flex overflow-x-auto scrollbar-none gap-3 items-center pb-1">
+            {categories.map((cat) => (
               <button
-                type="submit"
-                className="w-full sm:w-auto h-[48px] px-[28px] bg-[#C9A96E] text-[#1E1B2E] font-sans font-medium rounded-full hover:scale-[1.02] transition-transform"
+                key={cat}
+                onClick={() => setSelectedCategory(cat)}
+                className={cn(
+                  "whitespace-nowrap px-5 py-2 rounded-full font-sans text-[14px] transition-all duration-300",
+                  selectedCategory === cat 
+                  ? "bg-[#1E1B2E] text-white shadow-md" 
+                  : "bg-white text-[#1E1B2E] border border-[rgba(30,27,46,0.08)] hover:shadow-[0_2px_8px_rgba(30,27,46,0.05)] hover:-translate-y-0.5"
+                )}
+              >
+                {cat}
+              </button>
+            ))}
+          </div>
+        </div>
+      </motion.div>
+
+      {/* 4. ARTICLE GRID */}
+      <section className="py-[60px] flex-1">
+        <div className="max-w-7xl mx-auto px-4 md:px-8">
+          {filteredArticles.length > 0 ? (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+              {filteredArticles.map((article, idx) => (
+                <motion.div
+                  key={article.id}
+                  initial={{ opacity: 0, y: 40 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true, margin: "-50px" }}
+                  transition={{ duration: 0.7, delay: idx * 0.1, ease: appleEase }}
+                >
+                  <Link href={`/blog/${article.slug}`} className="block h-full group">
+                    <motion.div 
+                      whileHover={{ y: -6, boxShadow: "0 12px 40px rgba(30,27,46,0.12)" }}
+                      transition={{ type: "spring", stiffness: 300, damping: 20 }}
+                      className="bg-white rounded-[16px] overflow-hidden h-full flex flex-col shadow-[0_4px_20px_rgba(30,27,46,0.04)]"
+                    >
+                      {/* Image Top */}
+                      <div className="w-full aspect-[16/9] relative overflow-hidden bg-[#1E1B2E]">
+                        <img 
+                          src={article.coverImage} 
+                          alt={article.title} 
+                          className="w-full h-full object-cover transition-transform duration-700 ease-out group-hover:scale-105"
+                        />
+                        <div className="absolute top-4 right-4 bg-[#C9A96E] text-[#1E1B2E] px-3 py-1 rounded-full font-sans font-bold text-[11px] uppercase tracking-[0.1em] shadow-md">
+                          {article.category}
+                        </div>
+                      </div>
+
+                      {/* Content Bottom */}
+                      <div className="p-7 flex flex-col flex-1">
+                        <h3 className="font-heading text-[20px] text-[#1E1B2E] mb-3 leading-[1.2] group-hover:text-[#C9A96E] transition-colors line-clamp-2">
+                          {article.title}
+                        </h3>
+                        
+                        <p className="font-sans text-[14px] text-[#8E8E93] leading-[1.6] mb-6 line-clamp-2 flex-1">
+                          {article.excerpt}
+                        </p>
+
+                        <div className="flex items-center gap-3 mt-auto pt-5 border-t border-[rgba(30,27,46,0.06)]">
+                          <div className="relative w-7 h-7 rounded-full overflow-hidden shrink-0 flex items-center justify-center bg-[#1E1B2E] text-[#C9A96E] font-bold text-[10px]">
+                            {article.author?.image ? (
+                              <img src={article.author.image} alt={article.author.name} className="w-full h-full object-cover" />
+                            ) : (
+                              article.author?.name?.charAt(0) || "A"
+                            )}
+                          </div>
+                          <div className="flex flex-col gap-0.5">
+                            <span className="font-sans text-[13px] text-[#1E1B2E] font-medium leading-none">{article.author?.name || "Author"}</span>
+                            <div className="flex items-center gap-1 font-sans text-[12px] text-[#8E8E93] leading-none">
+                              <span>{new Date(article.publishedAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}</span>
+                              <span>&middot;</span>
+                              <span>{article.readTime} min read</span>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </motion.div>
+                  </Link>
+                </motion.div>
+              ))}
+            </div>
+          ) : (
+            <div className="py-32 flex flex-col items-center text-center">
+              <h3 className="font-heading text-[24px] text-[#1E1B2E] mb-3">No articles found</h3>
+              <p className="font-sans text-[16px] text-[#8E8E93] mb-8">
+                We haven't published anything in this category yet.
+              </p>
+              <button 
+                onClick={() => setSelectedCategory("All")}
+                className="text-[#C9A96E] font-sans text-[15px] font-medium hover:text-[#1E1B2E] transition-colors duration-300 border-b border-transparent hover:border-[#1E1B2E]"
+              >
+                Clear filter
+              </button>
+            </div>
+          )}
+        </div>
+      </section>
+
+      {/* 5. NEWSLETTER CTA */}
+      <section className="py-[120px] bg-[#1E1B2E] text-center">
+        <div className="max-w-2xl mx-auto px-4">
+          <motion.div
+            initial={{ opacity: 0, y: 30 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.8, ease: appleEase }}
+          >
+            <h2 className="font-heading font-black text-[36px] text-white mb-4">
+              Stay curious.
+            </h2>
+            <p className="font-sans text-[16px] text-[#F5F1EB] mb-10 font-light opacity-90">
+              Join 40,000+ educators and learners receiving our weekly insights.
+            </p>
+            <div className="flex flex-col sm:flex-row gap-4 justify-center relative">
+              <input 
+                type="email" 
+                placeholder="Enter your email" 
+                className="w-full h-[56px] bg-transparent border-0 border-b border-white/20 px-4 font-sans text-[16px] text-white placeholder-white/50 focus:border-[#C9A96E] focus:ring-0 focus:outline-none transition-colors"
+              />
+              <motion.button 
+                whileHover={{ scale: 1.02 }}
+                whileTap={{ scale: 0.98 }}
+                transition={{ type: "spring", stiffness: 400, damping: 25 }}
+                className="w-full sm:w-auto shrink-0 bg-[#C9A96E] text-[#1E1B2E] font-sans font-medium text-[16px] rounded-full px-8 h-[56px]"
               >
                 Subscribe
-              </button>
-            </form>
-          </div>
-        </SlideUp>
+              </motion.button>
+            </div>
+          </motion.div>
+        </div>
       </section>
 
     </div>

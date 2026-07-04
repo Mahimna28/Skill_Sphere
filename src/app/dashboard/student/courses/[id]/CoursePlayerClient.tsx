@@ -1,21 +1,15 @@
 "use client";
 
 import { useState } from "react";
-import { motion, AnimatePresence } from "framer-motion";
-import { 
-  CheckCircle2, ChevronRight, PlayCircle, BookText, ArrowLeft, Trophy, 
-  Download, File, Award, ThumbsUp, MessageCircle, Bookmark, Check, Play, Lock, ArrowRight
-} from "lucide-react";
-import Link from "next/link";
 import { Button } from "@/components/ui/button";
-import { useReducedMotion } from "@/lib/animations";
+import { CheckCircle2, ChevronRight, PlayCircle, BookText, ArrowLeft, Trophy, Download, File, Award } from "lucide-react";
+import Link from "next/link";
 
 export default function CoursePlayerClient({ course }: { course: any }) {
   const allLessons = course.modules.flatMap((m: any) => m.lessons);
   const [activeLesson, setActiveLesson] = useState(allLessons[0] || null);
   const [loading, setLoading] = useState(false);
   const [completedCertId, setCompletedCertId] = useState<string | null>(null);
-  const shouldReduceMotion = useReducedMotion();
 
   const handleComplete = async () => {
     if (!activeLesson) return;
@@ -51,23 +45,15 @@ export default function CoursePlayerClient({ course }: { course: any }) {
 
   if (!activeLesson) {
     return (
-      <div className="flex flex-col items-center justify-center h-full min-h-[60vh] text-center p-[60px]">
-        <div className="mb-[24px]">
-          <BookText size={56} className="text-[#1E1B2E] opacity-25" />
+      <div className="flex flex-col items-center justify-center h-[60vh] text-center">
+        <div className="bg-accent p-6 rounded-full border-4 border-black mb-6">
+          <BookText size={48} />
         </div>
-        <h2 className="font-heading text-[24px] text-[#1E1B2E]">
-          No content available yet.
-        </h2>
-        <p className="font-sans text-[14px] text-[#8E8E93] mt-[8px]">
-          The teacher is still preparing this course.
-        </p>
-        <div>
-          <Link href="/dashboard/student/courses" className="inline-block mt-[28px]">
-            <button className="h-[44px] px-[24px] rounded-xl border border-[#1E1B2E] text-[#1E1B2E] font-sans text-[14px] font-medium hover:bg-[#1E1B2E] hover:text-white transition-colors duration-200">
-              Go Back
-            </button>
-          </Link>
-        </div>
+        <h2 className="text-3xl font-black">No content available yet.</h2>
+        <p className="text-muted-foreground mt-2">The teacher is still preparing this course.</p>
+        <Link href="/dashboard/student/courses">
+          <Button className="mt-6 neo-brutalism">Go Back</Button>
+        </Link>
       </div>
     );
   }
@@ -77,365 +63,178 @@ export default function CoursePlayerClient({ course }: { course: any }) {
 
   if (completedCertId) {
     return (
-      <motion.div 
-        initial={{ opacity: 0, scale: 0.95 }}
-        animate={{ opacity: 1, scale: 1 }}
-        className="flex flex-col items-center justify-center h-[calc(100vh-80px)] text-center"
-      >
-        <motion.div 
-          initial={{ scale: 0 }}
-          animate={{ scale: 1 }}
-          transition={{ type: "spring", delay: 0.2 }}
-          className="w-32 h-32 bg-[rgba(201,169,110,0.15)] rounded-full flex items-center justify-center mb-8"
-        >
-          <Award size={64} className="text-[#C9A96E]" />
-        </motion.div>
-        <h2 className="font-heading text-5xl text-[#1E1B2E] mb-4">Course Finished!</h2>
-        <p className="text-[#8E8E93] mb-8 max-w-xl text-lg">
+      <div className="flex flex-col items-center justify-center h-[calc(100vh-160px)] text-center animate-in fade-in zoom-in duration-500">
+        <div className="w-32 h-32 bg-[#F5C84C] text-black border-4 border-black rounded-full flex items-center justify-center mb-8 shadow-[8px_8px_0px_0px_rgba(0,0,0,1)]">
+          <Award size={64} />
+        </div>
+        <h2 className="text-5xl md:text-7xl font-black uppercase tracking-tighter mb-4">Course Finished!</h2>
+        <p className="text-xl font-bold text-muted-foreground mb-8 max-w-xl">
           Congratulations! You have successfully completed all modules in this course and earned a new certificate.
         </p>
         <div className="flex gap-4">
           <Link href="/dashboard/student/courses">
-            <button className="h-12 px-8 rounded-xl border border-[rgba(30,27,46,0.1)] text-[#1E1B2E] font-medium hover:bg-[rgba(30,27,46,0.03)] transition-colors">
+            <Button variant="outline" className="h-14 px-8 font-black border-4 border-black text-lg">
               Back to Dashboard
-            </button>
+            </Button>
           </Link>
           <Link href={`/certificates/${completedCertId}`} target="_blank">
-            <button className="h-12 px-8 rounded-xl bg-[#1E1B2E] text-white font-medium hover:bg-[#2d2a3d] transition-colors">
+            <Button className="neo-brutalism bg-[#4F7DF3] text-white h-14 px-8 font-black text-lg">
               View Certificate
-            </button>
+            </Button>
           </Link>
         </div>
-      </motion.div>
+      </div>
     );
   }
 
-  // Active module based on active lesson
-  const activeModule = course.modules.find((m: any) => 
-    m.lessons.some((l: any) => l.id === activeLesson.id)
-  );
-
   return (
-    <div className="flex flex-col lg:flex-row gap-8 max-w-7xl mx-auto px-6 py-6 pb-20">
-      {/* 1. Main Content Area - 65% */}
-      <div className="flex-1 min-w-0">
-        
-        {/* Breadcrumb */}
-        <motion.div 
-          initial={shouldReduceMotion ? {} : { opacity: 0, y: -10 }}
-          animate={{ opacity: 1, y: 0 }}
-          className="flex items-center gap-2 text-sm text-[#8E8E93] mb-3"
-        >
-          <Link href="/dashboard/student/courses" className="hover:text-[#1E1B2E] transition-colors">
-            My Courses
+    <div className="flex flex-col lg:flex-row gap-8 lg:h-[calc(100vh-160px)]">
+      {/* 1. Main Content Area */}
+      <div className="flex-1 overflow-y-auto space-y-6 scrollbar-none pb-12">
+        <div className="flex items-center justify-between mb-2">
+          <Link href="/dashboard/student/courses" className="flex items-center gap-2 text-sm font-bold hover:text-primary transition-colors">
+            <ArrowLeft size={16} /> Back to Courses
           </Link>
-          <ChevronRight className="w-4 h-4" />
-          <span className="text-[#1E1B2E] truncate">{course.title}</span>
-        </motion.div>
-
-        {/* Title */}
-        <motion.h1 
-          initial={shouldReduceMotion ? {} : { opacity: 0, y: 10 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.1 }}
-          className="font-heading text-3xl text-[#1E1B2E] mb-1"
-        >
-          {activeLesson.title}
-        </motion.h1>
-
-        <motion.p 
-          initial={shouldReduceMotion ? {} : { opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ delay: 0.2 }}
-          className="text-[#8E8E93] text-sm mb-6"
-        >
-          {activeModule?.title}
-        </motion.p>
-
+          <div className="flex items-center gap-2 bg-secondary/20 px-3 py-1 border-2 border-black rounded-full text-xs font-black">
+            <Trophy size={14} className="text-primary" /> +50 POINTS EARNED
+          </div>
+        </div>
+        
+        <h2 className="text-4xl font-black uppercase tracking-tighter">{activeLesson.title}</h2>
+        
         {/* Video Player or Notes Only View */}
         {activeLesson.videoUrl ? (
-          <motion.div 
-            key={activeLesson.id}
-            initial={shouldReduceMotion ? {} : { opacity: 0, scale: 0.98 }}
-            animate={{ opacity: 1, scale: 1 }}
-            transition={{ duration: 0.5, ease: [0.25, 0.1, 0.25, 1.0] }}
-            className="rounded-2xl overflow-hidden shadow-[0_8px_32px_rgba(0,0,0,0.08)] bg-black"
-          >
-            <div className="aspect-video">
-              <iframe
-                src={activeLesson.videoUrl}
-                className="w-full h-full"
-                allowFullScreen
-                title="Course Video"
-              />
-            </div>
-          </motion.div>
+          <div className="aspect-video w-full bg-black border-4 border-black shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] rounded-3xl overflow-hidden relative group">
+            <iframe
+              src={activeLesson.videoUrl}
+              className="w-full h-full"
+              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+              allowFullScreen
+            ></iframe>
+          </div>
         ) : (
-          <motion.div 
-            key={activeLesson.id}
-            initial={shouldReduceMotion ? {} : { opacity: 0, scale: 0.98 }}
-            animate={{ opacity: 1, scale: 1 }}
-            transition={{ duration: 0.5, ease: [0.25, 0.1, 0.25, 1.0] }}
-            className="aspect-[21/9] w-full bg-[rgba(201,169,110,0.04)] border border-[rgba(201,169,110,0.2)] rounded-2xl flex flex-col items-center justify-center text-center p-8"
-          >
-            <div className="w-16 h-16 rounded-full bg-white border border-[rgba(30,27,46,0.06)] shadow-sm flex items-center justify-center mb-4">
-              <BookText size={24} className="text-[#C9A96E]" />
-            </div>
-            <h3 className="font-heading text-xl text-[#1E1B2E]">Lecture Notes Only</h3>
-            <p className="text-sm text-[#8E8E93] mt-1 max-w-md">This lesson is reading-based. No video content available.</p>
-          </motion.div>
+          <div className="aspect-[21/9] w-full bg-accent/10 border-4 border-black border-dashed rounded-3xl flex flex-col items-center justify-center text-center p-8">
+             <div className="w-16 h-16 rounded-full bg-white border-2 border-black flex items-center justify-center mb-4">
+                <BookText size={32} />
+             </div>
+             <p className="text-xl font-black uppercase">Lecture Notes Only</p>
+             <p className="text-sm font-bold text-muted-foreground mt-1">This lesson is reading-based. No video content available.</p>
+          </div>
         )}
 
-        {/* Video Controls / Meta Bar */}
-        <motion.div 
-          initial={shouldReduceMotion ? {} : { opacity: 0, y: 10 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.3 }}
-          className="flex items-center justify-between mt-5 px-1"
-        >
-          <div className="flex items-center gap-4">
-            <button className="flex items-center gap-2 text-sm text-[#8E8E93] hover:text-[#1E1B2E] transition-colors">
-              <ThumbsUp className="w-4 h-4" />
-              Helpful
-            </button>
-            <button className="flex items-center gap-2 text-sm text-[#8E8E93] hover:text-[#1E1B2E] transition-colors">
-              <MessageCircle className="w-4 h-4" />
-              Discuss
-            </button>
-            <button className="flex items-center gap-2 text-sm text-[#8E8E93] hover:text-[#1E1B2E] transition-colors">
-              <Bookmark className="w-4 h-4" />
-              Save
-            </button>
-          </div>
-        </motion.div>
-
-        {/* Lesson Description / Notes */}
-        <motion.div 
-          initial={shouldReduceMotion ? {} : { opacity: 0, y: 15 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.4 }}
-          className="mt-8 bg-white rounded-2xl p-6 md:p-8 shadow-[0_4px_20px_rgba(0,0,0,0.04)] border border-[rgba(30,27,46,0.04)]"
-        >
-          <h3 className="font-heading text-xl text-[#1E1B2E] mb-4">About this lesson</h3>
-          <p className="text-[#8E8E93] text-sm md:text-base leading-relaxed">
-            {activeLesson.content || "This lesson contains essential information to build your foundation in this subject. Pay close attention to the concepts discussed, as they will be critical for upcoming modules and assignments."}
+        <div className="neo-brutalism bg-white p-8 space-y-4">
+          <h3 className="text-2xl font-black border-b-4 border-black pb-2 inline-block">Lesson Overview</h3>
+          <p className="text-lg font-medium text-black/70 leading-relaxed">
+            {activeLesson.content || "This lesson contains essential information to build your foundation in this subject."}
           </p>
-          
-          {/* Key Takeaways */}
-          <div className="mt-6 space-y-3">
-            <div className="flex items-start gap-3">
-              <div className="w-5 h-5 rounded-full bg-[rgba(201,169,110,0.12)] flex items-center justify-center flex-shrink-0 mt-0.5">
-                <Check className="w-3 h-3 text-[#C9A96E]" />
-              </div>
-              <span className="text-sm text-[#1E1B2E]">Understand the core principles presented in this lecture</span>
-            </div>
-            <div className="flex items-start gap-3">
-              <div className="w-5 h-5 rounded-full bg-[rgba(201,169,110,0.12)] flex items-center justify-center flex-shrink-0 mt-0.5">
-                <Check className="w-3 h-3 text-[#C9A96E]" />
-              </div>
-              <span className="text-sm text-[#1E1B2E]">Apply the knowledge to upcoming assignments and quizzes</span>
-            </div>
-          </div>
 
-          {/* Attached Files */}
           {activeLesson.fileUrl && (
-            <div className="mt-8 p-5 bg-[#F5F1EB] border border-[rgba(30,27,46,0.06)] rounded-xl flex flex-col sm:flex-row items-center justify-between gap-4">
-               <div className="flex items-center gap-3">
-                  <div className="w-12 h-12 bg-white rounded-xl flex items-center justify-center shadow-sm shrink-0">
-                     <File size={24} className="text-[#C9A96E]" />
+            <div className="mt-8 p-6 bg-accent/20 border-4 border-black rounded-[2rem] flex flex-col md:flex-row items-center justify-between gap-6 shadow-[6px_6px_0px_0px_rgba(0,0,0,1)]">
+               <div className="flex items-center gap-4 text-center md:text-left">
+                  <div className="w-16 h-16 bg-white border-2 border-black rounded-2xl flex items-center justify-center shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] shrink-0">
+                     <File size={32} className="text-primary" />
                   </div>
                   <div>
-                     <h4 className="font-medium text-[#1E1B2E] text-sm">Academic Materials Attached</h4>
-                     <p className="text-xs text-[#8E8E93]">{activeLesson.fileType || "Document"} File Ready</p>
+                     <h4 className="font-black uppercase text-sm">Academic Materials Attached</h4>
+                     <p className="text-xs font-bold text-muted-foreground uppercase">{activeLesson.fileType || "Document"} FILE READY</p>
                   </div>
                </div>
-               <a href={activeLesson.fileUrl} download className="w-full sm:w-auto">
-                 <button className="w-full h-10 px-5 rounded-xl bg-white border border-[rgba(30,27,46,0.1)] text-[#1E1B2E] text-sm font-medium hover:bg-[rgba(30,27,46,0.03)] transition-colors flex items-center justify-center gap-2">
-                   <Download size={16} /> Download
-                 </button>
+               <a href={activeLesson.fileUrl} download className="w-full md:w-auto">
+                 <Button className="w-full neo-brutalism bg-[#F5C84C] text-black font-black h-14 px-8 uppercase flex items-center gap-2">
+                   <Download size={20} /> Download Materials
+                 </Button>
                </a>
             </div>
           )}
-        </motion.div>
 
-        {/* Navigation Buttons */}
-        <motion.div 
-          initial={shouldReduceMotion ? {} : { opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.5 }}
-          className="flex flex-col sm:flex-row items-center justify-between mt-8 gap-4"
-        >
-          <button 
-            onClick={handlePrevious}
-            disabled={currentIndex === 0}
-            className="w-full sm:w-auto flex items-center justify-center gap-2 px-5 py-2.5 rounded-xl border border-[rgba(30,27,46,0.1)] text-sm text-[#1E1B2E] hover:bg-[rgba(30,27,46,0.03)] transition-colors disabled:opacity-40 disabled:hover:bg-transparent"
-          >
-            <ArrowLeft className="w-4 h-4" />
-            Previous
-          </button>
-          
-          <button 
-            onClick={handleComplete}
-            disabled={loading}
-            className="w-full sm:w-auto flex items-center justify-center gap-2 px-6 py-2.5 rounded-xl bg-[#1E1B2E] text-white text-sm hover:bg-[#2d2a3d] transition-colors disabled:opacity-70 shadow-[0_4px_14px_rgba(30,27,46,0.1)]"
-          >
-            {loading ? "Saving..." : (isLastLesson ? "Finish Course" : "Mark Complete & Next")}
-            {!loading && <ArrowRight className="w-4 h-4" />}
-          </button>
-        </motion.div>
-        
-        {/* Assignments Section (if any) */}
+          <div className="pt-6 flex justify-between items-center border-t-2 border-black border-dashed">
+            <Button 
+              variant="outline" 
+              className="font-bold border-2 border-black" 
+              disabled={allLessons.findIndex((l: any) => l.id === activeLesson?.id) === 0}
+              onClick={handlePrevious}
+            >
+               Previous Lesson
+            </Button>
+            <Button 
+              className="neo-brutalism bg-[#34D399] font-black h-12 px-8"
+              onClick={handleComplete}
+              disabled={loading}
+            >
+               {loading ? "Completing..." : (isLastLesson ? "Finish Course" : "Complete & Next")}
+            </Button>
+          </div>
+        </div>
+
+        {/* Assignments Section */}
         {course.assignments && course.assignments.length > 0 && (
-          <motion.div 
-            initial={shouldReduceMotion ? {} : { opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.6 }}
-            className="mt-12"
-          >
-            <h3 className="font-heading text-xl text-[#1E1B2E] mb-4">Course Assignments</h3>
+          <div className="neo-brutalism bg-[#F5C84C] p-8 space-y-6 mt-8">
+            <h3 className="text-2xl font-black border-b-4 border-black pb-2 inline-block">Course Assignments</h3>
             <div className="space-y-4">
               {course.assignments.map((assignment: any) => (
-                <div key={assignment.id} className="bg-white border border-[rgba(30,27,46,0.06)] p-5 rounded-2xl shadow-sm flex flex-col md:flex-row justify-between gap-4 items-start md:items-center">
+                <div key={assignment.id} className="bg-white border-4 border-black p-6 rounded-2xl flex flex-col md:flex-row justify-between gap-4 items-start md:items-center">
                   <div>
-                    <h4 className="text-base font-medium text-[#1E1B2E]">{assignment.title}</h4>
-                    <p className="text-sm text-[#8E8E93] mt-1">{assignment.description}</p>
-                    <div className="mt-3 flex items-center gap-2 text-xs font-medium text-orange-600 bg-orange-50 px-2.5 py-1 rounded-md inline-flex">
-                      Due: {new Date(assignment.dueDate).toLocaleString(undefined, { dateStyle: 'medium', timeStyle: 'short' })}
-                    </div>
+                    <h4 className="text-lg font-black uppercase">{assignment.title}</h4>
+                    <p className="text-xs font-bold text-red-600 mb-2">Due: {new Date(assignment.dueDate).toLocaleString()}</p>
+                    <p className="text-sm font-medium">{assignment.description}</p>
                   </div>
                   {new Date() > new Date(assignment.dueDate) ? (
-                    <button disabled className="h-10 px-5 rounded-xl border border-[rgba(30,27,46,0.1)] bg-[rgba(30,27,46,0.04)] text-[#8E8E93] text-sm font-medium shrink-0">
+                    <Button disabled className="neo-brutalism font-black border-2 border-black whitespace-nowrap opacity-50 bg-gray-300 text-black">
                       Deadline Passed
-                    </button>
+                    </Button>
                   ) : (
-                    <button className="h-10 px-5 rounded-xl border border-[rgba(30,27,46,0.1)] text-[#1E1B2E] text-sm font-medium hover:bg-[rgba(30,27,46,0.03)] transition-colors shrink-0">
+                    <Button className="neo-brutalism font-black border-2 border-black whitespace-nowrap" onClick={() => alert("Submission UI coming soon!")}>
                       Submit Work
-                    </button>
+                    </Button>
                   )}
                 </div>
               ))}
             </div>
-          </motion.div>
+          </div>
         )}
-        
       </div>
 
-      {/* 2. Sidebar - 35% */}
-      <div className="w-full lg:w-80 flex-shrink-0">
+      {/* 2. Sidebar - Course Content */}
+      <aside className="w-full lg:w-80 bg-white border-4 border-black shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] rounded-3xl flex flex-col overflow-hidden shrink-0 lg:max-h-full">
+        <div className="p-6 border-b-4 border-black bg-primary text-white">
+          <h3 className="text-xl font-black uppercase tracking-tight line-clamp-1">{course.title}</h3>
+          <p className="text-xs font-bold opacity-80 mt-1 uppercase tracking-widest">{course.subject}</p>
+        </div>
         
-        {/* Course Card */}
-        <motion.div 
-          initial={shouldReduceMotion ? {} : { opacity: 0, x: 20 }}
-          animate={{ opacity: 1, x: 0 }}
-          transition={{ duration: 0.5, delay: 0.2 }}
-          className="bg-white rounded-2xl overflow-hidden shadow-[0_4px_20px_rgba(0,0,0,0.06)] border border-[rgba(30,27,46,0.04)] sticky top-6"
-        >
-          {/* Course Header Image */}
-          <div className="h-32 bg-gradient-to-br from-[#1E1B2E] to-[#2d2a3d] relative p-5 flex flex-col justify-end">
-            <span className="text-[#C9A96E] text-[11px] font-semibold uppercase tracking-wider mb-1">
-              {course.subject}
-            </span>
-            <h2 className="font-heading text-xl text-white truncate">{course.title}</h2>
-          </div>
-          
-          {/* Progress */}
-          <div className="p-5 border-b border-[rgba(30,27,46,0.04)]">
-            <div className="flex items-center justify-between mb-2">
-              <span className="text-sm text-[#8E8E93]">Course Progress</span>
-              <span className="text-sm font-medium text-[#1E1B2E]">35%</span>
-            </div>
-            <div className="h-2 bg-[#F5F1EB] rounded-full overflow-hidden">
-              <motion.div 
-                initial={shouldReduceMotion ? {} : { width: 0 }}
-                animate={{ width: "35%" }}
-                transition={{ duration: 0.8, delay: 0.5, ease: [0.25, 0.1, 0.25, 1.0] }}
-                className="h-full bg-[#C9A96E] rounded-full"
-              />
-            </div>
-            
-            {/* Points Badge */}
-            <motion.div 
-              initial={shouldReduceMotion ? {} : { scale: 0 }}
-              animate={{ scale: 1 }}
-              transition={{ delay: 0.6, type: "spring" }}
-              className="mt-4 inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-[rgba(201,169,110,0.1)] border border-[rgba(201,169,110,0.2)]"
-            >
-              <Trophy className="w-3.5 h-3.5 text-[#C9A96E]" />
-              <span className="text-xs font-medium text-[#1E1B2E]">+50 Points Earned</span>
-            </motion.div>
-          </div>
-
-          {/* Module List */}
-          <div className="p-2 space-y-1 max-h-[calc(100vh-320px)] overflow-y-auto scrollbar-none">
-            {course.modules.map((module: any) => (
-              <div key={module.id} className="mb-4 last:mb-0">
-                {/* Module Header */}
-                <div className="px-3 py-2">
-                  <h4 className="text-[11px] font-semibold text-[#8E8E93] uppercase tracking-wider">
-                    {module.title}
-                  </h4>
-                </div>
-                
-                {/* Lesson Items */}
-                <div className="space-y-1">
-                  {module.lessons.map((lesson: any, i: number) => {
-                    const isActive = activeLesson?.id === lesson.id;
-                    const isCompleted = false; // Add actual completion logic if available in data model
-                    
-                    return (
-                      <motion.div
-                        key={lesson.id}
-                        initial={shouldReduceMotion ? {} : { opacity: 0, x: 10 }}
-                        animate={{ opacity: 1, x: 0 }}
-                        transition={{ delay: 0.3 + i * 0.05 }}
-                        onClick={() => setActiveLesson(lesson)}
-                        className={`mx-1 rounded-xl px-3 py-2.5 flex items-center gap-3 cursor-pointer transition-all ${
-                          isActive 
-                            ? "bg-[rgba(201,169,110,0.12)] border border-[rgba(201,169,110,0.2)] shadow-sm" 
-                            : "hover:bg-[rgba(30,27,46,0.03)] border border-transparent"
-                        }`}
-                      >
-                        {/* Status Icon */}
-                        <div className={`w-7 h-7 rounded-full flex items-center justify-center flex-shrink-0 ${
-                          isCompleted 
-                            ? "bg-[#C9A96E]" 
-                            : isActive 
-                              ? "bg-[rgba(201,169,110,0.2)]" 
-                              : "bg-[#F5F1EB]"
-                        }`}>
-                          {isCompleted ? (
-                            <Check className="w-3.5 h-3.5 text-white" />
-                          ) : isActive ? (
-                            <Play className="w-3.5 h-3.5 text-[#C9A96E]" />
-                          ) : (
-                            <Lock className="w-3 h-3 text-[#8E8E93]" />
-                          )}
-                        </div>
-                        
-                        <div className="flex-1 min-w-0">
-                          <p className={`text-sm font-medium truncate ${
-                            isActive ? "text-[#1E1B2E]" : "text-[#8E8E93]"
-                          }`}>
-                            {lesson.title}
-                          </p>
-                        </div>
-                        
-                        {isActive && (
-                          <motion.div 
-                            layoutId="activeIndicator"
-                            className="w-1.5 h-1.5 rounded-full bg-[#C9A96E]"
-                          />
-                        )}
-                      </motion.div>
-                    );
-                  })}
-                </div>
+        <div className="flex-1 overflow-y-auto p-4 space-y-6">
+          {course.modules.map((module: any) => (
+            <div key={module.id} className="space-y-3">
+              <h4 className="text-sm font-black uppercase tracking-widest text-muted-foreground flex items-center gap-2">
+                 <div className="w-1.5 h-1.5 bg-black rounded-full" /> {module.title}
+              </h4>
+              <div className="space-y-1">
+                {module.lessons.map((lesson: any) => {
+                  const isActive = activeLesson?.id === lesson.id;
+                  return (
+                    <button
+                      key={lesson.id}
+                      onClick={() => setActiveLesson(lesson)}
+                      className={`w-full text-left p-3 rounded-xl border-2 flex items-center gap-3 transition-all ${
+                        isActive 
+                          ? "bg-accent border-black shadow-[3px_3px_0px_0px_rgba(0,0,0,1)] -translate-x-0.5 -translate-y-0.5" 
+                          : "border-transparent hover:bg-muted"
+                      }`}
+                    >
+                      <div className={`shrink-0 w-8 h-8 rounded-lg flex items-center justify-center border-2 border-black shadow-[1px_1px_0px_0px_rgba(0,0,0,1)] ${isActive ? "bg-white" : "bg-muted"}`}>
+                        {lesson.videoUrl ? <PlayCircle size={16} /> : <BookText size={16} />}
+                      </div>
+                      <span className={`text-sm font-bold line-clamp-1 ${isActive ? "text-black" : "text-slate-600"}`}>
+                        {lesson.title}
+                      </span>
+                      {isActive && <ChevronRight size={14} className="ml-auto" />}
+                    </button>
+                  );
+                })}
               </div>
-            ))}
-          </div>
-        </motion.div>
-        
-      </div>
+            </div>
+          ))}
+        </div>
+      </aside>
     </div>
   );
 }

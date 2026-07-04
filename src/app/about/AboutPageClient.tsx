@@ -3,7 +3,9 @@
 import Image from "next/image";
 import Link from "next/link";
 import { motion } from "framer-motion";
-import { Target, Eye, Star, Heart, Shield, Zap } from "lucide-react";
+import { Target, Eye, Star, Heart, Shield, Zap, Code, Link2, MessageCircle, Mail } from "lucide-react";
+import { useEffect, useState } from "react";
+import { TEAM_MEMBERS } from "@/lib/team";
 
 import { useReducedMotion, useIsMobile } from "@/lib/animations";
 import { FadeIn } from "@/components/animations/FadeIn";
@@ -17,6 +19,29 @@ export default function AboutPageClient() {
   const shouldReduceMotion = useReducedMotion();
 
   const getStaggerDelay = (desktopDelay: number) => isMobile ? desktopDelay * 0.5 : desktopDelay;
+
+  const [stats, setStats] = useState([
+    { target: 2024, suffix: "", label: "FOUNDED" },
+    { target: 12500, suffix: "+", label: "STUDENTS" },
+    { target: 45, suffix: "+", label: "COUNTRIES" },
+    { target: 12, suffix: "+", label: "TEAM" }
+  ]);
+
+  useEffect(() => {
+    fetch("/api/stats/public")
+      .then(res => res.json())
+      .then(data => {
+        if (data.stats) {
+          setStats([
+            { target: 2024, suffix: "", label: "FOUNDED" },
+            { target: data.stats.users || 0, suffix: "+", label: "STUDENTS" },
+            { target: data.stats.institutions || 0, suffix: "+", label: "INSTITUTIONS" },
+            { target: data.stats.courses || 0, suffix: "+", label: "COURSES" }
+          ]);
+        }
+      })
+      .catch(console.error);
+  }, []);
 
   return (
     <div className="flex flex-col overflow-hidden font-sans bg-[#F5F1EB]">
@@ -127,16 +152,18 @@ export default function AboutPageClient() {
               viewport={{ once: true, margin: "-10%" }}
               transition={{ duration: 1.2, ease: [0.075, 0.82, 0.165, 1] }}
               style={{ originY: 0 }}
-              className="w-full h-full bg-[#C9A96E]"
+              className="w-full h-full bg-[rgba(201,169,110,0.3)]"
             />
           </div>
 
           <div className="relative z-10 flex flex-col gap-12">
             {[
-              { year: "2023", title: "Founded", desc: "Skill Sphere started as a small project to help students learn programming." },
-              { year: "2024", title: "First 1,000 Students", desc: "Reached our first milestone with students from 15 countries." },
-              { year: "2025", title: "AI Tutor Launch", desc: "Introduced AI-powered tutoring to provide 24/7 personalized help." },
-              { year: "2026", title: "Global Expansion", desc: "Now serving students across 45+ countries with 200+ courses." }
+              { year: "2024", title: "The Spark", desc: "The idea for Skill Sphere was born from a simple observation: millions of students start online courses, but most quit within weeks. Not because they lack ability, but because they lack guidance, community, and real-time support. We set out to build the platform we wished existed." },
+              { year: "Early 2025", title: "First Prototype", desc: "We built the initial MVP with Next.js, Prisma, and PostgreSQL. The core learning loop — courses, enrollment, progress tracking — took shape. Teachers could create courses, students could enroll, and the foundation was set." },
+              { year: "Mid 2025", title: "AI & Real-Time Chat", desc: "The OpenAI-powered AI Study Tutor launched, giving students 24/7 help. Real-time Course Chat followed, connecting learners in the same course. The multi-role system (Student, Teacher, Admin) was implemented, enabling institutional use." },
+              { year: "Late 2025", title: "Institutions & Parents", desc: "Institution management arrived — schools could onboard, teachers could create private classes, and parents could monitor their child's progress. The platform became a complete ecosystem for structured learning." },
+              { year: "Early 2026", title: "Platform Scale", desc: "Super Admin dashboard, global courses, feedback system, and analytics gave administrators full control. The UI was redesigned to a premium Apple-inspired aesthetic — cream, navy, and gold — reflecting the quality of the learning experience." },
+              { year: "Mid 2026", title: "Community Growth", desc: "Today, Skill Sphere serves thousands of students across institutions. With enhanced gamification, mobile responsiveness, and an ever-growing course catalog, we're just getting started. The mission remains: no learner left behind." }
             ].map((item, index) => {
               const isEven = index % 2 === 0;
               return (
@@ -150,21 +177,21 @@ export default function AboutPageClient() {
                     transition={{ duration: 0.6, ease: [0.25, 0.1, 0.25, 1.0], delay: 0.1 }}
                     className={`w-full md:w-1/2 flex ${isEven ? 'md:justify-end md:pr-12' : 'md:justify-start md:pl-12'} pl-[60px] md:pl-0`}
                   >
-                    <div className="bg-white rounded-xl p-[24px] shadow-[0_4px_20px_rgba(0,0,0,0.06)] max-w-[360px] text-left w-full">
-                      <span className="font-sans text-[12px] text-[#C9A96E] uppercase font-semibold">{item.year}</span>
-                      <h3 className="font-heading text-[20px] text-[#1E1B2E] mt-2 mb-2">{item.title}</h3>
-                      <p className="font-sans text-[14px] text-[#8E8E93] leading-[1.6]">{item.desc}</p>
+                    <div className="bg-transparent max-w-[500px] text-left w-full">
+                      <span className="font-heading text-[24px] text-[#C9A96E]">{item.year}</span>
+                      <h3 className="font-heading text-[20px] text-[#1E1B2E] mt-1 mb-2">{item.title}</h3>
+                      <p className="font-sans text-[14px] text-[#8E8E93] leading-[1.7] max-w-[500px]">{item.desc}</p>
                     </div>
                   </motion.div>
 
                   {/* Dot */}
-                  <div className="absolute left-[24px] md:left-1/2 top-8 -translate-x-1/2">
+                  <div className="absolute left-[24px] md:left-1/2 top-4 -translate-x-1/2">
                     <motion.div 
                       initial={shouldReduceMotion ? { scale: 1 } : { scale: 0 }}
                       whileInView={{ scale: 1 }}
                       viewport={{ once: true }}
                       transition={{ type: "spring", stiffness: 300, damping: 20 }}
-                      className="w-[12px] h-[12px] bg-[#C9A96E] rounded-full shadow-[0_0_0_4px_rgba(201,169,110,0.2)]"
+                      className="w-[12px] h-[12px] bg-[#C9A96E] rounded-full"
                     />
                   </div>
                 </div>
@@ -180,21 +207,38 @@ export default function AboutPageClient() {
           <h2 className="font-heading text-[36px] text-[#1E1B2E]">Meet the Team</h2>
         </FadeIn>
 
-        <StaggerContainer staggerDelay={getStaggerDelay(0.15)} className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-[24px] mt-[40px]">
-          {[
-            { name: "Swayam Chaudhari", role: "Founder & CEO", img: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=400&h=400&fit=crop" },
-            { name: "Mahimna Mistry", role: "Head of Product", img: "https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?w=400&h=400&fit=crop" },
-            { name: "Jal Patel", role: "Lead Designer", img: "https://images.unsplash.com/photo-1519085360753-af0119f7cbe7?w=400&h=400&fit=crop" },
-            { name: "Priya S.", role: "Lead Engineer", img: "https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=400&h=400&fit=crop" }
-          ].map((member, i) => (
+        <StaggerContainer staggerDelay={getStaggerDelay(0.15)} className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-[24px] mt-[40px]">
+          {TEAM_MEMBERS.map((member, i) => (
             <StaggerItem key={i}>
-              <div className="bg-white rounded-2xl overflow-hidden shadow-[0_4px_20px_rgba(0,0,0,0.06)] group transition-all duration-400 hover:-translate-y-1 hover:shadow-[0_12px_32px_rgba(0,0,0,0.12)]">
+              <div className="bg-white rounded-[16px] overflow-hidden flex flex-col shadow-[0_4px_20px_rgba(30,27,46,0.04)] h-full group hover:-translate-y-1 hover:shadow-[0_12px_32px_rgba(30,27,46,0.12)] transition-all duration-300">
                 <div className="w-full aspect-square relative overflow-hidden bg-[#1E1B2E]">
-                  <Image src={member.img} alt={member.name} fill className="object-cover grayscale group-hover:grayscale-0 transition-all duration-400" />
+                  <Image src={member.img} alt={member.name} fill className="object-cover grayscale group-hover:grayscale-0 transition-all duration-500 ease-out" />
                 </div>
-                <div className="text-left">
-                  <h3 className="font-heading text-[18px] text-[#1E1B2E] pt-[16px] px-[20px] pb-[4px]">{member.name}</h3>
-                  <p className="font-sans text-[13px] text-[#8E8E93] px-[20px] pb-[20px]">{member.role}</p>
+                <div className="p-7 flex flex-col flex-1 text-left">
+                  <h3 className="font-heading text-[20px] text-[#1E1B2E] leading-none mb-[8px]">{member.name}</h3>
+                  <p className="font-sans text-[12px] text-[#C9A96E] uppercase tracking-[0.1em] mb-[16px]">{member.role}</p>
+                  <p className="font-sans text-[14px] text-[#8E8E93] leading-[1.6] mb-[24px] flex-grow line-clamp-3">{member.bio}</p>
+                  
+                  <div className="mt-auto flex flex-col gap-4">
+                    {member.socials.email && (
+                      <div className="flex items-center gap-2 text-[#8E8E93] font-sans text-[13px]">
+                        <Mail size={14} />
+                        <a href={`mailto:${member.socials.email}`} className="hover:text-[#C9A96E] transition-colors truncate">{member.socials.email}</a>
+                      </div>
+                    )}
+                    <div className="flex items-center gap-3 border-t border-[rgba(30,27,46,0.06)] pt-4">
+                      {member.socials.github && member.socials.github !== "#" && (
+                        <a href={member.socials.github} target="_blank" rel="noopener noreferrer" className="text-[#8E8E93] hover:text-[#C9A96E] transition-colors">
+                          <Code size={18} />
+                        </a>
+                      )}
+                      {member.socials.linkedin && member.socials.linkedin !== "#" && (
+                        <a href={member.socials.linkedin} target="_blank" rel="noopener noreferrer" className="text-[#8E8E93] hover:text-[#C9A96E] transition-colors">
+                          <Link2 size={18} />
+                        </a>
+                      )}
+                    </div>
+                  </div>
                 </div>
               </div>
             </StaggerItem>
@@ -230,12 +274,7 @@ export default function AboutPageClient() {
       <section className="px-[32px] pb-[80px] max-w-7xl mx-auto w-full">
         <div className="bg-[#1E1B2E] rounded-2xl p-[60px]">
           <StaggerContainer staggerDelay={getStaggerDelay(0.15)} className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-[40px] text-center">
-            {[
-              { target: 2024, suffix: "", label: "FOUNDED" },
-              { target: 12500, suffix: "+", label: "STUDENTS" },
-              { target: 45, suffix: "+", label: "COUNTRIES" },
-              { target: 12, suffix: "+", label: "TEAM" }
-            ].map((stat, i) => (
+            {stats.map((stat, i) => (
               <StaggerItem key={i} className="flex flex-col items-center">
                 <CountUp target={stat.target} suffix={stat.suffix} className="font-heading text-[48px] text-[#C9A96E]" />
                 <span className="font-sans text-[14px] text-white/70 uppercase tracking-[0.08em] mt-[8px]">{stat.label}</span>

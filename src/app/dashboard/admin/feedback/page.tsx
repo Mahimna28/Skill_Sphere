@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { MessageSquare, Calendar, Bug, Lightbulb, Heart } from "lucide-react";
+import { MessageSquare, Calendar, Bug, Lightbulb, Heart, Trash2, Loader2 } from "lucide-react";
 
 export default function AdminFeedbackPage() {
   const [feedbacks, setFeedbacks] = useState<any[]>([]);
@@ -18,6 +18,24 @@ export default function AdminFeedbackPage() {
       if (res.ok) setFeedbacks(data.feedbacks);
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handleDelete = async (id: string) => {
+    if (!confirm("Are you sure you want to delete this feedback?")) return;
+    
+    try {
+      const res = await fetch(`/api/feedback/${id}`, {
+        method: "DELETE",
+      });
+      if (res.ok) {
+        setFeedbacks((prev) => prev.filter((f) => f.id !== id));
+      } else {
+        alert("Failed to delete feedback");
+      }
+    } catch (error) {
+      console.error("Error deleting feedback:", error);
+      alert("Error deleting feedback");
     }
   };
 
@@ -130,8 +148,17 @@ export default function AdminFeedbackPage() {
                   <Calendar size={14} className="text-[#8E8E93]" /> 
                   {new Date(f.createdAt).toLocaleDateString()}
                 </div>
-                <div className={`px-[10px] py-[4px] rounded-full font-sans text-[11px] font-medium capitalize ${getRoleStyle(f.user.role)}`}>
-                  {f.user.role}
+                <div className="flex items-center gap-3">
+                  <div className={`px-[10px] py-[4px] rounded-full font-sans text-[11px] font-medium capitalize ${getRoleStyle(f.user.role)}`}>
+                    {f.user.role}
+                  </div>
+                  <button 
+                    onClick={() => handleDelete(f.id)}
+                    className="p-1.5 text-[#8E8E93] hover:text-red-500 hover:bg-red-50 rounded-md transition-colors"
+                    title="Delete feedback"
+                  >
+                    <Trash2 size={16} />
+                  </button>
                 </div>
               </div>
             </div>

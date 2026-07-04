@@ -36,11 +36,39 @@ export default async function CourseDetailPage({ params }: { params: Promise<{ i
     if (enrollment) isEnrolled = true;
   }
 
+  // Fetch suggested courses (max 3)
+  let suggestedCourses = await prisma.course.findMany({
+    where: { 
+      isPublic: true, 
+      id: { not: courseId },
+      subject: course.subject
+    },
+    take: 3,
+    include: {
+      teacher: { select: { name: true } }
+    }
+  });
+
+  if (suggestedCourses.length < 3) {
+    const additionalCourses = await prisma.course.findMany({
+      where: {
+        isPublic: true,
+        id: { notIn: [courseId, ...suggestedCourses.map(c => c.id)] }
+      },
+      take: 3 - suggestedCourses.length,
+      include: {
+        teacher: { select: { name: true } }
+      }
+    });
+    suggestedCourses = [...suggestedCourses, ...additionalCourses];
+  }
+
   return (
     <CourseDetailClient 
       course={course} 
       userRole={decoded?.role || null} 
-      isEnrolled={isEnrolled} 
+      isEnrolled={isEnrolled}
+      suggestedCourses={suggestedCourses}
     />
   );
 }

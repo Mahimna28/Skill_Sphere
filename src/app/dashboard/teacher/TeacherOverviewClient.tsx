@@ -2,7 +2,9 @@
 
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { FadeIn, SlideUp, StaggerContainer, StaggerItem } from "@/components/animations";
+import { FadeIn } from "@/components/animations/FadeIn";
+import { SlideUp } from "@/components/animations/SlideUp";
+import { StaggerContainer, StaggerItem } from "@/components/animations/StaggerContainer";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { BookOpen, Users, Plus, Loader2, X, Globe, Lock, ShieldAlert } from "lucide-react";

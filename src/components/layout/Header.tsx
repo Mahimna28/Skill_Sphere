@@ -89,13 +89,17 @@ export function Header() {
     { name: "About", href: "/about", icon: Info },
   ];
 
+  const isHomePage = pathname === "/";
+  const shouldHaveSolidBackground = scrolled || !isHomePage;
+
   return (
     <header 
+      style={{ transitionDuration: "600ms", transitionTimingFunction: "cubic-bezier(0.25, 0.1, 0.25, 1.0)" }}
       className={cn(
-        "fixed top-0 w-full z-50 transition-all duration-300 ease-out",
-        scrolled 
-          ? "bg-[rgba(30,27,46,0.9)] shadow-[0_4px_24px_rgba(0,0,0,0.15)] backdrop-blur-xl py-[16px] border-b border-[rgba(255,255,255,0.12)]" 
-          : "bg-[rgba(30,27,46,0.65)] backdrop-blur-xl py-[24px] border-b border-[rgba(255,255,255,0.06)]"
+        "fixed top-0 w-full z-50 transition-all",
+        shouldHaveSolidBackground 
+          ? "bg-[rgba(30,27,46,0.92)] backdrop-blur-xl shadow-[0_4px_24px_rgba(0,0,0,0.2)] py-[16px] border-b border-[rgba(255,255,255,0.08)]" 
+          : "bg-transparent py-[24px]"
       )}
     >
       <div className="max-w-7xl mx-auto px-4 flex items-center justify-between">
@@ -120,7 +124,7 @@ export function Header() {
                     href={link.href} 
                     className={cn(
                       "relative text-[14px] font-medium transition-colors duration-300 py-1",
-                      "after:content-[''] after:absolute after:bottom-0 after:left-1/2 after:-translate-x-1/2 after:h-[2px] after:bg-[#C9A96E] after:transition-all after:duration-300",
+                      "after:content-[''] after:absolute after:-bottom-1 after:left-1/2 after:-translate-x-1/2 after:h-[2px] after:bg-[#C9A96E] after:transition-all after:duration-300",
                       isActive 
                         ? "text-[#C9A96E] after:w-full" 
                         : "text-[rgba(255,255,255,0.85)] hover:text-white after:w-0 hover:after:w-full"
@@ -221,8 +225,8 @@ export function Header() {
             ) : (
               <>
                 <Link href="/login">
-                  <button className="h-[40px] px-5 rounded-xl border border-[#C9A96E] text-[#C9A96E] text-[14px] font-medium transition-colors hover:bg-[#C9A96E] hover:text-[#1E1B2E]">
-                    Sign In
+                  <button className="h-[40px] px-5 rounded-xl border border-[rgba(255,255,255,0.5)] text-white text-[14px] font-medium transition-colors hover:bg-white/10">
+                    Log in
                   </button>
                 </Link>
                 <Link href="/register">

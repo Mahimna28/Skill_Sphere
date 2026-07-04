@@ -2,7 +2,21 @@
 
 import { motion } from "framer-motion";
 
-export function StaggerContainer({ children, className = "", delay = 0, staggerDelay = 0.1 }: { children: React.ReactNode, className?: string, delay?: number, staggerDelay?: number }) {
+export function StaggerContainer({
+  children,
+  className = "",
+  delay = 0,
+  delayChildren,
+  staggerDelay = 0.1,
+}: {
+  children: React.ReactNode;
+  className?: string;
+  delay?: number;
+  delayChildren?: number;
+  staggerDelay?: number;
+}) {
+  const resolvedDelay = delayChildren ?? delay;
+
   return (
     <motion.div
       initial="hidden"
@@ -12,7 +26,7 @@ export function StaggerContainer({ children, className = "", delay = 0, staggerD
         hidden: {},
         show: {
           transition: {
-            delayChildren: delay,
+            delayChildren: resolvedDelay,
             staggerChildren: staggerDelay,
           },
         },

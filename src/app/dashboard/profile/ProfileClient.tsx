@@ -11,10 +11,16 @@ import {
   Users, BarChart3, LayoutDashboard, X,
   Briefcase, GraduationCap as CertIcon, Activity,
   Target, Zap, Flame, Info, CheckCircle2, Download,
-  Unlock, Globe, EyeOff, Pencil, Trash2
+  Unlock, Globe, EyeOff, Pencil, Trash2, Eye
 } from "lucide-react";
 
-export default function ProfileClient({ user, roleData }: { user: any, roleData: any }) {
+interface Props {
+  user: any;
+  roleData: any;
+  hasPassword?: boolean;
+}
+
+export default function ProfileClient({ user, roleData, hasPassword = true }: Props) {
   const router = useRouter();
   const [isEditing, setIsEditing] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -411,7 +417,7 @@ export default function ProfileClient({ user, roleData }: { user: any, roleData:
               
               <h4 className="text-[12px] uppercase tracking-[0.08em] font-medium text-[#8E8E93] mb-4">Security Settings</h4>
               <div className="space-y-4 mb-6">
-                <PasswordChangeSection />
+                <PasswordChangeSection hasPassword={hasPassword} />
                 
                 {/* Privacy toggle if not editing */}
                 {!isEditing && ["student", "parent"].includes(user.role) && (
@@ -442,13 +448,14 @@ export default function ProfileClient({ user, roleData }: { user: any, roleData:
   );
 }
 
-function PasswordChangeSection() {
+function PasswordChangeSection({ hasPassword }: { hasPassword: boolean }) {
   const [show, setShow] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
   const [status, setStatus] = useState<{ type: "success" | "error", message: string } | null>(null);
   const [passwords, setPasswords] = useState({ oldPassword: "", newPassword: "", confirmPassword: "" });
 
-  const handlePasswordChange = async (e: React.FormEvent) => {
+  const handlePasswordChange = async (e: React.MouseEvent | React.FormEvent) => {
     e.preventDefault();
     if (passwords.newPassword !== passwords.confirmPassword) {
       setStatus({ type: "error", message: "New passwords do not match" });
@@ -456,25 +463,39 @@ function PasswordChangeSection() {
     }
     setLoading(true); setStatus(null);
     try {
+      const bodyPayload = hasPassword 
+        ? { oldPassword: passwords.oldPassword, newPassword: passwords.newPassword }
+        : { newPassword: passwords.newPassword };
+
       const res = await fetch("/api/profile/change-password", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ oldPassword: passwords.oldPassword, newPassword: passwords.newPassword }),
+        body: JSON.stringify(bodyPayload),
       });
       const data = await res.json();
       if (res.ok) {
-        setStatus({ type: "success", message: "Success!" });
+        setStatus({ type: "success", message: "Password successfully updated!" });
         setPasswords({ oldPassword: "", newPassword: "", confirmPassword: "" });
-        setTimeout(() => setShow(false), 2000);
+        setTimeout(() => {
+          setShow(false);
+          window.location.reload();
+        }, 1500);
       } else { setStatus({ type: "error", message: data.message }); }
-    } catch (err) { setStatus({ type: "error", message: "Failed" }); }
+    } catch (err) { setStatus({ type: "error", message: "Failed to update password." }); }
     finally { setLoading(false); }
+  };
+
+  const handleKeyDown = (e: React.KeyboardEvent) => {
+    if (e.key === "Enter") {
+      e.preventDefault();
+      handlePasswordChange(e);
+    }
   };
 
   if (!show) {
     return (
       <button type="button" onClick={() => setShow(true)} className="w-full h-[40px] rounded-xl border border-[#1E1B2E] text-[#1E1B2E] text-[14px] font-medium hover:bg-[#1E1B2E] hover:text-white transition-colors">
-        Change Password
+        {hasPassword ? "Change Password" : "Make Password"}
       </button>
     );
   }
@@ -482,18 +503,37 @@ function PasswordChangeSection() {
   return (
     <div className="p-4 bg-[rgba(30,27,46,0.02)] border border-[rgba(30,27,46,0.06)] rounded-xl space-y-3">
       <div className="flex items-center justify-between">
-        <h4 className="text-[11px] font-medium uppercase tracking-[0.08em] text-[#1E1B2E]">Update Password</h4>
+        <h4 className="text-[11px] font-medium uppercase tracking-[0.08em] text-[#1E1B2E]">
+          {hasPassword ? "Update Password" : "Set Password"}
+        </h4>
         <button onClick={() => setShow(false)} className="text-[#8E8E93] hover:text-[#1E1B2E]"><X size={14} /></button>
       </div>
-      <form onSubmit={handlePasswordChange} className="space-y-3">
-        <input type="password" required className="w-full h-[36px] bg-white border border-[rgba(30,27,46,0.12)] rounded-lg px-3 text-[13px] text-[#1E1B2E] focus:outline-none focus:border-[#C9A96E]" placeholder="Old Password" value={passwords.oldPassword} onChange={e => setPasswords({...passwords, oldPassword: e.target.value})} />
-        <input type="password" required className="w-full h-[36px] bg-white border border-[rgba(30,27,46,0.12)] rounded-lg px-3 text-[13px] text-[#1E1B2E] focus:outline-none focus:border-[#C9A96E]" placeholder="New Password" value={passwords.newPassword} onChange={e => setPasswords({...passwords, newPassword: e.target.value})} />
-        <input type="password" required className="w-full h-[36px] bg-white border border-[rgba(30,27,46,0.12)] rounded-lg px-3 text-[13px] text-[#1E1B2E] focus:outline-none focus:border-[#C9A96E]" placeholder="Confirm" value={passwords.confirmPassword} onChange={e => setPasswords({...passwords, confirmPassword: e.target.value})} />
-        {status && <p className={`text-[11px] font-medium ${status.type === "success" ? "text-[#C9A96E]" : "text-[#DC2626]"}`}>{status.message}</p>}
-        <button type="submit" disabled={loading} className="w-full h-[36px] rounded-lg bg-[#1E1B2E] text-white text-[13px] font-medium hover:bg-[#2A2640] transition-colors disabled:opacity-50 flex items-center justify-center">
-          {loading ? <Loader2 className="w-4 h-4 animate-spin" /> : "Update"}
+      <div className="space-y-3">
+        {hasPassword && (
+          <div className="relative">
+            <input type={showPassword ? "text" : "password"} required className="w-full h-[36px] bg-white border border-[rgba(30,27,46,0.12)] rounded-lg px-3 pr-10 text-[13px] text-[#1E1B2E] focus:outline-none focus:border-[#C9A96E] [&::-ms-reveal]:hidden [&::-ms-clear]:hidden" placeholder="Current Password" value={passwords.oldPassword} onChange={e => setPasswords({...passwords, oldPassword: e.target.value})} onKeyDown={handleKeyDown} />
+            <button type="button" onClick={() => setShowPassword(!showPassword)} className="absolute right-3 top-1/2 -translate-y-1/2 text-[#1E1B2E] opacity-50 hover:opacity-100 hover:text-[#C9A96E] transition-colors">
+              {showPassword ? <EyeOff size={15} /> : <Eye size={15} />}
+            </button>
+          </div>
+        )}
+        <div className="relative">
+          <input type={showPassword ? "text" : "password"} required className="w-full h-[36px] bg-white border border-[rgba(30,27,46,0.12)] rounded-lg px-3 pr-10 text-[13px] text-[#1E1B2E] focus:outline-none focus:border-[#C9A96E] [&::-ms-reveal]:hidden [&::-ms-clear]:hidden" placeholder="New Password (min 8 chars, 1 uppercase, 1 number, 1 special)" value={passwords.newPassword} onChange={e => setPasswords({...passwords, newPassword: e.target.value})} onKeyDown={handleKeyDown} />
+          <button type="button" onClick={() => setShowPassword(!showPassword)} className="absolute right-3 top-1/2 -translate-y-1/2 text-[#1E1B2E] opacity-50 hover:opacity-100 hover:text-[#C9A96E] transition-colors">
+            {showPassword ? <EyeOff size={15} /> : <Eye size={15} />}
+          </button>
+        </div>
+        <div className="relative">
+          <input type={showPassword ? "text" : "password"} required className="w-full h-[36px] bg-white border border-[rgba(30,27,46,0.12)] rounded-lg px-3 pr-10 text-[13px] text-[#1E1B2E] focus:outline-none focus:border-[#C9A96E] [&::-ms-reveal]:hidden [&::-ms-clear]:hidden" placeholder="Confirm New Password" value={passwords.confirmPassword} onChange={e => setPasswords({...passwords, confirmPassword: e.target.value})} onKeyDown={handleKeyDown} />
+          <button type="button" onClick={() => setShowPassword(!showPassword)} className="absolute right-3 top-1/2 -translate-y-1/2 text-[#1E1B2E] opacity-50 hover:opacity-100 hover:text-[#C9A96E] transition-colors">
+            {showPassword ? <EyeOff size={15} /> : <Eye size={15} />}
+          </button>
+        </div>
+        {status && <p className={`text-[12px] font-medium ${status.type === "success" ? "text-[#C9A96E]" : "text-[#DC2626]"}`}>{status.message}</p>}
+        <button type="button" onClick={handlePasswordChange} disabled={loading} className="w-full h-[36px] rounded-lg bg-[#1E1B2E] text-white text-[13px] font-medium hover:bg-[#2A2640] transition-colors disabled:opacity-50 flex items-center justify-center">
+          {loading ? <Loader2 className="w-4 h-4 animate-spin" /> : "Update Password"}
         </button>
-      </form>
+      </div>
     </div>
   );
 }

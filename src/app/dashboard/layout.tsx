@@ -3,7 +3,7 @@
 import Link from "next/link";
 import Image from "next/image";
 import { usePathname, useRouter } from "next/navigation";
-import { BookOpen, LogOut, MessageSquare, Sparkles, Trophy, Users, Shield, LayoutDashboard, UserCircle, Menu, X, School, Home, Bell, HelpCircle, Heart, Globe, Settings, ShieldAlert, Search, ChevronDown } from "lucide-react";
+import { BookOpen, LogOut, MessageSquare, Sparkles, Trophy, Users, Shield, LayoutDashboard, UserCircle, Menu, X, School, Home, Bell, HelpCircle, Heart, Globe, Settings, ShieldAlert, Search, ChevronDown, PenTool } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { useState, useEffect, useRef } from "react";
@@ -81,6 +81,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
           { href: "/dashboard/teacher/students", label: "My Students", icon: Users },
           { href: "/dashboard/teacher/institutions", label: "Institutions", icon: School },
           { href: "/dashboard/teacher/community", label: "Community", icon: Users },
+          { href: "/dashboard/teacher/blog/create", label: "Write Blog", icon: PenTool },
         ];
       case "parent":
         return [
@@ -93,12 +94,17 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
           { href: "/dashboard/admin/courses", label: "Global Courses", icon: BookOpen },
           { href: "/dashboard/admin/feedback", label: "Review Feedback", icon: Heart },
           { href: "/dashboard/admin/promote", label: "Promote Admins", icon: ShieldAlert },
+          { href: "/dashboard/admin/blog/create", label: "Write Blog", icon: PenTool },
         ];
       case "institute_admin":
         return [
-          { href: "/dashboard/teacher", label: "Teacher Dashboard", icon: BookOpen },
+          { href: "/dashboard/teacher", label: "Overview", icon: LayoutDashboard },
+          { href: "/dashboard/teacher/courses", label: "Manage Courses", icon: BookOpen },
+          { href: "/dashboard/teacher/students", label: "My Students", icon: Users },
+          { href: "/dashboard/teacher/institutions", label: "Institutions", icon: School },
+          { href: "/dashboard/teacher/community", label: "Community", icon: Users },
+          { href: "/dashboard/teacher/blog/create", label: "Write Blog", icon: PenTool },
           { href: "/dashboard/admin/institute", label: "My Institute", icon: Shield },
-          { href: "/dashboard/admin/feedback", label: "Review Feedback", icon: Heart },
         ];
       default:
         return [];

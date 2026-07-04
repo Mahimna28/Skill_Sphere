@@ -5,6 +5,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { Sparkles, Check, CheckCircle, XCircle, Play, Trophy } from "lucide-react";
 import { Header } from "@/components/layout/Header";
 import { Footer } from "@/components/layout/Footer";
+import Link from "next/link";
 
 // Reusable Feature Section component
 type FeatureSectionProps = {
@@ -14,7 +15,6 @@ type FeatureSectionProps = {
   image: string;
   imagePosition?: "left" | "right";
   features: string[];
-  stats?: { value: string; label: string }[];
 };
 
 function FeatureSection({ 
@@ -23,8 +23,7 @@ function FeatureSection({
   description, 
   image, 
   imagePosition = "right",
-  features,
-  stats
+  features
 }: FeatureSectionProps) {
   return (
     <section className="py-24 bg-[#F5F1EB] overflow-hidden">
@@ -61,18 +60,6 @@ function FeatureSection({
               </motion.div>
             ))}
           </div>
-
-          {/* Stats */}
-          {stats && (
-            <div className="flex gap-8 mt-8 pt-8 border-t border-[rgba(30,27,46,0.08)]">
-              {stats.map((stat, i) => (
-                <div key={i}>
-                  <p className="font-heading text-3xl text-[#C9A96E]">{stat.value}</p>
-                  <p className="text-sm text-[#8E8E93]">{stat.label}</p>
-                </div>
-              ))}
-            </div>
-          )}
         </motion.div>
 
         {/* Image Side */}
@@ -153,20 +140,24 @@ function HeroSection() {
           </p>
           
           <div className="flex flex-wrap gap-4">
-            <motion.button
-              whileHover={{ scale: 1.03 }}
-              whileTap={{ scale: 0.97 }}
-              className="px-8 py-3.5 rounded-xl bg-[#C9A96E] text-[#1E1B2E] font-medium"
-            >
-              Get Started Free
-            </motion.button>
-            <motion.button
-              whileHover={{ scale: 1.03 }}
-              whileTap={{ scale: 0.97 }}
-              className="px-8 py-3.5 rounded-xl border border-white/20 text-white font-medium hover:bg-white/10 transition-colors"
-            >
-              Watch Demo
-            </motion.button>
+            <Link href="/register">
+              <motion.button
+                whileHover={{ scale: 1.03 }}
+                whileTap={{ scale: 0.97 }}
+                className="px-8 py-3.5 rounded-xl bg-[#C9A96E] text-[#1E1B2E] font-medium"
+              >
+                Get Started Free
+              </motion.button>
+            </Link>
+            <Link href="/courses">
+              <motion.button
+                whileHover={{ scale: 1.03 }}
+                whileTap={{ scale: 0.97 }}
+                className="px-8 py-3.5 rounded-xl border border-white/20 text-white font-medium hover:bg-white/10 transition-colors"
+              >
+                Explore Courses
+              </motion.button>
+            </Link>
           </div>
         </motion.div>
 
@@ -376,7 +367,7 @@ function StorySection() {
               ))}
             </div>
             <p className="text-sm text-[#8E8E93]">
-              <span className="text-[#1E1B2E] font-medium">12,000+</span> students started this week
+              Join the growing community
             </p>
           </div>
         </motion.div>
@@ -477,20 +468,24 @@ function CTASection() {
           Join 50,000+ students already learning on Skill Sphere. It's free to get started.
         </p>
         <div className="flex flex-wrap gap-4 justify-center">
-          <motion.button
-            whileHover={{ scale: 1.03 }}
-            whileTap={{ scale: 0.97 }}
-            className="px-8 py-4 rounded-xl bg-[#C9A96E] text-[#1E1B2E] font-medium text-lg"
-          >
-            Create Free Account
-          </motion.button>
-          <motion.button
-            whileHover={{ scale: 1.03 }}
-            whileTap={{ scale: 0.97 }}
-            className="px-8 py-4 rounded-xl border border-white/20 text-white font-medium text-lg hover:bg-white/10 transition-colors"
-          >
-            Explore Courses
-          </motion.button>
+          <Link href="/register">
+            <motion.button
+              whileHover={{ scale: 1.03 }}
+              whileTap={{ scale: 0.97 }}
+              className="px-8 py-4 rounded-xl bg-[#C9A96E] text-[#1E1B2E] font-medium text-lg"
+            >
+              Create Free Account
+            </motion.button>
+          </Link>
+          <Link href="/courses">
+            <motion.button
+              whileHover={{ scale: 1.03 }}
+              whileTap={{ scale: 0.97 }}
+              className="px-8 py-4 rounded-xl border border-white/20 text-white font-medium text-lg hover:bg-white/10 transition-colors"
+            >
+              Explore Courses
+            </motion.button>
+          </Link>
         </div>
       </motion.div>
     </section>
@@ -511,10 +506,6 @@ export default function FeaturesPage() {
       "Get step-by-step explanations with real examples",
       "Generate custom quizzes based on your weak areas",
       "Save conversations and revisit them anytime"
-    ],
-    stats: [
-      { value: "10K+", label: "Questions Answered" },
-      { value: "4.9★", label: "Student Rating" }
     ]
   };
 
@@ -529,10 +520,6 @@ export default function FeaturesPage() {
       "Built-in code editor for hands-on practice",
       "Auto-graded quizzes with instant feedback",
       "Progress tracking with visual skill trees"
-    ],
-    stats: [
-      { value: "500+", label: "Video Lessons" },
-      { value: "50+", label: "Interactive Labs" }
     ]
   };
 
@@ -547,10 +534,6 @@ export default function FeaturesPage() {
       "Q&A forum with upvoting and verified answers",
       "Direct messaging with instructors and peers",
       "Study groups for collaborative learning"
-    ],
-    stats: [
-      { value: "2.5K", label: "Daily Messages" },
-      { value: "98%", label: "Questions Answered" }
     ]
   };
 
@@ -565,10 +548,6 @@ export default function FeaturesPage() {
       "Achievement badges for milestones",
       "Global and course-specific leaderboards",
       "Redeem points for certificates and rewards"
-    ],
-    stats: [
-      { value: "15K", label: "Active Streaks" },
-      { value: "120", label: "Achievement Badges" }
     ]
   };
 

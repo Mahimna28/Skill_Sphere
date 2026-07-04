@@ -46,6 +46,7 @@ interface Props {
   course: Course;
   userRole: string | null;
   isEnrolled: boolean;
+  suggestedCourses?: any[];
 }
 
 const MOCK_MODULES = [
@@ -74,7 +75,7 @@ const MOCK_MODULES = [
   }
 ];
 
-export default function CourseDetailClient({ course, userRole, isEnrolled }: Props) {
+export default function CourseDetailClient({ course, userRole, isEnrolled, suggestedCourses = [] }: Props) {
   const router = useRouter();
   const [activeTab, setActiveTab] = useState<"overview" | "curriculum">("overview");
   const [expandedModules, setExpandedModules] = useState<Set<string>>(new Set(["m1", course.modules[0]?.id]));
@@ -512,18 +513,21 @@ export default function CourseDetailClient({ course, userRole, isEnrolled }: Pro
           </h2>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            {[1, 2, 3].map((item, idx) => (
+            {suggestedCourses.map((suggested) => (
               <div
-                key={item}
+                key={suggested.id}
               >
-                <div className="bg-white rounded-[16px] overflow-hidden flex flex-col shadow-[0_4px_20px_rgba(30,27,46,0.04)] hover:shadow-[0_12px_40px_rgba(30,27,46,0.08)] hover:-translate-y-2 transition-all duration-300 group cursor-pointer">
-                  <div className="w-full aspect-[16/9] bg-[#1E1B2E] relative overflow-hidden">
-                    <Image src={`https://images.unsplash.com/photo-1551288049-bebda4e38f71?auto=format&fit=crop&q=80&w=800`} alt="Course" fill className="object-cover opacity-80 group-hover:scale-105 transition-transform duration-700" />
+                <div 
+                  onClick={() => router.push(`/courses/${suggested.id}`)}
+                  className="bg-white rounded-[16px] overflow-hidden flex flex-col shadow-[0_4px_20px_rgba(30,27,46,0.04)] hover:shadow-[0_12px_40px_rgba(30,27,46,0.08)] hover:-translate-y-2 transition-all duration-300 group cursor-pointer h-full"
+                >
+                  <div className="w-full aspect-[16/9] bg-[#1E1B2E] relative overflow-hidden shrink-0">
+                    <Image src={suggested.thumbnail || `https://images.unsplash.com/photo-1551288049-bebda4e38f71?auto=format&fit=crop&q=80&w=800`} alt={suggested.title} fill className="object-cover opacity-80 group-hover:scale-105 transition-transform duration-700" />
                   </div>
-                  <div className="p-6">
-                    <h3 className="font-heading text-[20px] text-[#1E1B2E] mb-2 leading-[1.2]">Data Science Fundamentals</h3>
+                  <div className="p-6 flex flex-col flex-1">
+                    <h3 className="font-heading text-[20px] text-[#1E1B2E] mb-2 leading-[1.2] line-clamp-2">{suggested.title}</h3>
                     <div className="flex items-center gap-2 mb-4 text-[#8E8E93] font-sans text-[13px]">
-                      <span>by David Chen</span>
+                      <span>by {suggested.teacher?.name || "Instructor"}</span>
                     </div>
                     <div className="flex items-end justify-between mt-auto">
                       <span className="font-heading text-[20px] text-[#1E1B2E]">Free</span>
