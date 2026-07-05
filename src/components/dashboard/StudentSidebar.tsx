@@ -2,7 +2,6 @@
 
 import React, { useState, useEffect } from "react";
 import Link from "next/link";
-import Image from "next/image";
 import { usePathname, useSearchParams } from "next/navigation";
 import { motion, AnimatePresence, useReducedMotion } from "framer-motion";
 import {
@@ -11,25 +10,33 @@ import {
   Trophy,
   Sparkles,
   School,
-  UserCircle,
   Heart,
-  Bell,
-  LogOut,
+  Home,
   Menu,
   X,
+  Users,
+  HelpCircle,
+  MessageSquare,
+  Settings,
+  ShieldAlert,
+  Shield,
 } from "lucide-react";
 import { isCommunityHubEnabled } from "@/lib/features";
 import { SidebarItem, CommunityHubSidebarGroup } from "@/components/ui/SidebarItem";
 import "@/styles/sidebar.css";
 
 interface StudentSidebarProps {
-  userName: string;
+  userName?: string;
+  userRole?: string;
+  userImage?: string | null;
   unreadCount?: number;
   onLogout: () => void;
 }
 
 export default function StudentSidebar({
   userName = "Student User",
+  userRole = "student",
+  userImage = null,
   unreadCount = 0,
   onLogout,
 }: StudentSidebarProps) {
@@ -52,42 +59,97 @@ export default function StudentSidebar({
     badge?: number;
   };
 
-  const navItemsTop: NavItem[] = [
-    { href: "/dashboard/student", label: "Overview", icon: LayoutDashboard },
-    { href: "/dashboard/student/courses", label: "My Courses", icon: BookOpen },
-    { href: "/dashboard/student/leaderboard", label: "Leaderboard", icon: Trophy },
-  ];
+  // Determine nav items based on userRole
+  const getNavItems = () => {
+    if (userRole === "teacher") {
+      return {
+        top: [
+          { href: "/dashboard/teacher", label: "Overview", icon: LayoutDashboard },
+          { href: "/dashboard/teacher/courses", label: "Manage Courses", icon: BookOpen },
+          { href: "/dashboard/teacher/students", label: "My Students", icon: Users },
+          { href: "/dashboard/teacher/institutions", label: "Institutions", icon: School },
+          { href: "/dashboard/qa", label: "Q&A Forum", icon: HelpCircle },
+        ],
+        bottom: [
+          { href: "/dashboard/chat/direct", label: "Messages", icon: MessageSquare },
+          { href: "/dashboard/feedback", label: "Give Feedback", icon: Heart },
+        ],
+      };
+    }
 
-  const navItemsBottom: NavItem[] = [
-    { href: "/dashboard/student/ai-tutor", label: "AI Study Tutor", icon: Sparkles },
-    { href: "/dashboard/student/institutions", label: "Institutions", icon: School },
-    { href: "/dashboard/profile", label: "My Profile", icon: UserCircle },
-    { href: "/dashboard/feedback", label: "Give Feedback", icon: Heart },
-  ];
+    if (userRole === "parent") {
+      return {
+        top: [
+          { href: "/dashboard/parent", label: "Overview", icon: LayoutDashboard },
+        ],
+        bottom: [
+          { href: "/dashboard/chat/direct", label: "Messages", icon: MessageSquare },
+          { href: "/dashboard/feedback", label: "Give Feedback", icon: Heart },
+        ],
+      };
+    }
+
+    if (userRole === "superadmin" || userRole === "admin") {
+      return {
+        top: [
+          { href: "/dashboard/admin", label: "Master Panel", icon: LayoutDashboard },
+          { href: "/dashboard/admin/system", label: "System Control", icon: Settings },
+          { href: "/dashboard/admin/courses", label: "Global Courses", icon: BookOpen },
+          { href: "/dashboard/admin/feedback", label: "Review Feedback", icon: Heart },
+          { href: "/dashboard/admin/promote", label: "Promote Admins", icon: ShieldAlert },
+        ],
+        bottom: [
+          { href: "/dashboard/chat/direct", label: "Messages", icon: MessageSquare },
+          { href: "/dashboard/feedback", label: "Give Feedback", icon: Heart },
+        ],
+      };
+    }
+
+    if (userRole === "institute_admin") {
+      return {
+        top: [
+          { href: "/dashboard/teacher", label: "Teacher Dashboard", icon: BookOpen },
+          { href: "/dashboard/admin/institute", label: "My Institute", icon: Shield },
+          { href: "/dashboard/admin/feedback", label: "Review Feedback", icon: Heart },
+        ],
+        bottom: [
+          { href: "/dashboard/chat/direct", label: "Messages", icon: MessageSquare },
+          { href: "/dashboard/feedback", label: "Give Feedback", icon: Heart },
+        ],
+      };
+    }
+
+    // Default: Student Portal
+    return {
+      top: [
+        { href: "/dashboard/student", label: "Overview", icon: LayoutDashboard },
+        { href: "/dashboard/student/courses", label: "My Courses", icon: BookOpen },
+        { href: "/dashboard/student/leaderboard", label: "Leaderboard", icon: Trophy },
+      ],
+      bottom: [
+        { href: "/dashboard/student/ai-tutor", label: "AI Study Tutor", icon: Sparkles },
+        { href: "/dashboard/student/institutions", label: "Institutions", icon: School },
+        { href: "/dashboard/feedback", label: "Give Feedback", icon: Heart },
+      ],
+    };
+  };
+
+  const navItems = getNavItems();
 
   const isItemActive = (href: string) => {
-    if (href === "/dashboard/student") {
-      return pathname === "/dashboard/student" || pathname === "/dashboard/student/overview";
+    if (href === "/dashboard/student" || href === "/dashboard/teacher" || href === "/dashboard/parent" || href === "/dashboard/admin") {
+      return pathname === href || pathname === `${href}/overview`;
     }
     if (href === "/dashboard/student/ai-tutor") {
       return pathname?.startsWith("/dashboard/student/ai-tutor") || pathname?.startsWith("/dashboard/student/aitutor");
     }
-    if (href === "/dashboard/profile") {
-      return pathname?.startsWith("/dashboard/profile") || pathname?.startsWith("/dashboard/student/profile");
-    }
-    if (href === "/dashboard/notifications") {
-      return pathname?.startsWith("/dashboard/notifications") || pathname?.startsWith("/dashboard/student/notifications");
+    if (href === "/") {
+      return pathname === "/";
     }
     return pathname?.startsWith(href);
   };
 
-  // Generate User Initials
-  const initials = (userName || "Student User")
-    .split(" ")
-    .map((n) => n[0])
-    .join("")
-    .slice(0, 2)
-    .toUpperCase();
+
 
   const easing = [0.16, 1, 0.3, 1];
 
@@ -120,15 +182,14 @@ export default function StudentSidebar({
       role="navigation"
       aria-label="Main sidebar"
     >
-      {/* Top Brand Area: Only SkillSphere in big bold letters, no logo */}
-      <div className="relative z-10 px-3 py-5 border-b border-white/10 mb-2">
+      {/* Top Brand Area: "Skill Sphere" logo — Playfair Display, 20px, white */}
+      <div className="relative z-10 px-3 py-5 border-b border-[rgba(255,255,255,0.08)] mb-2">
         <div className="flex items-center justify-between">
           <Link href="/" className="block">
             <span
-              className="text-2xl font-black tracking-tight text-white"
-              style={{ fontFamily: "var(--font-heading, serif)" }}
+              className="text-[20px] font-bold tracking-tight text-white font-heading"
             >
-              SkillSphere
+              Skill Sphere
             </span>
           </Link>
           <button
@@ -148,7 +209,7 @@ export default function StudentSidebar({
         variants={sidebarVariants as any}
         className="sidebar-nav-scroll relative z-10 flex-1 space-y-0.5 overflow-y-auto pr-1 flex flex-col"
       >
-        {navItemsTop.map((item) => (
+        {navItems.top.map((item) => (
           <motion.div key={`${item.label}-${item.href}`} variants={navItemVariants as any}>
             <SidebarItem
               href={item.href}
@@ -161,13 +222,16 @@ export default function StudentSidebar({
           </motion.div>
         ))}
 
-        <motion.div variants={navItemVariants as any}>
-          <CommunityHubSidebarGroup />
-        </motion.div>
+        {/* Community Hub only for students */}
+        {userRole === "student" && (
+          <motion.div variants={navItemVariants as any}>
+            <CommunityHubSidebarGroup />
+          </motion.div>
+        )}
 
-        <div className="my-2 border-t border-white/10 mx-2" />
+        <div className="my-2 border-t border-[rgba(255,255,255,0.08)] mx-2" />
 
-        {navItemsBottom.map((item) => (
+        {navItems.bottom.map((item) => (
           <motion.div key={`${item.label}-${item.href}`} variants={navItemVariants as any}>
             <SidebarItem
               href={item.href}
@@ -180,40 +244,15 @@ export default function StudentSidebar({
           </motion.div>
         ))}
 
-        {/* Bottom Section: Notifications, User Info & Reddish Logout Button */}
-        <div className="mt-auto pt-3 border-t border-white/10 space-y-2">
+        {/* Bottom Section: Home Button (replacing user info) */}
+        <div className="mt-auto pt-3 border-t border-[rgba(255,255,255,0.08)] px-2 pb-2">
           <SidebarItem
-            href="/dashboard/notifications"
-            label="Notifications"
-            icon={Bell}
-            active={isItemActive("/dashboard/notifications")}
-            badge={unreadCount}
+            href="/"
+            label="Home"
+            icon={Home}
+            active={pathname === "/"}
             shouldReduceMotion={shouldReduceMotion}
           />
-
-          <div className="pt-3 border-t border-white/10 space-y-3">
-            <div className="flex items-center gap-3 px-2 py-1">
-              <div className="w-9 h-9 rounded-full bg-[#C9A96E] text-[#1E1B2E] font-extrabold text-sm flex items-center justify-center shrink-0 shadow-md">
-                {initials}
-              </div>
-              <div className="min-w-0 flex-1">
-                <h4 className="text-sm font-bold text-white truncate leading-tight">
-                  {userName}
-                </h4>
-                <span className="block text-[10px] font-bold text-[#C9A96E] tracking-wider uppercase truncate mt-0.5">
-                  LEVEL 2 EXPLORER
-                </span>
-              </div>
-            </div>
-
-            <button
-              onClick={onLogout}
-              className="w-full bg-red-500/15 hover:bg-red-500 text-red-400 hover:text-white border border-red-500/30 hover:border-red-500 transition-all duration-200 flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl font-bold text-sm shadow-sm cursor-pointer"
-            >
-              <LogOut size={16} />
-              <span>Logout</span>
-            </button>
-          </div>
         </div>
       </motion.nav>
     </div>
@@ -221,24 +260,23 @@ export default function StudentSidebar({
 
   return (
     <>
-      {/* Desktop Native macOS Vibrant Sidebar (Exact 280px Width) */}
+      {/* Desktop Native macOS Vibrant Sidebar (Exact 260px Width) */}
       <motion.aside
         initial="hidden"
         animate="visible"
         variants={sidebarVariants as any}
-        className="hidden md:flex md:w-[280px] md:flex-col md:fixed md:top-0 md:bottom-0 md:left-0 md:z-50 shrink-0"
+        className="hidden md:flex md:w-[260px] md:flex-col md:fixed md:top-0 md:bottom-0 md:left-0 md:z-50 shrink-0"
       >
         {sidebarContent}
       </motion.aside>
 
-      {/* Mobile Top Header: Only SkillSphere heading in bold letters */}
-      <div className="md:hidden flex items-center justify-between px-5 py-4 bg-[#1E1B2E] text-white border-b border-white/10 sticky top-0 z-40">
+      {/* Mobile Top Header */}
+      <div className="md:hidden flex items-center justify-between px-5 py-4 bg-[#1E1B2E] text-white border-b border-[rgba(255,255,255,0.08)] sticky top-0 z-40">
         <Link href="/" className="block">
           <span
-            className="font-black text-xl text-white tracking-tight"
-            style={{ fontFamily: "var(--font-heading, serif)" }}
+            className="font-bold text-[20px] text-white tracking-tight font-heading"
           >
-            SkillSphere
+            Skill Sphere
           </span>
         </Link>
         <button
@@ -250,7 +288,7 @@ export default function StudentSidebar({
         </button>
       </div>
 
-      {/* Mobile Slide-in Drawer with Glassmorphism & Spring Physics */}
+      {/* Mobile Slide-in Drawer */}
       <AnimatePresence>
         {mobileOpen && (
           <>

@@ -52,23 +52,23 @@
   position: relative;
 }
 
-/* Hover state: background rgba(255, 255, 255, 0.08), cursor pointer */
+/* Hover state: background rgba(255, 255, 255, 0.05), cursor pointer */
 .sidebar-group-toggle:hover,
 .sidebar-item-glass:hover {
-  background: var(--hover-bg);
+  background: rgba(255, 255, 255, 0.05) !important;
   color: #FFFFFF;
   transform: none !important;
   box-shadow: none !important;
 }
 
-/* Selected / Active state: Solid Gold Pill #C9A96E with dark text #1E1B2E (matching Resume Playback button) */
+/* Selected / Active state: Gold left border (3px solid #C9A96E), gold text #C9A96E, subtle cream background tint rgba(201,169,110,0.08) */
 .sidebar-group.active > .sidebar-group-toggle,
 .sidebar-item-glass.active {
-  background: var(--accent-gold) !important;
-  color: #1E1B2E !important;
+  background: rgba(201, 169, 110, 0.08) !important;
+  color: #C9A96E !important;
   font-weight: 600 !important;
-  border-radius: 8px !important;
-  border: none !important;
+  border-left: 3px solid #C9A96E !important;
+  border-radius: 4px !important;
   box-shadow: none !important;
   transform: none !important;
 }

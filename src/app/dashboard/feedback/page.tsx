@@ -1,21 +1,22 @@
 "use client";
 
-import { useState } from "react";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { MessageSquare, Send, Heart, Bug, Lightbulb, CheckCircle2 } from "lucide-react";
+import React, { useState } from "react";
+import { motion, AnimatePresence } from "framer-motion";
+import { Bug, Lightbulb, Heart, Send, CheckCircle2, AlertCircle, Loader2 } from "lucide-react";
 
 export default function FeedbackPage() {
   const [content, setContent] = useState("");
-  const [type, setType] = useState("suggestion");
+  const [type, setType] = useState("bug"); // Default or selected type
   const [loading, setLoading] = useState(false);
   const [submitted, setSubmitted] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!content.trim()) return;
     setLoading(true);
+    setError(null);
+
     try {
       const res = await fetch("/api/feedback", {
         method: "POST",
@@ -25,89 +26,184 @@ export default function FeedbackPage() {
       if (res.ok) {
         setSubmitted(true);
         setContent("");
+      } else {
+        const data = await res.json().catch(() => ({}));
+        setError(data.message || "Something went wrong while submitting your feedback.");
       }
+    } catch (err) {
+      setError("Network error: Unable to submit feedback at this time.");
     } finally {
       setLoading(false);
     }
   };
 
-  if (submitted) {
-    return (
-      <div className="max-w-2xl mx-auto py-20 text-center space-y-6 animate-in zoom-in duration-500">
-        <div className="w-24 h-24 bg-green-100 border-4 border-black rounded-full flex items-center justify-center mx-auto shadow-[8px_8px_0px_0px_rgba(0,0,0,1)]">
-          <CheckCircle2 className="text-green-600" size={48} />
-        </div>
-        <h2 className="text-4xl font-black uppercase tracking-tighter">Thank You!</h2>
-        <p className="text-xl font-bold text-muted-foreground">Your feedback has been sent to the administrators. We appreciate your help in making Skill Sphere better.</p>
-        <Button onClick={() => setSubmitted(false)} className="neo-brutalism bg-primary text-white font-black px-10 h-14">Send More Feedback</Button>
-      </div>
-    );
-  }
+  const feedbackTypes = [
+    { id: "bug", label: "Bug Report", icon: Bug },
+    { id: "suggestion", label: "Suggestion", icon: Lightbulb },
+    { id: "other", label: "Other", icon: Heart },
+  ];
 
   return (
-    <div className="max-w-3xl mx-auto space-y-10 animate-in fade-in slide-in-from-bottom-4 duration-500">
-      <div className="text-center space-y-3">
-        <h1 className="text-5xl font-black uppercase tracking-tighter flex items-center justify-center gap-4">
-          <MessageSquare className="text-primary" size={48} /> Help Us Improve
-        </h1>
-        <p className="text-xl font-bold text-muted-foreground">Found a bug? Have a suggestion? Let our team know!</p>
-      </div>
-
-      <Card className="border-4 border-black shadow-[12px_12px_0px_0px_rgba(0,0,0,1)] rounded-[2.5rem] overflow-hidden bg-white">
-        <CardHeader className="bg-primary/5 border-b-4 border-black p-8">
-          <CardTitle className="font-black uppercase tracking-tight text-2xl">Feedback Form</CardTitle>
-        </CardHeader>
-        <CardContent className="p-8 space-y-8">
-          <div className="grid grid-cols-3 gap-4">
-            <button 
-              onClick={() => setType("bug")}
-              className={`p-6 border-4 border-black rounded-2xl flex flex-col items-center gap-3 transition-all ${type === "bug" ? "bg-red-100 shadow-none translate-x-1 translate-y-1" : "bg-white shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:shadow-none hover:translate-x-0.5 hover:translate-y-0.5"}`}
-            >
-              <Bug className={type === "bug" ? "text-red-600" : "text-muted-foreground"} />
-              <span className="font-black uppercase text-xs">Bug Report</span>
-            </button>
-            <button 
-              onClick={() => setType("suggestion")}
-              className={`p-6 border-4 border-black rounded-2xl flex flex-col items-center gap-3 transition-all ${type === "suggestion" ? "bg-blue-100 shadow-none translate-x-1 translate-y-1" : "bg-white shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:shadow-none hover:translate-x-0.5 hover:translate-y-0.5"}`}
-            >
-              <Lightbulb className={type === "suggestion" ? "text-blue-600" : "text-muted-foreground"} />
-              <span className="font-black uppercase text-xs">Suggestion</span>
-            </button>
-            <button 
-              onClick={() => setType("other")}
-              className={`p-6 border-4 border-black rounded-2xl flex flex-col items-center gap-3 transition-all ${type === "other" ? "bg-accent/20 shadow-none translate-x-1 translate-y-1" : "bg-white shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:shadow-none hover:translate-x-0.5 hover:translate-y-0.5"}`}
-            >
-              <Heart className={type === "other" ? "text-primary" : "text-muted-foreground"} />
-              <span className="font-black uppercase text-xs">Other</span>
-            </button>
-          </div>
-
-          <div className="space-y-2">
-            <label className="text-sm font-black uppercase tracking-widest opacity-60">Your Message</label>
-            <textarea 
-              value={content}
-              onChange={e => setContent(e.target.value)}
-              placeholder="Tell us what's on your mind..."
-              className="w-full h-48 p-4 border-4 border-black rounded-2xl font-bold text-lg resize-none"
-              required
-            />
-          </div>
-
-          <Button 
-            onClick={handleSubmit} 
-            disabled={loading || !content.trim()} 
-            className="w-full h-16 text-xl font-black neo-brutalism bg-primary text-white"
-          >
-            {loading ? "Sending..." : <><Send className="mr-3" /> Submit Feedback</>}
-          </Button>
-        </CardContent>
-      </Card>
-
-      <div className="bg-accent/10 border-4 border-black border-dashed rounded-[2rem] p-8 text-center">
-        <p className="font-bold text-sm text-muted-foreground">
-          Note: Your feedback will be reviewed by our administration team. For urgent technical support, please use the direct chat system.
+    <motion.div
+      initial={{ opacity: 0, y: 16 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.4, ease: [0.16, 1, 0.3, 1] }}
+      className="font-sans pb-16"
+    >
+      {/* Subtitle below top bar (Top bar has the "Give Feedback" title) */}
+      <div className="pt-2 px-4 sm:px-8 max-w-[640px] mx-auto text-center sm:text-left">
+        <p className="font-sans text-sm text-[#8E8E93]">
+          Found a bug? Have a suggestion? Let our team know!
         </p>
       </div>
-    </div>
+
+      {/* Feedback Form Card */}
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.4, delay: 0.1, ease: [0.16, 1, 0.3, 1] }}
+        className="bg-white rounded-2xl p-6 sm:p-8 shadow-[0_4px_20px_rgba(0,0,0,0.06)] border border-[rgba(30,27,46,0.06)] max-w-[640px] mx-auto mt-5 mb-8"
+      >
+        {/* Card Header */}
+        <div className="mb-6">
+          <h2 className="font-heading text-xl font-bold text-[#1E1B2E]">
+            Feedback Form
+          </h2>
+          <div className="h-px bg-[rgba(30,27,46,0.06)] mt-4" />
+        </div>
+
+        {/* Success Banner */}
+        <AnimatePresence mode="wait">
+          {submitted ? (
+            <motion.div
+              key="success"
+              initial={{ opacity: 0, y: -10 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -10 }}
+              transition={{ duration: 0.3 }}
+              className="bg-[rgba(34,197,94,0.08)] border border-[rgba(34,197,94,0.2)] rounded-xl p-6 text-center space-y-3 my-4"
+            >
+              <div className="flex items-center justify-center gap-2.5 text-[#22C55E]">
+                <CheckCircle2 className="w-5 h-5 shrink-0" />
+                <span className="font-sans text-sm font-medium">
+                  Thank you! Your feedback has been submitted.
+                </span>
+              </div>
+              <div>
+                <button
+                  type="button"
+                  onClick={() => setSubmitted(false)}
+                  className="font-sans text-[13px] text-[#C9A96E] hover:underline font-medium cursor-pointer"
+                >
+                  Submit another
+                </button>
+              </div>
+            </motion.div>
+          ) : (
+            <motion.form
+              key="form"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              onSubmit={handleSubmit}
+              className="space-y-6"
+            >
+              {/* Error Banner */}
+              {error && (
+                <motion.div
+                  initial={{ opacity: 0, y: -10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  className="bg-[rgba(220,38,38,0.08)] border border-[rgba(220,38,38,0.2)] rounded-xl p-4 flex items-center justify-between gap-3 text-[#DC2626]"
+                >
+                  <div className="flex items-center gap-2.5 text-sm font-sans">
+                    <AlertCircle className="w-5 h-5 shrink-0" />
+                    <span>{error}</span>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={() => setError(null)}
+                    className="border border-[#DC2626] text-[#DC2626] hover:bg-[#DC2626] hover:text-white px-3 py-1 rounded-lg text-[13px] font-medium transition-colors shrink-0 cursor-pointer"
+                  >
+                    Try again
+                  </button>
+                </motion.div>
+              )}
+
+              {/* Feedback Type Selection */}
+              <div>
+                <label className="block font-sans text-xs uppercase tracking-[0.08em] text-[#8E8E93] font-semibold mb-3">
+                  Feedback Type
+                </label>
+                <div className="grid grid-cols-3 gap-3">
+                  {feedbackTypes.map((item, idx) => {
+                    const Icon = item.icon;
+                    const isSelected = type === item.id;
+                    return (
+                      <motion.button
+                        key={item.id}
+                        type="button"
+                        onClick={() => setType(item.id)}
+                        initial={{ opacity: 0, y: 15 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ duration: 0.2, delay: idx * 0.06 }}
+                        className={`flex flex-col items-center justify-center p-5 rounded-xl border transition-all cursor-pointer ${
+                          isSelected
+                            ? "border-2 border-[#C9A96E] bg-[rgba(201,169,110,0.06)] text-[#1E1B2E]"
+                            : "border-[rgba(30,27,46,0.1)] bg-white hover:border-[rgba(30,27,46,0.2)] hover:shadow-[0_2px_8px_rgba(0,0,0,0.04)] text-[#1E1B2E]"
+                        }`}
+                      >
+                        <Icon
+                          className={`w-6 h-6 transition-colors ${
+                            isSelected ? "text-[#C9A96E]" : "text-[#8E8E93]"
+                          }`}
+                        />
+                        <span className="font-sans text-[13px] font-medium mt-2.5">
+                          {item.label}
+                        </span>
+                      </motion.button>
+                    );
+                  })}
+                </div>
+              </div>
+
+              {/* Message Textarea */}
+              <div>
+                <label className="block font-sans text-xs uppercase tracking-[0.08em] text-[#8E8E93] font-semibold mt-6 mb-2.5">
+                  Your Message
+                </label>
+                <textarea
+                  value={content}
+                  onChange={(e) => setContent(e.target.value)}
+                  placeholder="Tell us what's on your mind..."
+                  required
+                  className="w-full bg-white border border-[rgba(30,27,46,0.12)] rounded-xl min-h-[160px] p-4 font-sans text-sm text-[#1E1B2E] placeholder-[#8E8E93] focus:outline-none focus:border-[#C9A96E] focus:ring-3 focus:ring-[rgba(201,169,110,0.15)] transition-all leading-[1.6] resize-y"
+                />
+              </div>
+
+              {/* Submit Button */}
+              <div className="pt-2">
+                <button
+                  type="submit"
+                  disabled={loading || !content.trim()}
+                  className="w-full h-12 rounded-xl bg-[#1E1B2E] text-white font-sans text-sm font-medium transition-all hover:scale-[1.01] hover:shadow-md active:scale-[0.99] disabled:bg-[#E5E5E5] disabled:text-[#8E8E93] disabled:hover:scale-100 disabled:hover:shadow-none disabled:cursor-not-allowed flex items-center justify-center gap-2 cursor-pointer shadow-sm"
+                >
+                  {loading ? (
+                    <>
+                      <Loader2 className="w-4 h-4 animate-spin text-white" />
+                      <span>Submitting...</span>
+                    </>
+                  ) : (
+                    <>
+                      <Send className="w-4 h-4 text-white" />
+                      <span>Submit Feedback</span>
+                    </>
+                  )}
+                </button>
+              </div>
+            </motion.form>
+          )}
+        </AnimatePresence>
+      </motion.div>
+    </motion.div>
   );
 }

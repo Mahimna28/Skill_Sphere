@@ -164,4 +164,45 @@ table {
 
 .gold-glow {
   box-shadow: 0 6px 20px rgba(201,169,110,0.18);
+}
+
+/* User Profile Dropdown Styles */
+.user-dropdown-trigger {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  border: 2px solid rgba(30, 27, 46, 0.08);
+  cursor: pointer;
+  transition: border-color 0.25s ease;
+}
+.user-dropdown-trigger:hover {
+  border-color: #C9A96E;
+}
+
+.user-dropdown-menu {
+  background: #FFFFFF;
+  border: 1px solid rgba(30, 27, 46, 0.06);
+  border-radius: 16px;
+  padding: 8px 0;
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.12);
+  min-width: 240px;
+}
+
+.user-dropdown-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 20px;
+  font-size: 14px;
+  color: #1E1B2E;
+  cursor: pointer;
+  transition: background 0.15s ease, color 0.15s ease;
+}
+.user-dropdown-item:hover {
+  background: rgba(201, 169, 110, 0.06);
+  color: #C9A96E;
+}
+.user-dropdown-item.danger:hover {
+  background: rgba(220, 38, 38, 0.06);
+  color: #DC2626;
 }

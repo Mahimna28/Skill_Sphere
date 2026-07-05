@@ -2,7 +2,7 @@
 
 import React, { useState } from "react";
 import Link from "next/link";
-import { motion, useReducedMotion } from "framer-motion";
+import { motion, useReducedMotion, AnimatePresence } from "framer-motion";
 import {
   Trophy,
   Flame,
@@ -16,6 +16,12 @@ import {
   Sparkles,
   Calendar,
   Star,
+  Search,
+  Plus,
+  X,
+  Share2,
+  Check,
+  Filter,
 } from "lucide-react";
 
 // Easing and motion setup
@@ -68,73 +74,242 @@ function ProgressHero({
   level: number;
   shouldReduceMotion: boolean;
 }) {
+  const [currentStreak, setCurrentStreak] = useState(streak || 0);
+  const [checkedInToday, setCheckedInToday] = useState(false);
+  const [showStreakModal, setShowStreakModal] = useState(false);
+  const [studyGoal, setStudyGoal] = useState("30 mins");
+  const [showToast, setShowToast] = useState(false);
+
+  const daysOfWeek = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
+  const todayIndex = new Date().getDay() === 0 ? 6 : new Date().getDay() - 1;
+
+  const handleCheckIn = () => {
+    if (!checkedInToday) {
+      setCurrentStreak((prev) => prev + 1);
+      setCheckedInToday(true);
+      setShowToast(true);
+      setTimeout(() => setShowToast(false), 4000);
+    }
+  };
+
   return (
-    <motion.div
-      initial={shouldReduceMotion ? { opacity: 0 } : { opacity: 0, y: 20 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.6, ease: easing, delay: 0.0 }}
-      className="bg-[#FFFFFF] rounded-3xl p-8 border border-[#1E1B2E]/10 shadow-[0_12px_40px_rgba(30,27,46,0.06)] flex flex-col md:flex-row items-center justify-between gap-8 relative overflow-hidden"
-    >
-      {/* Subtle Gold Glow Background Decorative Element */}
-      <div className="absolute -top-24 -right-24 w-64 h-64 bg-[#C9A96E]/10 rounded-full blur-3xl pointer-events-none" />
+    <>
+      <motion.div
+        initial={shouldReduceMotion ? { opacity: 0 } : { opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.6, ease: easing, delay: 0.0 }}
+        className="bg-[#FFFFFF] rounded-3xl p-8 border border-[#1E1B2E]/10 shadow-[0_12px_40px_rgba(30,27,46,0.06)] flex flex-col md:flex-row items-center justify-between gap-8 relative overflow-hidden"
+      >
+        {/* Subtle Gold Glow Background Decorative Element */}
+        <div className="absolute -top-24 -right-24 w-64 h-64 bg-[#C9A96E]/10 rounded-full blur-3xl pointer-events-none" />
 
-      <div className="space-y-4 max-w-xl z-10 text-center md:text-left">
-        <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-[#F5F1EB] border border-[#C9A96E]/30 text-[#1E1B2E] text-xs font-bold uppercase tracking-wider">
-          <Sparkles className="w-3.5 h-3.5 text-[#C9A96E]" /> Level {level} Explorer
-        </div>
-        <h1 className="text-3xl md:text-4xl font-extrabold text-[#1E1B2E] tracking-tight" style={{ fontFamily: "var(--font-heading, serif)" }}>
-          Welcome back, {name || "Student"}!
-        </h1>
-        <p className="text-[#8E8E93] text-base leading-relaxed">
-          You are on a stellar streak. Keep fueling your ambition and complete today's recommended milestone.
-        </p>
-        <div className="flex flex-wrap items-center justify-center md:justify-start gap-4 pt-2">
-          <div className="flex items-center gap-2 px-4 py-2 bg-[#F5F1EB] rounded-2xl border border-[#1E1B2E]/5">
-            <Flame className="w-5 h-5 text-[#C9A96E] fill-[#C9A96E]/20" />
-            <span className="text-sm font-bold text-[#1E1B2E]">{streak || 0} Day Streak</span>
-          </div>
-          <Link href="/courses">
-            <button className="px-5 py-2.5 bg-[#1E1B2E] text-[#FFFFFF] rounded-2xl text-sm font-semibold hover:bg-[#C9A96E] hover:text-[#1E1B2E] transition-all shadow-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#C9A96E]">
-              Explore Catalog →
+        <div className="space-y-4 max-w-xl z-10 text-center md:text-left">
+          <h1 className="text-3xl md:text-4xl font-extrabold text-[#1E1B2E] tracking-tight" style={{ fontFamily: "var(--font-heading, serif)" }}>
+            Welcome back, {name || "Student"}!
+          </h1>
+          <p className="text-[#8E8E93] text-base leading-relaxed">
+            You are on a stellar streak. Keep fueling your ambition and complete today's recommended milestone.
+          </p>
+          <div className="flex flex-wrap items-center justify-center md:justify-start gap-4 pt-2">
+            <button
+              type="button"
+              onClick={() => setShowStreakModal(true)}
+              className="flex items-center gap-2.5 px-4 py-2 bg-[#F5F1EB] hover:bg-[rgba(201,169,110,0.2)] rounded-2xl border border-[#1E1B2E]/10 transition-all cursor-pointer shadow-sm hover:scale-105 group"
+              title="Click to view streak calendar & check in!"
+            >
+              <Flame className="w-5 h-5 text-[#C9A96E] fill-[#C9A96E]/20 group-hover:scale-110 transition-transform animate-pulse" />
+              <span className="text-sm font-bold text-[#1E1B2E]">{currentStreak} Day Streak</span>
+              <span className="text-[10px] font-black bg-[#1E1B2E] text-[#C9A96E] px-2.5 py-0.5 rounded-full uppercase ml-1 shadow-xs">
+                {checkedInToday ? "✓ Checked In" : "+ Check In"}
+              </span>
             </button>
-          </Link>
+            <Link href="/courses">
+              <button className="px-5 py-2.5 bg-[#1E1B2E] text-[#FFFFFF] rounded-2xl text-sm font-semibold hover:bg-[#C9A96E] hover:text-[#1E1B2E] transition-all shadow-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#C9A96E] cursor-pointer">
+                Explore Catalog →
+              </button>
+            </Link>
+          </div>
         </div>
-      </div>
 
-      {/* Visual Progress Ring */}
-      <div className="relative flex items-center justify-center w-36 h-36 shrink-0 z-10" aria-label={`Overall progress: ${progressPercent}%`}>
-        <svg className="w-full h-full -rotate-90 transform" viewBox="0 0 100 100">
-          <circle
-            cx="50"
-            cy="50"
-            r="40"
-            className="text-[#F5F1EB]"
-            strokeWidth="10"
-            stroke="currentColor"
-            fill="transparent"
-          />
-          <motion.circle
-            cx="50"
-            cy="50"
-            r="40"
-            className="text-[#C9A96E]"
-            strokeWidth="10"
-            strokeDasharray={251.2}
-            strokeDashoffset={251.2 - (251.2 * progressPercent) / 100}
-            strokeLinecap="round"
-            stroke="currentColor"
-            fill="transparent"
-            initial={{ strokeDashoffset: 251.2 }}
-            animate={{ strokeDashoffset: 251.2 - (251.2 * progressPercent) / 100 }}
-            transition={{ duration: 1.2, ease: easing, delay: 0.2 }}
-          />
-        </svg>
-        <div className="absolute flex flex-col items-center justify-center text-center">
-          <span className="text-2xl font-black text-[#1E1B2E]">{progressPercent}%</span>
-          <span className="text-[10px] font-bold text-[#8E8E93] uppercase tracking-wider">Avg Mastery</span>
+        {/* Visual Progress Ring */}
+        <div className="relative flex items-center justify-center w-36 h-36 shrink-0 z-10" aria-label={`Overall progress: ${progressPercent}%`}>
+          <svg className="w-full h-full -rotate-90 transform" viewBox="0 0 100 100">
+            <circle
+              cx="50"
+              cy="50"
+              r="40"
+              className="text-[#F5F1EB]"
+              strokeWidth="10"
+              stroke="currentColor"
+              fill="transparent"
+            />
+            <motion.circle
+              cx="50"
+              cy="50"
+              r="40"
+              className="text-[#C9A96E]"
+              strokeWidth="10"
+              strokeDasharray={251.2}
+              strokeDashoffset={251.2 - (251.2 * progressPercent) / 100}
+              strokeLinecap="round"
+              stroke="currentColor"
+              fill="transparent"
+              initial={{ strokeDashoffset: 251.2 }}
+              animate={{ strokeDashoffset: 251.2 - (251.2 * progressPercent) / 100 }}
+              transition={{ duration: 1.2, ease: easing, delay: 0.2 }}
+            />
+          </svg>
+          <div className="absolute flex flex-col items-center justify-center text-center">
+            <span className="text-2xl font-black text-[#1E1B2E]">{progressPercent}%</span>
+            <span className="text-[10px] font-bold text-[#8E8E93] uppercase tracking-wider">Avg Mastery</span>
+          </div>
         </div>
-      </div>
-    </motion.div>
+      </motion.div>
+
+      {/* Daily Streak & Calendar Modal */}
+      <AnimatePresence>
+        {showStreakModal && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm">
+            <motion.div
+              initial={{ opacity: 0, scale: 0.95, y: 10 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              exit={{ opacity: 0, scale: 0.95, y: 10 }}
+              className="bg-white rounded-3xl p-6 md:p-8 max-w-md w-full border border-[#1E1B2E]/10 shadow-2xl relative overflow-hidden"
+            >
+              <div className="flex items-center justify-between pb-4 border-b border-[#1E1B2E]/10 mb-6">
+                <div className="flex items-center gap-2">
+                  <div className="w-10 h-10 rounded-2xl bg-[rgba(201,169,110,0.15)] text-[#C9A96E] flex items-center justify-center font-bold">
+                    <Flame className="w-6 h-6 fill-[#C9A96E]" />
+                  </div>
+                  <div>
+                    <h3 className="text-xl font-bold text-[#1E1B2E]" style={{ fontFamily: "var(--font-heading, serif)" }}>
+                      Study Streak & Goals
+                    </h3>
+                    <p className="text-xs text-[#8E8E93]">Consistency is the key to mastery</p>
+                  </div>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => setShowStreakModal(false)}
+                  className="p-2 rounded-full hover:bg-gray-100 text-[#8E8E93] transition-colors cursor-pointer"
+                >
+                  <X size={18} />
+                </button>
+              </div>
+
+              {/* Streak Stats Box */}
+              <div className="grid grid-cols-2 gap-4 mb-6">
+                <div className="p-4 rounded-2xl bg-[#F5F1EB] border border-[#1E1B2E]/5 text-center">
+                  <p className="text-xs font-bold text-[#8E8E93] uppercase">Current Streak</p>
+                  <p className="text-2xl font-black text-[#1E1B2E] mt-1 flex items-center justify-center gap-1">
+                    <Flame className="w-5 h-5 text-[#C9A96E] fill-[#C9A96E]" /> {currentStreak} <span className="text-xs font-medium text-[#8E8E93]">days</span>
+                  </p>
+                </div>
+                <div className="p-4 rounded-2xl bg-[#F5F1EB] border border-[#1E1B2E]/5 text-center">
+                  <p className="text-xs font-bold text-[#8E8E93] uppercase">Longest Streak</p>
+                  <p className="text-2xl font-black text-[#1E1B2E] mt-1 flex items-center justify-center gap-1">
+                    <Trophy className="w-5 h-5 text-[#C9A96E]" /> {Math.max(currentStreak, 7)} <span className="text-xs font-medium text-[#8E8E93]">days</span>
+                  </p>
+                </div>
+              </div>
+
+              {/* 7-Day Weekly Tracker */}
+              <div className="mb-6">
+                <p className="text-xs font-bold text-[#1E1B2E] uppercase tracking-wider mb-3">This Week's Consistency</p>
+                <div className="grid grid-cols-7 gap-2">
+                  {daysOfWeek.map((day, idx) => {
+                    const isPast = idx < todayIndex;
+                    const isToday = idx === todayIndex;
+                    const isCompleted = isPast || (isToday && checkedInToday);
+                    return (
+                      <div
+                        key={day}
+                        className={`flex flex-col items-center p-2 rounded-xl border text-center transition-all ${
+                          isCompleted
+                            ? "bg-[rgba(201,169,110,0.15)] border-[#C9A96E] text-[#1E1B2E]"
+                            : isToday
+                            ? "bg-[#1E1B2E] text-white border-[#1E1B2E] ring-2 ring-[#C9A96E]/50"
+                            : "bg-gray-50 border-gray-200 text-[#8E8E93]"
+                        }`}
+                      >
+                        <span className="text-[10px] font-bold">{day}</span>
+                        <div className="w-6 h-6 rounded-full flex items-center justify-center mt-1.5 font-black text-xs">
+                          {isCompleted ? (
+                            <Check className="w-3.5 h-3.5 text-[#C9A96E] stroke-[3]" />
+                          ) : isToday ? (
+                            <span className="text-white">★</span>
+                          ) : (
+                            <span className="opacity-30">-</span>
+                          )}
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+
+              {/* Daily Goal Selection */}
+              <div className="mb-6">
+                <p className="text-xs font-bold text-[#1E1B2E] uppercase tracking-wider mb-2.5">Daily Study Goal</p>
+                <div className="grid grid-cols-4 gap-2">
+                  {["15 mins", "30 mins", "60 mins", "2 hrs"].map((goal) => (
+                    <button
+                      key={goal}
+                      type="button"
+                      onClick={() => setStudyGoal(goal)}
+                      className={`py-2 px-3 rounded-xl text-xs font-bold border transition-all cursor-pointer ${
+                        studyGoal === goal
+                          ? "bg-[#1E1B2E] text-[#C9A96E] border-[#1E1B2E] shadow-sm"
+                          : "bg-white text-[#1E1B2E] border-gray-200 hover:border-[#C9A96E]"
+                      }`}
+                    >
+                      {goal}
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              {/* Check In Action Button */}
+              <div className="pt-2">
+                {!checkedInToday ? (
+                  <button
+                    type="button"
+                    onClick={handleCheckIn}
+                    className="w-full py-3.5 bg-gradient-to-r from-[#C9A96E] to-[#E5C992] text-[#1E1B2E] rounded-2xl font-extrabold text-sm uppercase tracking-wider shadow-md hover:scale-[1.02] transition-transform cursor-pointer flex items-center justify-center gap-2"
+                  >
+                    <Flame className="w-5 h-5 fill-[#1E1B2E]" /> Check In For Today (+10 XP)
+                  </button>
+                ) : (
+                  <div className="w-full py-3.5 bg-[#22C55E]/15 border border-[#22C55E] text-[#1E1B2E] rounded-2xl font-bold text-sm text-center flex items-center justify-center gap-2">
+                    <CheckCircle2 className="w-5 h-5 text-[#22C55E]" /> Today's Streak Checked In!
+                  </div>
+                )}
+              </div>
+            </motion.div>
+          </div>
+        )}
+      </AnimatePresence>
+
+      {/* Success Toast */}
+      <AnimatePresence>
+        {showToast && (
+          <motion.div
+            initial={{ opacity: 0, y: 50 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: 50 }}
+            className="fixed bottom-6 right-6 z-50 bg-[#1E1B2E] text-white px-6 py-4 rounded-2xl shadow-2xl border border-[#C9A96E] flex items-center gap-3"
+          >
+            <div className="w-8 h-8 rounded-full bg-[#C9A96E] text-[#1E1B2E] flex items-center justify-center font-black">
+              ★
+            </div>
+            <div>
+              <p className="font-bold text-sm text-[#C9A96E]">Streak Increased!</p>
+              <p className="text-xs text-white/80">+1 Day added & 10 XP awarded to your profile!</p>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </>
   );
 }
 
@@ -428,51 +603,307 @@ function CertificatesGallery({
 
 // ── Section 6: RecentActivityFeed ────────────────────────────────────────
 function RecentActivityFeed({
-  recentActivity,
+  recentActivity: initialActivity,
   shouldReduceMotion,
 }: {
   recentActivity: Array<{ id: string; type: "course" | "score" | "certificate"; title: string; subtitle: string; time: string }>;
   shouldReduceMotion: boolean;
 }) {
-  return (
-    <motion.div
-      initial={shouldReduceMotion ? { opacity: 0 } : { opacity: 0, x: 20 }}
-      animate={{ opacity: 1, x: 0 }}
-      transition={{ duration: 0.6, ease: easing, delay: 0.35 }}
-      className="bg-[#FFFFFF] rounded-3xl p-8 border border-[#1E1B2E]/10 shadow-[0_12px_40px_rgba(30,27,46,0.06)] flex flex-col justify-between"
-    >
-      <div className="mb-6">
-        <h2 className="text-2xl font-bold text-[#1E1B2E]" style={{ fontFamily: "var(--font-heading, serif)" }}>
-          Recent Activity Feed
-        </h2>
-        <p className="text-sm text-[#8E8E93]">Chronological progress timeline</p>
-      </div>
+  const [activities, setActivities] = useState(initialActivity);
+  const [filter, setFilter] = useState<"all" | "score" | "certificate" | "course">("all");
+  const [searchQuery, setSearchQuery] = useState("");
+  const [showAddModal, setShowAddModal] = useState(false);
+  const [newTitle, setNewTitle] = useState("");
+  const [newSubtitle, setNewSubtitle] = useState("");
+  const [newType, setNewType] = useState<"course" | "score" | "certificate">("course");
+  const [selectedActivity, setSelectedActivity] = useState<any | null>(null);
 
-      {recentActivity.length === 0 ? (
-        <div className="py-10 text-center bg-[#F5F1EB]/50 rounded-2xl border border-dashed border-[#8E8E93]/30">
-          <Calendar className="w-10 h-10 text-[#C9A96E] mx-auto mb-2 opacity-60" />
-          <p className="font-bold text-[#1E1B2E] text-sm">No recent activity</p>
-          <p className="text-xs text-[#8E8E93] mt-1">Start engaging with lessons and quizzes!</p>
+  const handleAddActivity = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!newTitle.trim()) return;
+    const newAct = {
+      id: `custom-${Date.now()}`,
+      type: newType,
+      title: newTitle,
+      subtitle: newSubtitle || "Personal study milestone",
+      time: "Just now",
+    };
+    setActivities([newAct, ...activities]);
+    setNewTitle("");
+    setNewSubtitle("");
+    setShowAddModal(false);
+  };
+
+  const filteredActivities = activities.filter((act) => {
+    const matchesFilter = filter === "all" || act.type === filter;
+    const matchesSearch =
+      act.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      act.subtitle.toLowerCase().includes(searchQuery.toLowerCase());
+    return matchesFilter && matchesSearch;
+  });
+
+  return (
+    <>
+      <motion.div
+        initial={shouldReduceMotion ? { opacity: 0 } : { opacity: 0, x: 20 }}
+        animate={{ opacity: 1, x: 0 }}
+        transition={{ duration: 0.6, ease: easing, delay: 0.35 }}
+        className="bg-[#FFFFFF] rounded-3xl p-6 md:p-8 border border-[#1E1B2E]/10 shadow-[0_12px_40px_rgba(30,27,46,0.06)] flex flex-col justify-between"
+      >
+        <div className="space-y-4 mb-6">
+          <div className="flex items-center justify-between">
+            <div>
+              <h2 className="text-2xl font-bold text-[#1E1B2E]" style={{ fontFamily: "var(--font-heading, serif)" }}>
+                Recent Activity Feed
+              </h2>
+              <p className="text-xs text-[#8E8E93]">Chronological progress & study milestones</p>
+            </div>
+            <button
+              type="button"
+              onClick={() => setShowAddModal(true)}
+              className="px-3 py-1.5 rounded-xl bg-[#1E1B2E] text-[#C9A96E] hover:bg-[#C9A96E] hover:text-[#1E1B2E] font-bold text-xs transition-all flex items-center gap-1.5 cursor-pointer shadow-sm"
+            >
+              <Plus size={14} /> Log Activity
+            </button>
+          </div>
+
+          {/* Search Box */}
+          <div className="relative">
+            <Search className="w-4 h-4 text-[#8E8E93] absolute left-3.5 top-1/2 -translate-y-1/2" />
+            <input
+              type="text"
+              placeholder="Filter activity by title or subject..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="w-full bg-[#F5F1EB]/60 border border-[#1E1B2E]/10 rounded-xl pl-10 pr-3 py-2 text-xs font-medium text-[#1E1B2E] placeholder-[#8E8E93] focus:outline-none focus:border-[#C9A96E] transition-all"
+            />
+          </div>
+
+          {/* Filter Pills */}
+          <div className="flex items-center gap-1.5 overflow-x-auto pb-1 no-scrollbar">
+            {[
+              { id: "all", label: "All", icon: Filter },
+              { id: "score", label: "Quizzes", icon: Star },
+              { id: "certificate", label: "Certificates", icon: Trophy },
+              { id: "course", label: "Lessons", icon: BookOpen },
+            ].map((tab) => {
+              const Icon = tab.icon;
+              return (
+                <button
+                  key={tab.id}
+                  type="button"
+                  onClick={() => setFilter(tab.id as any)}
+                  className={`px-3 py-1 rounded-xl text-xs font-bold transition-all flex items-center gap-1 shrink-0 cursor-pointer ${
+                    filter === tab.id
+                      ? "bg-[rgba(201,169,110,0.2)] text-[#1E1B2E] border border-[#C9A96E]"
+                      : "bg-gray-50 text-[#8E8E93] hover:bg-gray-100 border border-transparent"
+                  }`}
+                >
+                  <Icon size={12} className={filter === tab.id ? "text-[#C9A96E]" : ""} />
+                  {tab.label}
+                </button>
+              );
+            })}
+          </div>
         </div>
-      ) : (
-        <div className="divide-y divide-[#8E8E93]/15 space-y-4">
-          {recentActivity.map((act) => {
-            return (
-              <div key={act.id} className="pt-4 first:pt-0 flex items-start gap-3">
-                <div className="w-8 h-8 rounded-full bg-[#F5F1EB] text-[#1E1B2E] flex items-center justify-center shrink-0 mt-0.5 font-bold text-xs">
-                  {act.type === "certificate" ? "🏆" : act.type === "score" ? "⭐" : "📘"}
+
+        {filteredActivities.length === 0 ? (
+          <div className="py-10 text-center bg-[#F5F1EB]/50 rounded-2xl border border-dashed border-[#8E8E93]/30">
+            <Calendar className="w-10 h-10 text-[#C9A96E] mx-auto mb-2 opacity-60" />
+            <p className="font-bold text-[#1E1B2E] text-sm">No activity found</p>
+            <p className="text-xs text-[#8E8E93] mt-1">Try clearing your search or log a new milestone!</p>
+          </div>
+        ) : (
+          <div className="divide-y divide-[#8E8E93]/15 space-y-3">
+            {filteredActivities.map((act) => {
+              return (
+                <div
+                  key={act.id}
+                  onClick={() => setSelectedActivity(act)}
+                  className="pt-3 first:pt-0 flex items-start gap-3 p-2 rounded-xl hover:bg-[#F5F1EB]/40 transition-colors cursor-pointer group"
+                  title="Click to view full milestone details"
+                >
+                  <div className="w-8 h-8 rounded-full bg-[#F5F1EB] border border-[#1E1B2E]/5 text-[#1E1B2E] flex items-center justify-center shrink-0 mt-0.5 font-bold text-xs shadow-2xs group-hover:scale-110 transition-transform">
+                    {act.type === "certificate" ? "🏆" : act.type === "score" ? "⭐" : "📘"}
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <p className="text-sm font-bold text-[#1E1B2E] leading-snug truncate group-hover:text-[#C9A96E] transition-colors">
+                      {act.title}
+                    </p>
+                    <p className="text-xs text-[#8E8E93] mt-0.5 truncate">{act.subtitle}</p>
+                  </div>
+                  <div className="flex flex-col items-end shrink-0">
+                    <span className="text-[11px] font-semibold text-[#8E8E93]">{act.time}</span>
+                    <span className="text-[10px] font-bold text-[#C9A96E] opacity-0 group-hover:opacity-100 transition-opacity">
+                      View →
+                    </span>
+                  </div>
                 </div>
-                <div className="flex-1 min-w-0">
-                  <p className="text-sm font-bold text-[#1E1B2E] leading-snug truncate">{act.title}</p>
-                  <p className="text-xs text-[#8E8E93] mt-0.5">{act.subtitle}</p>
-                </div>
-                <span className="text-[11px] font-semibold text-[#8E8E93] shrink-0">{act.time}</span>
+              );
+            })}
+          </div>
+        )}
+      </motion.div>
+
+      {/* Log Activity Modal */}
+      <AnimatePresence>
+        {showAddModal && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm">
+            <motion.div
+              initial={{ opacity: 0, scale: 0.95 }}
+              animate={{ opacity: 1, scale: 1 }}
+              exit={{ opacity: 0, scale: 0.95 }}
+              className="bg-white rounded-3xl p-6 md:p-8 max-w-md w-full border border-[#1E1B2E]/10 shadow-2xl relative"
+            >
+              <div className="flex items-center justify-between pb-4 border-b border-[#1E1B2E]/10 mb-6">
+                <h3 className="text-xl font-bold text-[#1E1B2E]" style={{ fontFamily: "var(--font-heading, serif)" }}>
+                  Log Study Milestone
+                </h3>
+                <button
+                  type="button"
+                  onClick={() => setShowAddModal(false)}
+                  className="p-2 rounded-full hover:bg-gray-100 text-[#8E8E93] transition-colors cursor-pointer"
+                >
+                  <X size={18} />
+                </button>
               </div>
-            );
-          })}
-        </div>
-      )}
-    </motion.div>
+              <form onSubmit={handleAddActivity} className="space-y-4">
+                <div>
+                  <label className="block text-xs font-bold text-[#1E1B2E] uppercase mb-1.5">Activity Type</label>
+                  <div className="grid grid-cols-3 gap-2">
+                    {[
+                      { id: "course", label: "Lesson 📘" },
+                      { id: "score", label: "Quiz ⭐" },
+                      { id: "certificate", label: "Cert 🏆" },
+                    ].map((type) => (
+                      <button
+                        key={type.id}
+                        type="button"
+                        onClick={() => setNewType(type.id as any)}
+                        className={`py-2 px-3 rounded-xl text-xs font-bold border transition-all cursor-pointer ${
+                          newType === type.id
+                            ? "bg-[#1E1B2E] text-[#C9A96E] border-[#1E1B2E]"
+                            : "bg-gray-50 text-[#8E8E93] border-gray-200"
+                        }`}
+                      >
+                        {type.label}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+                <div>
+                  <label className="block text-xs font-bold text-[#1E1B2E] uppercase mb-1.5">Milestone Title</label>
+                  <input
+                    type="text"
+                    required
+                    placeholder="e.g., Completed React Hooks Chapter"
+                    value={newTitle}
+                    onChange={(e) => setNewTitle(e.target.value)}
+                    className="w-full bg-[#F5F1EB]/60 border border-[#1E1B2E]/15 rounded-xl p-3 text-sm font-medium text-[#1E1B2E] placeholder-[#8E8E93] focus:outline-none focus:border-[#C9A96E]"
+                  />
+                </div>
+                <div>
+                  <label className="block text-xs font-bold text-[#1E1B2E] uppercase mb-1.5">Subtitle / Notes</label>
+                  <input
+                    type="text"
+                    placeholder="e.g., Frontend Web Development Course"
+                    value={newSubtitle}
+                    onChange={(e) => setNewSubtitle(e.target.value)}
+                    className="w-full bg-[#F5F1EB]/60 border border-[#1E1B2E]/15 rounded-xl p-3 text-sm font-medium text-[#1E1B2E] placeholder-[#8E8E93] focus:outline-none focus:border-[#C9A96E]"
+                  />
+                </div>
+                <div className="pt-4 flex justify-end gap-3">
+                  <button
+                    type="button"
+                    onClick={() => setShowAddModal(false)}
+                    className="px-5 py-2.5 rounded-xl border border-gray-200 text-sm font-bold text-[#8E8E93] hover:bg-gray-50 transition-colors cursor-pointer"
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    type="submit"
+                    className="px-6 py-2.5 rounded-xl bg-[#C9A96E] text-[#1E1B2E] font-extrabold text-sm hover:bg-[#b89758] transition-all shadow-sm cursor-pointer"
+                  >
+                    Add Milestone
+                  </button>
+                </div>
+              </form>
+            </motion.div>
+          </div>
+        )}
+      </AnimatePresence>
+
+      {/* Activity Details Modal */}
+      <AnimatePresence>
+        {selectedActivity && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm">
+            <motion.div
+              initial={{ opacity: 0, scale: 0.95 }}
+              animate={{ opacity: 1, scale: 1 }}
+              exit={{ opacity: 0, scale: 0.95 }}
+              className="bg-white rounded-3xl p-6 md:p-8 max-w-md w-full border border-[#1E1B2E]/10 shadow-2xl relative"
+            >
+              <div className="flex items-center justify-between pb-4 border-b border-[#1E1B2E]/10 mb-6">
+                <div className="flex items-center gap-2">
+                  <span className="text-2xl">
+                    {selectedActivity.type === "certificate" ? "🏆" : selectedActivity.type === "score" ? "⭐" : "📘"}
+                  </span>
+                  <h3 className="text-xl font-bold text-[#1E1B2E]" style={{ fontFamily: "var(--font-heading, serif)" }}>
+                    Milestone Details
+                  </h3>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => setSelectedActivity(null)}
+                  className="p-2 rounded-full hover:bg-gray-100 text-[#8E8E93] transition-colors cursor-pointer"
+                >
+                  <X size={18} />
+                </button>
+              </div>
+
+              <div className="space-y-4 mb-6">
+                <div className="p-4 rounded-2xl bg-[#F5F1EB] border border-[#1E1B2E]/5">
+                  <p className="text-xs font-bold text-[#8E8E93] uppercase">Title</p>
+                  <p className="text-lg font-extrabold text-[#1E1B2E] mt-0.5">{selectedActivity.title}</p>
+                </div>
+                <div className="p-4 rounded-2xl bg-[#F5F1EB] border border-[#1E1B2E]/5">
+                  <p className="text-xs font-bold text-[#8E8E93] uppercase">Subject / Category</p>
+                  <p className="text-sm font-bold text-[#1E1B2E] mt-0.5">{selectedActivity.subtitle}</p>
+                </div>
+                <div className="p-4 rounded-2xl bg-[#F5F1EB] border border-[#1E1B2E]/5 flex justify-between items-center">
+                  <div>
+                    <p className="text-xs font-bold text-[#8E8E93] uppercase">Timestamp</p>
+                    <p className="text-sm font-bold text-[#1E1B2E] mt-0.5">{selectedActivity.time}</p>
+                  </div>
+                  <span className="px-3 py-1 rounded-full bg-[#1E1B2E] text-[#C9A96E] text-xs font-bold uppercase">
+                    Verified ✓
+                  </span>
+                </div>
+              </div>
+
+              <div className="flex justify-between items-center pt-2">
+                <Link href={selectedActivity.type === "certificate" ? "/dashboard/student/institutions" : "/dashboard/student/courses"}>
+                  <button
+                    type="button"
+                    onClick={() => setSelectedActivity(null)}
+                    className="px-5 py-2.5 rounded-xl bg-[#1E1B2E] text-white font-bold text-sm hover:bg-[#C9A96E] hover:text-[#1E1B2E] transition-all cursor-pointer"
+                  >
+                    Go To Section →
+                  </button>
+                </Link>
+                <button
+                  type="button"
+                  onClick={() => setSelectedActivity(null)}
+                  className="px-5 py-2.5 rounded-xl bg-gray-100 text-[#1E1B2E] font-bold text-sm hover:bg-gray-200 transition-colors cursor-pointer"
+                >
+                  Close
+                </button>
+              </div>
+            </motion.div>
+          </div>
+        )}
+      </AnimatePresence>
+    </>
   );
 }
 

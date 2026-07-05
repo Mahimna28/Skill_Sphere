@@ -9,7 +9,10 @@ export default async function StudentLeaderboard() {
   const decoded: any = token ? verifyToken(token) : null;
 
   const users = await prisma.user.findMany({
-    where: { role: "student" },
+    where: {
+      role: "student",
+      hideFromLeaderboard: false,
+    },
     orderBy: { points: "desc" },
     select: {
       id: true,

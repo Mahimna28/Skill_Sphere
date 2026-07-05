@@ -14,11 +14,13 @@ model User {
   username  String?  @unique  // Set on first visit to Messages
   password  String?          // Nullable: Google OAuth users won't have a password initially
   googleId  String?  @unique // Google OAuth "sub" ID — used to link accounts
+  githubId  String?  @unique // GitHub OAuth ID — used to link accounts
   image     String?  // Profile picture URL
   role      String   @default("student") // student, teacher, parent, admin
   points    Int      @default(0)
   bio       String?
   skills    String?  // JSON string: [{name: "Python", level: 80}]
+  notificationPrefs String? // JSON string for user notification settings
   
   // Student specific
   learningGoal  String?
@@ -39,7 +41,8 @@ model User {
   parentNotes     String?
 
   // Privacy
-  isProfilePublic Boolean @default(true)
+  isProfilePublic     Boolean @default(true)
+  hideFromLeaderboard Boolean @default(false)
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt

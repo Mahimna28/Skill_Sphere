@@ -3,7 +3,7 @@
 import React from "react";
 import { useRouter } from "next/navigation";
 import { motion, useReducedMotion } from "framer-motion";
-import { Trophy, Crown, Flame, BarChart3 } from "lucide-react";
+import { Trophy, Crown, Flame } from "lucide-react";
 
 // Global motion easing
 const easing = [0.25, 0.1, 0.25, 1.0] as const;
@@ -70,8 +70,8 @@ export default function LeaderboardClient({
       variants={containerVariants}
       className="space-y-8 max-w-7xl mx-auto pb-12 font-sans"
     >
-      {/* Sleek Page Header & CTA */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-[#1E1B2E]/10 pb-6">
+      {/* Sleek Page Header */}
+      <div className="border-b border-[#1E1B2E]/10 pb-6">
         <div>
           <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#FFFFFF] border border-[#C9A96E]/30 text-[#1E1B2E] text-xs font-bold uppercase tracking-wider mb-2 shadow-sm">
             <Trophy className="w-3.5 h-3.5 text-[#C9A96E]" /> Global Standing
@@ -86,18 +86,6 @@ export default function LeaderboardClient({
             Track your rank among peers, build study streaks, and earn distinction.
           </p>
         </div>
-
-        {/* Top-right "View Global Stats" CTA */}
-        <motion.button
-          whileHover={shouldReduceMotion ? {} : { scale: 1.03 }}
-          whileTap={shouldReduceMotion ? {} : { scale: 0.98 }}
-          onClick={() => router.push("/dashboard/student/analytics")}
-          aria-label="View Global Stats"
-          className="h-[44px] px-6 rounded-xl bg-gradient-to-r from-[#C9A96E] via-[#E2C48D] to-[#C9A96E] bg-[length:200%_100%] hover:bg-[position:100%_0] transition-all duration-500 text-[#1E1B2E] font-bold text-sm uppercase tracking-wider shadow-[0_4px_14px_rgba(201,169,110,0.3)] hover:shadow-[0_8px_24px_rgba(201,169,110,0.5)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#C9A96E] flex items-center justify-center gap-2 shrink-0 cursor-pointer self-start sm:self-center"
-        >
-          <BarChart3 className="w-4.5 h-4.5 shrink-0" />
-          <span>View Global Stats</span>
-        </motion.button>
       </div>
 
       {/* Frosted Glass Table Card (w-full overflow-hidden min-w-0, no scrollbars) */}
