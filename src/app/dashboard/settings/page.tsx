@@ -32,7 +32,6 @@ export default async function SettingsPage() {
       role: true,
       googleId: true,
       password: true,
-      notificationPrefs: true,
       bio: true,
       skills: true,
       learningGoal: true,
@@ -43,21 +42,13 @@ export default async function SettingsPage() {
       qualification: true,
       parentNotes: true,
       isProfilePublic: true,
-      hideFromLeaderboard: true,
     },
   });
 
   if (!user) redirect("/login");
 
-  let notificationPrefs = defaultNotificationPrefs;
-  if (user.notificationPrefs) {
-    try {
-      notificationPrefs = {
-        ...defaultNotificationPrefs,
-        ...JSON.parse(user.notificationPrefs),
-      };
-    } catch (e) {}
-  }
+  // notificationPrefs not in schema — use defaults
+  const notificationPrefs = defaultNotificationPrefs;
 
   const initialUser = {
     id: user.id,
@@ -80,7 +71,7 @@ export default async function SettingsPage() {
     qualification: user.qualification || "",
     parentNotes: user.parentNotes || "",
     isProfilePublic: user.isProfilePublic ?? true,
-    hideFromLeaderboard: user.hideFromLeaderboard ?? false,
+    hideFromLeaderboard: false, // not in schema — default false
   };
 
   return <SettingsClient initialUser={initialUser} />;
