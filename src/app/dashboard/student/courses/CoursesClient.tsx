@@ -288,15 +288,10 @@ export default function CoursesClient({
                 <div className="relative h-48 w-full bg-[#1E1B2E] overflow-hidden shrink-0">
                   {course.thumbnail ? (
                     <>
-                      {/* Shimmer skeleton shown until image loads */}
-                      {!imgLoaded.has(course.id) && <ThumbnailSkeleton />}
                       <img
                         src={course.thumbnail}
                         alt={course.title}
-                        onLoad={() => markImgLoaded(course.id)}
-                        className={`w-full h-full object-cover transition-all duration-500 group-hover:scale-105 ${
-                          imgLoaded.has(course.id) ? "opacity-100" : "opacity-0"
-                        }`}
+                        className="w-full h-full object-cover transition-all duration-500 group-hover:scale-105"
                       />
                     </>
                   ) : (

@@ -66,9 +66,13 @@ export default function CertificateClient({ certificate, course }: { certificate
   const courseName = certificate.title.replace("Certificate of Completion: ", "");
 
   return (
-    <div className="min-h-screen bg-[#0F0D1A] py-12 px-4 flex flex-col items-center">
+    <div className="min-h-screen bg-[#0F0D1A] pt-32 pb-12 px-4 flex flex-col items-center">
+      <style>{`
+        @import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700;900&family=Great+Vibes&family=Playfair+Display:ital,wght@0,400;0,700;1,400&display=swap');
+      `}</style>
+
       {/* Controls */}
-      <div className="w-full max-w-5xl flex justify-between items-center mb-8 print-hidden">
+      <div className="w-full max-w-5xl flex justify-between items-center mb-8 print-hidden relative z-50">
         <Link href="/dashboard/student">
           <Button
             variant="outline"
@@ -96,83 +100,108 @@ export default function CertificateClient({ certificate, course }: { certificate
           <div
             id="certificate-wrapper"
             ref={certRef}
-            className="relative shrink-0 shadow-2xl overflow-hidden"
+            className="relative shrink-0 shadow-[0_20px_50px_rgba(0,0,0,0.5)] overflow-hidden"
             style={{ 
               width: "1200px", 
               height: "675px", 
-              backgroundColor: "#1E1B2E", // Explicit hex background
-              color: "#FFFFFF",           // Explicit hex color to override lab() vars
-              fontFamily: "var(--font-heading, 'Times New Roman', serif)"
+              backgroundColor: "#1E1B2E", 
+              color: "#FFFFFF",
+              fontFamily: "'Playfair Display', serif"
             }}
           >
-            {/* Decorative Background Elements */}
-            <div className="absolute top-0 left-0 w-full h-full border-[20px] opacity-10 pointer-events-none" style={{ borderColor: "#C9A96E" }} />
-            <div className="absolute top-[30px] left-[30px] w-[calc(100%-60px)] h-[calc(100%-60px)] border-[2px] pointer-events-none" style={{ borderColor: "rgba(201,169,110,0.4)" }} />
-            <div className="absolute top-[40px] left-[40px] w-[calc(100%-80px)] h-[calc(100%-80px)] border pointer-events-none" style={{ borderColor: "rgba(201,169,110,0.2)" }} />
-            
-            {/* Subtle Watermark */}
-            <div className="absolute inset-0 flex items-center justify-center opacity-5 pointer-events-none" style={{ color: "#C9A96E" }}>
-              <Medal size={600} />
+            {/* Ornate Borders */}
+            <div className="absolute inset-0 pointer-events-none" style={{ backgroundColor: "#1E1B2E" }}>
+              <div className="absolute inset-[15px] border-[12px] border-double" style={{ borderColor: "#C9A96E" }}></div>
+              <div className="absolute inset-[32px] border-[2px]" style={{ borderColor: "#C9A96E", opacity: 0.8 }}></div>
+              <div className="absolute inset-[40px] border border-dashed" style={{ borderColor: "#C9A96E", opacity: 0.5 }}></div>
             </div>
 
-            <div className="relative z-10 w-full h-full flex flex-col items-center justify-center px-16 text-center">
+            {/* Corner Ornaments */}
+            <div className="absolute top-[32px] left-[32px] w-16 h-16 border-t-[4px] border-l-[4px]" style={{ borderColor: "#C9A96E" }}></div>
+            <div className="absolute top-[32px] right-[32px] w-16 h-16 border-t-[4px] border-r-[4px]" style={{ borderColor: "#C9A96E" }}></div>
+            <div className="absolute bottom-[32px] left-[32px] w-16 h-16 border-b-[4px] border-l-[4px]" style={{ borderColor: "#C9A96E" }}></div>
+            <div className="absolute bottom-[32px] right-[32px] w-16 h-16 border-b-[4px] border-r-[4px]" style={{ borderColor: "#C9A96E" }}></div>
+
+            {/* Background Watermark */}
+            <div className="absolute inset-0 flex items-center justify-center opacity-[0.03] pointer-events-none">
+              <Medal size={700} style={{ color: "#C9A96E" }} />
+            </div>
+
+            {/* Content Container */}
+            <div className="relative z-10 w-full h-full flex flex-col items-center pt-16 px-20 text-center">
               
-              {/* Header Icon */}
-              <div 
-                className="w-24 h-24 mb-6 rounded-full border-4 flex items-center justify-center shadow-[0_0_30px_rgba(201,169,110,0.2)]" 
-                style={{ borderColor: "#C9A96E", backgroundColor: "#1E1B2E", color: "#C9A96E" }}
-              >
-                <Award size={48} />
+              {/* Header */}
+              <div className="flex flex-col items-center mb-6">
+                <div className="w-16 h-16 mb-4 flex items-center justify-center">
+                  <Award size={48} style={{ color: "#C9A96E" }} />
+                </div>
+                <h2 className="text-[14px] uppercase tracking-[0.4em] mb-2 font-bold" style={{ color: "rgba(255,255,255,0.7)", fontFamily: "sans-serif" }}>
+                  Skill Sphere Education
+                </h2>
+                <h1 className="text-[64px] font-black uppercase tracking-widest drop-shadow-md leading-none" style={{ color: "#C9A96E", fontFamily: "'Cinzel', serif" }}>
+                  Certificate
+                </h1>
+                <h1 className="text-[28px] font-bold uppercase tracking-[0.3em] drop-shadow-md" style={{ color: "#C9A96E", fontFamily: "'Cinzel', serif" }}>
+                  Of Completion
+                </h1>
               </div>
-
-              <h1 className="text-[56px] font-black uppercase tracking-[0.1em] mb-2 drop-shadow-md" style={{ color: "#C9A96E" }}>
-                Certificate of Completion
-              </h1>
               
-              <div className="w-32 h-1 rounded-full mb-10 opacity-70" style={{ backgroundColor: "#C9A96E" }} />
+              {/* Divider */}
+              <div className="w-48 h-[2px] rounded-full mb-8 opacity-70" style={{ backgroundColor: "#C9A96E" }} />
 
-              <p className="text-[18px] font-bold uppercase tracking-[0.3em] mb-4" style={{ color: "rgba(255,255,255,0.6)" }}>
-                This certificate is proudly presented to
+              <p className="text-[18px] italic tracking-wider mb-6" style={{ color: "rgba(255,255,255,0.8)" }}>
+                This is to certify that
               </p>
 
-              <h2 className="text-[64px] font-bold mb-6 drop-shadow-lg" style={{ color: "#FFFFFF", fontFamily: "'Playfair Display', serif" }}>
+              {/* Student Name */}
+              <h2 className="text-[72px] font-bold drop-shadow-lg leading-none mb-6" style={{ color: "#FFFFFF", fontFamily: "'Great Vibes', cursive" }}>
                 {certificate.user.name}
               </h2>
 
-              <p className="text-[18px] font-bold uppercase tracking-widest max-w-3xl leading-relaxed mb-6" style={{ color: "rgba(255,255,255,0.6)" }}>
-                For successfully completing the rigorous requirements and demonstrating exceptional proficiency in
+              <p className="text-[16px] uppercase tracking-[0.2em] max-w-3xl leading-relaxed mb-8" style={{ color: "rgba(255,255,255,0.7)", fontFamily: "sans-serif" }}>
+                has successfully completed the comprehensive curriculum and demonstrated exceptional mastery in
               </p>
 
-              <h3 className="text-[40px] font-bold uppercase tracking-wide mb-12 drop-shadow-md" style={{ color: "#C9A96E" }}>
+              {/* Course Name */}
+              <h3 className="text-[36px] font-bold uppercase tracking-[0.15em] drop-shadow-md max-w-4xl leading-tight mb-auto" style={{ color: "#C9A96E", fontFamily: "'Cinzel', serif" }}>
                 {courseName}
               </h3>
 
-              {/* Footer Details */}
-              <div className="w-full flex justify-between items-end mt-auto mb-8 px-12 border-t pt-8" style={{ borderColor: "rgba(201,169,110,0.2)" }}>
+              {/* Footer Section */}
+              <div className="w-full flex justify-between items-end pb-12 mt-12 px-8">
                 
-                <div className="flex flex-col items-center w-[200px]">
-                  <span className="text-[14px] font-black uppercase tracking-widest mb-2" style={{ color: "#FFFFFF" }}>
+                {/* Date */}
+                <div className="flex flex-col items-center w-[220px]">
+                  <span className="text-[18px] font-bold uppercase tracking-widest mb-2" style={{ color: "#FFFFFF", fontFamily: "'Cinzel', serif" }}>
                     {formattedDate}
                   </span>
-                  <div className="w-full h-[1px] mb-2" style={{ backgroundColor: "rgba(201,169,110,0.5)" }} />
-                  <span className="text-[10px] font-bold uppercase tracking-widest" style={{ color: "rgba(255,255,255,0.5)" }}>
-                    Date of Issue
+                  <div className="w-full h-[1px] mb-2" style={{ backgroundColor: "#C9A96E" }} />
+                  <span className="text-[11px] font-bold uppercase tracking-[0.2em]" style={{ color: "rgba(255,255,255,0.5)", fontFamily: "sans-serif" }}>
+                    Date of Completion
                   </span>
                 </div>
 
-                <div className="flex flex-col items-center" style={{ color: "#C9A96E" }}>
-                  <ShieldCheck size={40} className="mb-3" />
-                  <span className="text-[10px] font-bold uppercase tracking-widest" style={{ color: "rgba(255,255,255,0.5)" }}>
-                    Credential ID: {certificate.id.slice(0, 12).toUpperCase()}
+                {/* Seal */}
+                <div className="flex flex-col items-center transform translate-y-4">
+                  <div className="w-32 h-32 rounded-full border-4 flex flex-col items-center justify-center relative shadow-[0_0_30px_rgba(201,169,110,0.3)] bg-[#1E1B2E]" style={{ borderColor: "#C9A96E" }}>
+                    <div className="w-[114px] h-[114px] rounded-full border border-dashed flex flex-col items-center justify-center" style={{ borderColor: "#C9A96E" }}>
+                      <ShieldCheck size={32} style={{ color: "#C9A96E", marginBottom: "4px" }} />
+                      <span className="text-[8px] uppercase font-bold tracking-widest" style={{ color: "#C9A96E", fontFamily: "sans-serif" }}>Official</span>
+                      <span className="text-[10px] uppercase font-black tracking-widest" style={{ color: "#C9A96E", fontFamily: "'Cinzel', serif" }}>Seal</span>
+                    </div>
+                  </div>
+                  <span className="text-[10px] font-bold uppercase tracking-widest mt-4" style={{ color: "rgba(255,255,255,0.4)", fontFamily: "sans-serif" }}>
+                    ID: {certificate.id.slice(0, 10).toUpperCase()}
                   </span>
                 </div>
 
-                <div className="flex flex-col items-center w-[200px]">
-                  <span className="text-[16px] font-black capitalize italic mb-2" style={{ color: "#FFFFFF", fontFamily: "serif" }}>
-                    {course?.teacher?.name || "Skill Sphere Admin"}
+                {/* Signature */}
+                <div className="flex flex-col items-center w-[220px]">
+                  <span className="text-[32px] capitalize mb-1 -translate-y-2" style={{ color: "#FFFFFF", fontFamily: "'Great Vibes', cursive" }}>
+                    {course?.teacher?.name || "Skill Sphere"}
                   </span>
-                  <div className="w-full h-[1px] mb-2" style={{ backgroundColor: "rgba(201,169,110,0.5)" }} />
-                  <span className="text-[10px] font-bold uppercase tracking-widest" style={{ color: "rgba(255,255,255,0.5)" }}>
+                  <div className="w-full h-[1px] mb-2" style={{ backgroundColor: "#C9A96E" }} />
+                  <span className="text-[11px] font-bold uppercase tracking-[0.2em]" style={{ color: "rgba(255,255,255,0.5)", fontFamily: "sans-serif" }}>
                     Lead Instructor
                   </span>
                 </div>
