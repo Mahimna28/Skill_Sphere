@@ -72,7 +72,7 @@ export default function CertificateClient({ certificate, course }: { certificate
       `}</style>
 
       {/* Controls */}
-      <div className="w-full max-w-5xl flex justify-between items-center mb-8 print-hidden relative z-50">
+      <div className="w-full max-w-5xl flex justify-between items-center mb-8 print-hidden relative z-10">
         <Link href="/dashboard/student">
           <Button
             variant="outline"
