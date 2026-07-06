@@ -17,8 +17,8 @@ export async function POST(req: Request) {
 
     const { oldPassword, newPassword } = await req.json();
 
-    if (!newPassword) {
-      return NextResponse.json({ message: "New password is required" }, { status: 400 });
+    if (!oldPassword || !newPassword) {
+      return NextResponse.json({ message: "All fields are required" }, { status: 400 });
     }
 
     const user = await prisma.user.findUnique({
@@ -29,15 +29,10 @@ export async function POST(req: Request) {
       return NextResponse.json({ message: "User not found" }, { status: 404 });
     }
 
-    // If user has a password, verify old password
-    if (user.password) {
-      if (!oldPassword) {
-        return NextResponse.json({ message: "Current password is required" }, { status: 400 });
-      }
-      const isMatch = await bcrypt.compare(oldPassword, user.password);
-      if (!isMatch) {
-        return NextResponse.json({ message: "Incorrect current password" }, { status: 400 });
-      }
+    // Verify old password
+    const isMatch = await bcrypt.compare(oldPassword, user.password);
+    if (!isMatch) {
+      return NextResponse.json({ message: "Incorrect old password" }, { status: 400 });
     }
 
     // Validate new password strength

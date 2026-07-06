@@ -69,8 +69,5 @@ export default async function ProfilePage() {
     });
   }
 
-  const hasPassword = !!user.password;
-  const safeUser = { ...user, password: "" };
-
-  return <ProfileClient user={safeUser} roleData={roleData} hasPassword={hasPassword} />;
+  return <ProfileClient user={user} roleData={roleData} />;
 }
