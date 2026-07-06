@@ -26,7 +26,7 @@ export default function CertificateClient({ certificate, course }: { certificate
       const canvas = await html2canvas(certRef.current, {
         scale: 2,
         useCORS: true,
-        backgroundColor: "#ffffff",
+        backgroundColor: "#1E1B2E",
         logging: false,
       });
 
@@ -51,26 +51,26 @@ export default function CertificateClient({ certificate, course }: { certificate
   const courseName = certificate.title.replace("Certificate of Completion: ", "");
 
   return (
-    <div className="min-h-screen bg-muted/30 py-12 px-4 flex flex-col items-center">
+    <div className="min-h-screen bg-[#0F0D1A] py-12 px-4 flex flex-col items-center">
       {/* Controls */}
       <div className="w-full max-w-5xl flex justify-between items-center mb-8 print-hidden">
         <Link href="/dashboard/student">
           <Button
             variant="outline"
-            className="border-4 border-black font-black uppercase text-xs h-10 shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] hover:shadow-none transition-all"
+            className="border-2 border-[#C9A96E]/30 text-[#C9A96E] hover:bg-[#C9A96E]/10 hover:text-[#C9A96E] bg-transparent font-bold uppercase tracking-wider text-xs h-11 px-6 rounded-xl transition-all"
           >
-            <ArrowLeft size={14} className="mr-2" /> Back to Dashboard
+            <ArrowLeft size={16} className="mr-2" /> Back to Dashboard
           </Button>
         </Link>
         <Button
           onClick={handleDownloadPDF}
           disabled={downloading}
-          className="neo-brutalism bg-[#4F7DF3] text-white font-black h-12 px-6"
+          className="bg-[#C9A96E] hover:bg-[#D6B87D] text-[#1E1B2E] font-extrabold uppercase tracking-wider text-xs h-11 px-8 rounded-xl shadow-[0_4px_20px_rgba(201,169,110,0.3)] transition-all"
         >
           {downloading ? (
-            <><Loader2 className="mr-2 animate-spin" size={18} /> Generating PDF...</>
+            <><Loader2 className="mr-2 animate-spin" size={16} /> Generating PDF...</>
           ) : (
-            <><Download className="mr-2" size={18} /> Download PDF</>
+            <><Download className="mr-2" size={16} /> Download PDF</>
           )}
         </Button>
       </div>
@@ -80,77 +80,82 @@ export default function CertificateClient({ certificate, course }: { certificate
         <div
           id="certificate-wrapper"
           ref={certRef}
-          className="relative shrink-0 shadow-2xl"
+          className="relative shrink-0 shadow-2xl bg-[#1E1B2E] overflow-hidden"
           style={{ 
             width: "1200px", 
             height: "675px", 
-            backgroundImage: "url('/images/certificate-template.jpg')",
-            backgroundSize: "cover",
-            backgroundPosition: "center",
-            fontFamily: "'Times New Roman', serif"
+            fontFamily: "var(--font-heading, 'Times New Roman', serif)"
           }}
         >
-          {/* Student Name (covers the placeholder) */}
-          <div className="absolute top-[31%] left-0 w-full flex justify-center">
-            <h2 
-              className="text-[52px] font-bold text-[#142646] uppercase tracking-wide bg-white px-10 py-2 rounded"
-              style={{ minWidth: '400px', textAlign: 'center' }}
-            >
+          {/* Decorative Background Elements */}
+          <div className="absolute top-0 left-0 w-full h-full border-[20px] border-[#C9A96E] opacity-10 pointer-events-none" />
+          <div className="absolute top-[30px] left-[30px] w-[calc(100%-60px)] h-[calc(100%-60px)] border-[2px] border-[#C9A96E]/40 pointer-events-none" />
+          <div className="absolute top-[40px] left-[40px] w-[calc(100%-80px)] h-[calc(100%-80px)] border border-[#C9A96E]/20 pointer-events-none" />
+          
+          {/* Subtle Watermark */}
+          <div className="absolute inset-0 flex items-center justify-center opacity-5 pointer-events-none">
+            <Medal size={600} className="text-[#C9A96E]" />
+          </div>
+
+          <div className="relative z-10 w-full h-full flex flex-col items-center justify-center px-16 text-center">
+            
+            {/* Header Icon */}
+            <div className="w-24 h-24 mb-6 rounded-full border-4 border-[#C9A96E] flex items-center justify-center bg-[#1E1B2E] text-[#C9A96E] shadow-[0_0_30px_rgba(201,169,110,0.2)]">
+              <Award size={48} />
+            </div>
+
+            <h1 className="text-[56px] font-black uppercase tracking-[0.1em] text-[#C9A96E] mb-2 drop-shadow-md">
+              Certificate of Completion
+            </h1>
+            
+            <div className="w-32 h-1 bg-[#C9A96E] rounded-full mb-10 opacity-70" />
+
+            <p className="text-[18px] font-bold text-[#FFFFFF]/60 uppercase tracking-[0.3em] mb-4">
+              This certificate is proudly presented to
+            </p>
+
+            <h2 className="text-[64px] font-bold text-white mb-6 drop-shadow-lg" style={{ fontFamily: "'Playfair Display', serif" }}>
               {certificate.user.name}
             </h2>
-          </div>
 
-          {/* Course Name (covers the placeholder) */}
-          <div className="absolute top-[49%] left-0 w-full flex justify-center">
-            <h3 
-              className="text-[42px] font-bold text-[#142646] uppercase tracking-wider bg-white px-8 py-1 rounded"
-              style={{ minWidth: '500px', textAlign: 'center' }}
-            >
+            <p className="text-[18px] font-bold text-[#FFFFFF]/60 uppercase tracking-widest max-w-3xl leading-relaxed mb-6">
+              For successfully completing the rigorous requirements and demonstrating exceptional proficiency in
+            </p>
+
+            <h3 className="text-[40px] font-bold text-[#C9A96E] uppercase tracking-wide mb-12 drop-shadow-md">
               {courseName}
             </h3>
-          </div>
 
-          {/* Bottom Row Overlays */}
-          <div className="absolute top-[71%] left-[10.5%] w-[79%] h-[60px] flex items-center">
-            
-            {/* Duration */}
-            <div className="w-1/5 h-full flex flex-col justify-center items-center bg-white">
-              <span className="text-[10px] font-bold text-[#142646] uppercase mb-0.5">Course Duration</span>
-              <span className="text-[14px] font-bold text-[#4F7DF3] uppercase">
-                {course?.duration || "40 HOURS"}
-              </span>
-            </div>
+            {/* Footer Details */}
+            <div className="w-full flex justify-between items-end mt-auto mb-8 px-12 border-t border-[#C9A96E]/20 pt-8">
+              
+              <div className="flex flex-col items-center w-[200px]">
+                <span className="text-[14px] font-black text-white uppercase tracking-widest mb-2">
+                  {formattedDate}
+                </span>
+                <div className="w-full h-[1px] bg-[#C9A96E]/50 mb-2" />
+                <span className="text-[10px] font-bold text-[#FFFFFF]/50 uppercase tracking-widest">
+                  Date of Issue
+                </span>
+              </div>
 
-            {/* Level */}
-            <div className="w-1/5 h-full flex flex-col justify-center items-center bg-white border-l border-gray-200">
-              <span className="text-[10px] font-bold text-[#142646] uppercase mb-0.5">Level</span>
-              <span className="text-[14px] font-bold text-[#4F7DF3] uppercase">
-                {course?.level || "INTERMEDIATE"}
-              </span>
-            </div>
+              <div className="flex flex-col items-center">
+                <ShieldCheck size={40} className="text-[#C9A96E] mb-3" />
+                <span className="text-[10px] font-bold text-[#FFFFFF]/50 uppercase tracking-widest">
+                  Credential ID: {certificate.id.slice(0, 12).toUpperCase()}
+                </span>
+              </div>
 
-            {/* Completion Date */}
-            <div className="w-1/5 h-full flex flex-col justify-center items-center bg-white border-l border-gray-200">
-              <span className="text-[10px] font-bold text-[#142646] uppercase mb-0.5">Completion Date</span>
-              <span className="text-[14px] font-bold text-[#34D399] uppercase">
-                {formattedDate}
-              </span>
-            </div>
+              <div className="flex flex-col items-center w-[200px]">
+                <span className="text-[16px] font-black text-white capitalize italic mb-2" style={{ fontFamily: "serif" }}>
+                  {course?.teacher?.name || "Skill Sphere Admin"}
+                </span>
+                <div className="w-full h-[1px] bg-[#C9A96E]/50 mb-2" />
+                <span className="text-[10px] font-bold text-[#FFFFFF]/50 uppercase tracking-widest">
+                  Lead Instructor
+                </span>
+              </div>
 
-            {/* Certificate ID */}
-            <div className="w-1/5 h-full flex flex-col justify-center items-center bg-white border-l border-gray-200">
-              <span className="text-[10px] font-bold text-[#142646] uppercase mb-0.5">Certificate ID</span>
-              <span className="text-[14px] font-bold text-[#4F7DF3] uppercase">
-                {certificate.id.slice(0, 10)}
-              </span>
-            </div>
-
-            {/* Instructor */}
-            <div className="w-1/5 h-full flex flex-col justify-center items-center bg-white border-l border-gray-200">
-              <span className="text-[10px] font-bold text-[#142646] uppercase mb-0.5">Instructor</span>
-              <span className="text-[14px] font-bold text-[#4F7DF3] uppercase truncate w-[120px] text-center">
-                {course?.teacher?.name || "Skill Sphere"}
-              </span>
             </div>
           </div>
         </div>
