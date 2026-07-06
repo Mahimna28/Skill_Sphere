@@ -54,3 +54,32 @@ export async function PATCH(req: Request) {
     return NextResponse.json({ message: "Server error" }, { status: 500 });
   }
 }
+
+// DELETE: Dismiss notifications
+export async function DELETE(req: Request) {
+  try {
+    const cookieStore = await cookies();
+    const token = cookieStore.get("token")?.value;
+    const decoded: any = token ? verifyToken(token) : null;
+    if (!decoded) return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
+
+    const url = new URL(req.url);
+    const id = url.searchParams.get("id");
+    const clearAll = url.searchParams.get("clearAll");
+
+    if (clearAll === "true") {
+      await prisma.notification.deleteMany({
+        where: { userId: decoded.id },
+      });
+    } else if (id) {
+      await prisma.notification.deleteMany({
+        where: { id, userId: decoded.id },
+      });
+    }
+
+    return NextResponse.json({ message: "Notifications deleted" });
+  } catch (error: any) {
+    return NextResponse.json({ message: "Server error" }, { status: 500 });
+  }
+}
+
