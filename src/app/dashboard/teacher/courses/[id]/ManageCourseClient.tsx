@@ -12,7 +12,7 @@ import Link from "next/link";
 export default function ManageCourseClient({ course, studentsProgress = [] }: { course: any, studentsProgress?: any[] }) {
   const router = useRouter();
   const [loading, setLoading] = useState(false);
-  const [activeTab, setActiveTab] = useState<"settings" | "curriculum" | "students">("settings");
+  const [activeTab, setActiveTab] = useState<"settings" | "curriculum" | "students" | "gradebook" | "assignments">("settings");
   
   const [formData, setFormData] = useState({
     title: course.title,
@@ -244,20 +244,20 @@ export default function ManageCourseClient({ course, studentsProgress = [] }: { 
   };
 
   return (
-    <div className="flex flex-col h-full bg-[#F5F1EB] font-sans">
+    <div className="flex flex-col h-full bg-[#F5F1EB] font-sans text-[#1E1B2E]">
       <div className="w-full max-w-[1000px] mx-auto pb-20">
         
         {/* Page Header + Tabs */}
-        <div className="pt-[24px] px-[32px] flex items-center gap-4">
-          <Link href="/dashboard/teacher">
-            <button className="w-10 h-10 rounded-full bg-white flex items-center justify-center border border-[rgba(30,27,46,0.1)] shadow-[0_2px_8px_rgba(0,0,0,0.04)] text-[#1E1B2E] hover:bg-[rgba(30,27,46,0.03)] transition-colors">
-              <ArrowLeft size={20} />
+        <div className="pt-8 px-8 flex items-center gap-4">
+          <Link href="/dashboard/teacher/courses">
+            <button className="w-10 h-10 rounded-full bg-white flex items-center justify-center border border-[rgba(30,27,46,0.1)] shadow-[0_2px_8px_rgba(0,0,0,0.04)] text-[#1E1B2E] hover:bg-[rgba(30,27,46,0.04)] hover:scale-105 transition-all">
+              <ArrowLeft size={18} />
             </button>
           </Link>
-          <h1 className="font-heading text-[24px] text-[#1E1B2E]">{course.title}</h1>
+          <h1 className="font-heading text-[28px] text-[#1E1B2E] tracking-tight">{course.title}</h1>
         </div>
         
-        <div className="pt-[20px] px-[32px] flex gap-1 overflow-x-auto scrollbar-none border-b border-[rgba(30,27,46,0.06)]">
+        <div className="pt-6 px-8 flex gap-2 overflow-x-auto scrollbar-none border-b border-[rgba(30,27,46,0.06)]">
           {[
             { id: "settings", label: "Settings", icon: Save },
             { id: "curriculum", label: "Curriculum", icon: BookOpen },
@@ -268,10 +268,10 @@ export default function ManageCourseClient({ course, studentsProgress = [] }: { 
             <button 
               key={tab.id}
               onClick={() => setActiveTab(tab.id as any)}
-              className={`px-4 py-2.5 rounded-t-lg font-medium text-[13px] flex items-center gap-2 transition-colors ${
+              className={`px-5 py-3 rounded-t-xl font-bold text-[13px] uppercase tracking-wider flex items-center gap-2 transition-all ${
                 activeTab === tab.id 
-                  ? 'bg-[rgba(30,27,46,0.06)] text-[#1E1B2E] shadow-sm' 
-                  : 'text-[#8E8E93] hover:bg-[rgba(30,27,46,0.04)]'
+                  ? 'bg-white text-[#1E1B2E] shadow-[0_-4px_16px_rgba(0,0,0,0.04)] border-t-2 border-t-[#C9A96E]' 
+                  : 'text-[#8E8E93] hover:text-[#1E1B2E] hover:bg-[rgba(30,27,46,0.03)]'
               }`}
             >
               <tab.icon size={16} /> {tab.label}
@@ -371,51 +371,55 @@ export default function ManageCourseClient({ course, studentsProgress = [] }: { 
         )}
 
       {activeTab === "curriculum" && (
-        <div className="space-y-8">
-          <div className="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 flex gap-4">
-            <Input placeholder="New Module Title..." className="flex-1 border border-gray-200 rounded-xl font-bold h-12" value={newModuleTitle} onChange={e => setNewModuleTitle(e.target.value)} />
-            <Button onClick={handleAddModule} disabled={loading} className="bg-[#1E1B2E] text-white rounded-xl font-medium text-[#1E1B2E] h-12">
-              <Plus className="mr-2" /> Add Module
+        <div className="space-y-6 p-8">
+          <div className="bg-white p-6 rounded-[16px] shadow-[0_4px_20px_rgba(0,0,0,0.04)] flex gap-4 items-center">
+            <Input placeholder="New Module Title..." className="flex-1 h-12 bg-white border border-[rgba(30,27,46,0.12)] rounded-xl px-4 text-[14px] text-[#1E1B2E] focus:outline-none focus:border-[#C9A96E] focus:ring-[3px] focus:ring-[rgba(201,169,110,0.15)] transition-all" value={newModuleTitle} onChange={e => setNewModuleTitle(e.target.value)} />
+            <Button onClick={handleAddModule} disabled={loading} className="h-12 px-6 rounded-xl bg-[#1E1B2E] text-white text-[14px] font-medium hover:scale-[1.02] hover:shadow-[0_4px_16px_rgba(30,27,46,0.2)] transition-all flex items-center gap-2">
+              <Plus size={16} /> Add Module
             </Button>
           </div>
           <div className="space-y-6">
             {course.modules.map((module: any) => (
-              <Card key={module.id} className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
-                <div className="p-4 bg-accent border-b border-gray-100 flex items-center justify-between">
-                   <h4 className="text-lg font-medium text-[#1E1B2E] ">{module.title}</h4>
-                   <Button variant="ghost" onClick={() => handleDeleteItem("module", module.id)} className="h-8 w-8 p-0 text-red-600 border border-gray-200 rounded-xl"><Trash2 size={16} /></Button>
+              <div key={module.id} className="bg-white rounded-[16px] shadow-[0_4px_20px_rgba(0,0,0,0.04)] overflow-hidden border border-[rgba(30,27,46,0.04)]">
+                <div className="p-5 bg-[rgba(30,27,46,0.02)] border-b border-[rgba(30,27,46,0.06)] flex items-center justify-between">
+                   <h4 className="font-heading text-[18px] text-[#1E1B2E]">{module.title}</h4>
+                   <Button variant="ghost" onClick={() => handleDeleteItem("module", module.id)} className="h-8 w-8 p-0 text-[#DC2626] hover:bg-[#DC2626]/10 rounded-lg transition-colors"><Trash2 size={16} /></Button>
                 </div>
-                <div className="p-4 space-y-3">
+                <div className="p-5 space-y-3">
                    {module.lessons.map((lesson: any) => (
                      <div key={lesson.id}>
                        {/* Lesson row */}
-                       <div className="flex items-center justify-between p-3 bg-muted/20 border border-gray-200 rounded-xl rounded-lg">
-                          <div className="flex items-center gap-3 text-sm font-bold">
-                             {lesson.videoUrl ? <Video size={16} /> : lesson.fileUrl ? <File size={16} className="text-primary" /> : <FileText size={16} />}
+                       <div className="flex items-center justify-between p-3.5 bg-white border border-[rgba(30,27,46,0.08)] rounded-xl hover:border-[rgba(201,169,110,0.4)] transition-colors group">
+                          <div className="flex items-center gap-3 text-[14px] font-medium text-[#1E1B2E]">
+                             <div className="w-8 h-8 rounded-lg bg-[rgba(201,169,110,0.1)] text-[#C9A96E] flex items-center justify-center shrink-0">
+                               {lesson.videoUrl ? <Video size={16} /> : lesson.fileUrl ? <File size={16} /> : <FileText size={16} />}
+                             </div>
                              {lesson.title}
-                             {lesson.fileType && <span className="text-[10px] bg-accent px-1.5 rounded-md ">{lesson.fileType}</span>}
+                             {lesson.fileType && <span className="text-[10px] bg-[rgba(30,27,46,0.06)] text-[#8E8E93] px-2 py-0.5 rounded-md uppercase font-bold tracking-wider">{lesson.fileType}</span>}
                           </div>
-                          <div className="flex gap-1">
-                            <Button variant="ghost" onClick={() => setEditingLesson(editingLesson?.id === lesson.id ? null : { id: lesson.id, title: lesson.title, content: lesson.content || "", videoUrl: lesson.videoUrl || "" })} className="h-7 w-7 p-0 text-blue-600 hover:bg-blue-50">
+                          <div className="flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                            <Button variant="ghost" onClick={() => setEditingLesson(editingLesson?.id === lesson.id ? null : { id: lesson.id, title: lesson.title, content: lesson.content || "", videoUrl: lesson.videoUrl || "" })} className="h-8 w-8 p-0 text-[#1E1B2E] hover:bg-[rgba(30,27,46,0.06)] rounded-lg">
                               <Pencil size={14} />
                             </Button>
-                            <Button variant="ghost" onClick={() => handleDeleteItem("lesson", lesson.id)} className="h-7 w-7 p-0 text-red-600 hover:bg-red-50">
+                            <Button variant="ghost" onClick={() => handleDeleteItem("lesson", lesson.id)} className="h-8 w-8 p-0 text-[#DC2626] hover:bg-[#DC2626]/10 rounded-lg">
                               <Trash2 size={14} />
                             </Button>
                           </div>
                        </div>
                        {/* Inline edit form */}
                        {editingLesson?.id === lesson.id && (
-                         <div className="mt-2 p-4 bg-blue-50 border-2 border-blue-300 rounded-xl space-y-3 animate-in slide-in-from-top-2 duration-200">
-                           <p className="text-xs font-medium text-[#1E1B2E]  tracking-widest text-blue-700">✏️ Editing: {lesson.title}</p>
-                           <Input placeholder="Lesson Title" className="border border-gray-200 rounded-xl font-bold" value={editingLesson.title} onChange={e => setEditingLesson({...editingLesson, title: e.target.value})} />
-                           <Input placeholder="Video URL (YouTube/Vimeo embed)" className="border border-gray-200 rounded-xl font-bold" value={editingLesson.videoUrl} onChange={e => setEditingLesson({...editingLesson, videoUrl: e.target.value})} />
-                           <Textarea placeholder="Lesson Notes / Content" className="border border-gray-200 rounded-xl font-bold h-20" value={editingLesson.content} onChange={e => setEditingLesson({...editingLesson, content: e.target.value})} />
-                           <div className="flex gap-2">
-                             <Button onClick={handleSaveLesson} disabled={loading} className="flex-1 h-10 bg-[#34D399] text-black font-medium text-[#1E1B2E] border border-gray-200 rounded-xl">
-                               {loading ? <Loader2 size={14} className="mr-2 animate-spin" /> : <Check size={14} className="mr-2" />} Save Changes
+                         <div className="mt-2 p-5 bg-white border border-[#C9A96E]/30 shadow-[0_4px_20px_rgba(201,169,110,0.08)] rounded-xl space-y-4 animate-in slide-in-from-top-2 duration-200">
+                           <p className="text-[11px] font-bold uppercase tracking-widest text-[#C9A96E] flex items-center gap-2">
+                             <Pencil size={12} /> Editing: {lesson.title}
+                           </p>
+                           <Input placeholder="Lesson Title" className="h-11 bg-white border border-[rgba(30,27,46,0.12)] rounded-xl px-4 text-[14px] text-[#1E1B2E] focus:outline-none focus:border-[#C9A96E] focus:ring-[3px] focus:ring-[rgba(201,169,110,0.15)] transition-all" value={editingLesson?.title || ""} onChange={e => setEditingLesson(prev => prev ? {...prev, title: e.target.value} : null)} />
+                           <Input placeholder="Video URL (YouTube/Vimeo embed)" className="h-11 bg-white border border-[rgba(30,27,46,0.12)] rounded-xl px-4 text-[14px] text-[#1E1B2E] focus:outline-none focus:border-[#C9A96E] focus:ring-[3px] focus:ring-[rgba(201,169,110,0.15)] transition-all" value={editingLesson?.videoUrl || ""} onChange={e => setEditingLesson(prev => prev ? {...prev, videoUrl: e.target.value} : null)} />
+                           <Textarea placeholder="Lesson Notes / Content" className="min-h-[100px] bg-white border border-[rgba(30,27,46,0.12)] rounded-xl p-3 text-[14px] text-[#1E1B2E] focus:outline-none focus:border-[#C9A96E] focus:ring-[3px] focus:ring-[rgba(201,169,110,0.15)] transition-all resize-y" value={editingLesson?.content || ""} onChange={e => setEditingLesson(prev => prev ? {...prev, content: e.target.value} : null)} />
+                           <div className="flex gap-2 pt-2">
+                             <Button onClick={handleSaveLesson} disabled={loading} className="flex-1 h-11 bg-[#1E1B2E] hover:scale-[1.01] text-white font-medium rounded-xl transition-all">
+                               {loading ? <Loader2 size={16} className="mr-2 animate-spin" /> : <Save size={16} className="mr-2" />} Save Changes
                              </Button>
-                             <Button variant="outline" onClick={() => setEditingLesson(null)} className="h-10 border border-gray-200 rounded-xl font-bold"><X size={14} /></Button>
+                             <Button variant="outline" onClick={() => setEditingLesson(null)} className="h-11 px-6 border border-[rgba(30,27,46,0.12)] hover:bg-[rgba(30,27,46,0.04)] rounded-xl font-medium"><X size={16} /></Button>
                            </div>
                          </div>
                        )}
@@ -425,74 +429,75 @@ export default function ManageCourseClient({ course, studentsProgress = [] }: { 
                    <button
                      type="button"
                      onClick={() => setExpandedModuleId(expandedModuleId === module.id ? null : module.id)}
-                     className="w-full mt-2 flex items-center justify-center gap-2 p-3 border border-gray-200 rounded-xl border-dashed rounded-xl font-medium text-[#1E1B2E] text-xs  hover:bg-[#34D399]/10 transition-colors"
+                     className="w-full mt-2 h-12 flex items-center justify-center gap-2 border-2 border-dashed border-[rgba(30,27,46,0.12)] rounded-xl font-bold text-[#8E8E93] text-[13px] uppercase tracking-wider hover:border-[#C9A96E] hover:text-[#C9A96E] hover:bg-[rgba(201,169,110,0.03)] transition-all"
                    >
-                     {expandedModuleId === module.id ? <><ChevronUp size={14} /> Hide Form</> : <><Plus size={14} /> Add Lesson</>}
+                     {expandedModuleId === module.id ? <><ChevronUp size={16} /> Cancel</> : <><Plus size={16} /> Add Lesson</>}
                    </button>
                    {/* Collapsible Add Lesson form */}
                    {expandedModuleId === module.id && (
-                     <div className="p-4 bg-muted/10 border border-gray-200 rounded-xl border-dashed rounded-xl space-y-4 animate-in slide-in-from-top-2 duration-200">
-                        <Input placeholder="Lesson Title" className="border border-gray-200 rounded-xl font-bold" value={newLesson.moduleId === module.id ? newLesson.title : ""} onChange={e => setNewLesson({...newLesson, moduleId: module.id, title: e.target.value})} />
-                        <Input placeholder="Video Link (YouTube/Vimeo)" className="border border-gray-200 rounded-xl font-bold" value={newLesson.moduleId === module.id ? newLesson.videoUrl : ""} onChange={e => setNewLesson({...newLesson, moduleId: module.id, videoUrl: e.target.value})} />
+                     <div className="mt-3 p-5 bg-[rgba(30,27,46,0.02)] border border-[rgba(30,27,46,0.08)] rounded-xl space-y-4 animate-in slide-in-from-top-2 duration-200">
+                        <Input placeholder="Lesson Title" className="h-11 bg-white border border-[rgba(30,27,46,0.12)] rounded-xl px-4 text-[14px] text-[#1E1B2E] focus:outline-none focus:border-[#C9A96E] focus:ring-[3px] focus:ring-[rgba(201,169,110,0.15)] transition-all" value={newLesson.moduleId === module.id ? newLesson.title : ""} onChange={e => setNewLesson({...newLesson, moduleId: module.id, title: e.target.value})} />
+                        <Input placeholder="Video Link (YouTube/Vimeo)" className="h-11 bg-white border border-[rgba(30,27,46,0.12)] rounded-xl px-4 text-[14px] text-[#1E1B2E] focus:outline-none focus:border-[#C9A96E] focus:ring-[3px] focus:ring-[rgba(201,169,110,0.15)] transition-all" value={newLesson.moduleId === module.id ? newLesson.videoUrl : ""} onChange={e => setNewLesson({...newLesson, moduleId: module.id, videoUrl: e.target.value})} />
                         <div className="space-y-2">
-                           <label className="text-[10px] font-medium text-[#1E1B2E]  opacity-60">Academic Material (PDF/PPT)</label>
+                           <label className="text-[11px] font-bold text-[#8E8E93] uppercase tracking-wider">Academic Material (PDF/PPT)</label>
                            <div className="flex gap-2">
                               <div className="relative flex-1">
-                                 <Input type="file" accept=".pdf,.ppt,.pptx" className="absolute inset-0 opacity-0 cursor-pointer z-10" onChange={(e) => handleFileUpload(e, module.id)} disabled={uploading} />
-                                 <div className="h-10 border border-gray-200 rounded-xl border-dashed rounded-lg flex items-center justify-center gap-2 bg-white font-bold text-xs">
-                                    {uploading ? <Loader2 className="animate-spin" size={14} /> : <Upload size={14} />}
-                                    {newLesson.moduleId === module.id && newLesson.fileUrl ? "File Ready" : "Choose PDF/PPT"}
+                                 <Input type="file" accept=".pdf,.ppt,.pptx" className="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10" onChange={(e) => handleFileUpload(e, module.id)} disabled={uploading} />
+                                 <div className="h-11 border-2 border-dashed border-[rgba(30,27,46,0.15)] rounded-xl flex items-center justify-center gap-2 bg-white text-[#8E8E93] font-medium text-[13px] hover:border-[#C9A96E] transition-colors">
+                                    {uploading ? <Loader2 className="animate-spin" size={16} /> : <Upload size={16} />}
+                                    {newLesson.moduleId === module.id && newLesson.fileUrl ? "File Uploaded Successfully" : "Click to Upload PDF/PPT"}
                                  </div>
                               </div>
                               {newLesson.moduleId === module.id && newLesson.fileUrl && (
-                                <Button variant="ghost" className="h-10 border border-gray-200 rounded-xl bg-[#C9A96E]/10 text-[#C9A96E]" onClick={() => setNewLesson({...newLesson, fileUrl: "", fileType: ""})}>
-                                  <X size={14} />
+                                <Button variant="ghost" className="h-11 w-11 p-0 border border-[rgba(30,27,46,0.12)] rounded-xl bg-white text-[#DC2626] hover:bg-[#DC2626]/10" onClick={() => setNewLesson({...newLesson, fileUrl: "", fileType: ""})}>
+                                  <Trash2 size={16} />
                                 </Button>
                               )}
                            </div>
                         </div>
-                        <Textarea placeholder="Lesson Notes / Content" className="border border-gray-200 rounded-xl font-bold h-24" value={newLesson.moduleId === module.id ? newLesson.content : ""} onChange={e => setNewLesson({...newLesson, moduleId: module.id, content: e.target.value})} />
-                        <Button onClick={() => handleAddLesson(module.id)} disabled={loading || uploading || !newLesson.title} className="w-full bg-[#34D399] text-black font-medium text-[#1E1B2E] border border-gray-200 rounded-xl">Add Lesson</Button>
+                        <Textarea placeholder="Lesson Notes / Content" className="min-h-[100px] bg-white border border-[rgba(30,27,46,0.12)] rounded-xl p-3 text-[14px] text-[#1E1B2E] focus:outline-none focus:border-[#C9A96E] focus:ring-[3px] focus:ring-[rgba(201,169,110,0.15)] transition-all resize-y" value={newLesson.moduleId === module.id ? newLesson.content : ""} onChange={e => setNewLesson({...newLesson, moduleId: module.id, content: e.target.value})} />
+                        <Button onClick={() => handleAddLesson(module.id)} disabled={loading || uploading || !newLesson.title} className="w-full h-11 bg-[#C9A96E] hover:bg-[#D6B87D] text-[#1E1B2E] font-bold uppercase tracking-wider rounded-xl transition-all shadow-md">Add Lesson</Button>
                      </div>
                    )}
                 </div>
-              </Card>
+              </div>
             ))}
           </div>
         </div>
       )}
 
       {activeTab === "students" && (
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 p-8">
            <div className="lg:col-span-1">
-              <Card className="bg-white p-6 rounded-2xl shadow-sm border border-gray-100">
-                 <h3 className="text-xl font-medium text-[#1E1B2E]  mb-4 flex items-center gap-2"><UserPlus size={24} /> Enroll Student</h3>
+              <div className="bg-white p-6 rounded-[16px] shadow-[0_4px_20px_rgba(0,0,0,0.04)]">
+                 <h3 className="font-heading text-[20px] text-[#1E1B2E] mb-6 flex items-center gap-2"><UserPlus size={20} className="text-[#C9A96E]" /> Enroll Student</h3>
                  <form onSubmit={handleEnrollStudent} className="space-y-4">
-                    <Input placeholder="Student Gmail" className="h-12 border border-gray-200 rounded-xl font-bold bg-white" value={studentEmail} onChange={e => setStudentEmail(e.target.value)} required />
-                    <Button type="submit" disabled={loading} className="w-full h-12 bg-[#1E1B2E] text-white rounded-xl font-medium">Enroll Now</Button>
+                    <Input placeholder="Student Email Address" className="h-12 bg-white border border-[rgba(30,27,46,0.12)] rounded-xl px-4 text-[14px] text-[#1E1B2E] focus:outline-none focus:border-[#C9A96E] focus:ring-[3px] focus:ring-[rgba(201,169,110,0.15)] transition-all" value={studentEmail} onChange={e => setStudentEmail(e.target.value)} required />
+                    <Button type="submit" disabled={loading} className="w-full h-12 bg-[#1E1B2E] text-white rounded-xl text-[14px] font-bold uppercase tracking-wider hover:scale-[1.02] shadow-md transition-all">Enroll Now</Button>
                  </form>
-              </Card>
+              </div>
            </div>
-           <div className="lg:col-span-2 space-y-8">
+           <div className="lg:col-span-2 space-y-6">
               {course.leaveRequests?.length > 0 && (
-                <Card className="neo-brutalism bg-orange-50 border-4 border-black overflow-hidden">
-                   <div className="p-4 bg-orange-200 border-b border-gray-100">
-                      <h3 className="text-xl font-medium text-[#1E1B2E]  text-orange-900">Pending Leave Requests ({course.leaveRequests.length})</h3>
+                <div className="bg-white rounded-[16px] border border-[#DC2626]/20 shadow-[0_4px_20px_rgba(220,38,38,0.08)] overflow-hidden">
+                   <div className="p-4 bg-[#DC2626]/5 border-b border-[#DC2626]/10 flex items-center gap-2">
+                      <div className="w-2 h-2 rounded-full bg-[#DC2626] animate-pulse" />
+                      <h3 className="font-heading text-[18px] text-[#DC2626]">Pending Drop Requests ({course.leaveRequests.length})</h3>
                    </div>
                    <div className="p-0">
                       <table className="w-full text-left">
-                         <tbody className="divide-y divide-gray-100">
+                         <tbody className="divide-y divide-[rgba(30,27,46,0.06)]">
                             {course.leaveRequests.map((req: any) => (
-                              <tr key={req.id} className="hover:bg-orange-100 transition-colors">
+                              <tr key={req.id} className="hover:bg-[rgba(30,27,46,0.02)] transition-colors">
                                  <td className="p-4">
-                                    <p className="font-medium text-[#1E1B2E] text-sm ">{req.user.name}</p>
-                                    <p className="text-[10px] font-bold opacity-60">{req.user.email}</p>
+                                    <p className="font-medium text-[#1E1B2E] text-[14px]">{req.user.name}</p>
+                                    <p className="text-[12px] text-[#8E8E93] mt-0.5">{req.user.email}</p>
                                  </td>
                                  <td className="p-4 text-right flex justify-end gap-2">
-                                    <Button onClick={() => handleLeaveRequest(req.id, "approve")} disabled={loading} className="h-8 font-medium text-[#1E1B2E] text-xs bg-[#C9A96E] text-white rounded-xl">
-                                       Approve
+                                    <Button onClick={() => handleLeaveRequest(req.id, "approve")} disabled={loading} className="h-9 px-4 font-bold text-[11px] uppercase tracking-wider bg-[#DC2626] text-white rounded-xl hover:bg-[#B91C1C]">
+                                       Approve Drop
                                     </Button>
-                                    <Button variant="outline" onClick={() => handleLeaveRequest(req.id, "reject")} disabled={loading} className="h-8 font-medium text-[#1E1B2E] text-xs border border-gray-200 rounded-xl hover:bg-red-50 text-red-600">
+                                    <Button variant="outline" onClick={() => handleLeaveRequest(req.id, "reject")} disabled={loading} className="h-9 px-4 font-bold text-[11px] uppercase tracking-wider border border-[rgba(30,27,46,0.12)] text-[#1E1B2E] rounded-xl hover:bg-[rgba(30,27,46,0.04)]">
                                        Reject
                                     </Button>
                                  </td>
@@ -501,42 +506,45 @@ export default function ManageCourseClient({ course, studentsProgress = [] }: { 
                          </tbody>
                       </table>
                    </div>
-                </Card>
+                </div>
               )}
 
-              <Card className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
-                 <div className="p-4 bg-muted border-b border-gray-100">
-                    <h3 className="text-xl font-medium text-[#1E1B2E] ">Enrolled Students ({course.enrollments.length})</h3>
+              <div className="bg-white rounded-[16px] shadow-[0_4px_20px_rgba(0,0,0,0.04)] overflow-hidden border border-[rgba(30,27,46,0.04)]">
+                 <div className="p-5 bg-[rgba(30,27,46,0.02)] border-b border-[rgba(30,27,46,0.06)]">
+                    <h3 className="font-heading text-[18px] text-[#1E1B2E]">Enrolled Students ({course.enrollments.length})</h3>
                  </div>
                  <div className="p-0">
                     {studentsProgress.length === 0 ? (
-                      <div className="p-12 text-center opacity-30 font-bold italic">No students enrolled in this class.</div>
+                      <div className="p-16 text-center">
+                        <Users size={32} className="mx-auto text-[#8E8E93] opacity-50 mb-3" />
+                        <p className="text-[14px] text-[#8E8E93]">No students enrolled in this class yet.</p>
+                      </div>
                     ) : (
                       <table className="w-full text-left">
-                         <tbody className="divide-y divide-gray-100">
+                         <tbody className="divide-y divide-[rgba(30,27,46,0.06)]">
                             {studentsProgress.map((student: any) => {
                               const enrId = course.enrollments.find((e: any) => e.userId === student.id)?.id;
                               return (
-                              <tr key={student.id} className="hover:bg-muted/10 transition-colors">
-                                 <td className="p-4 w-1/3">
-                                    <p className="font-medium text-[#1E1B2E] text-sm ">{student.name}</p>
-                                    <p className="text-[10px] font-bold opacity-60">{student.email}</p>
+                              <tr key={student.id} className="hover:bg-[rgba(30,27,46,0.02)] transition-colors">
+                                 <td className="p-5 w-1/3">
+                                    <p className="font-medium text-[#1E1B2E] text-[14px]">{student.name}</p>
+                                    <p className="text-[12px] text-[#8E8E93] mt-0.5">{student.email}</p>
                                  </td>
-                                 <td className="p-4 w-1/2">
-                                    <div className="flex items-center gap-2">
-                                      <div className="flex-1 h-2 bg-muted rounded-full overflow-hidden border border-black">
+                                 <td className="p-5 w-1/2">
+                                    <div className="flex items-center gap-3">
+                                      <div className="flex-1 h-1.5 bg-[rgba(30,27,46,0.06)] rounded-full overflow-hidden">
                                         <div 
-                                          className="h-full bg-[#34D399]" 
+                                          className="h-full bg-[#C9A96E]" 
                                           style={{ width: `${student.progress || 0}%` }}
                                         />
                                       </div>
-                                      <span className="text-xs font-medium text-[#1E1B2E]  w-12 text-right">{student.progress || 0}%</span>
+                                      <span className="text-[12px] font-bold text-[#1E1B2E] w-10 text-right">{student.progress || 0}%</span>
                                     </div>
-                                    <p className="text-[9px] font-bold opacity-60 mt-0.5">{student.completedLessons || 0} / {student.totalLessons || 0} Lessons</p>
+                                    <p className="text-[11px] text-[#8E8E93] mt-1.5">{student.completedLessons || 0} / {student.totalLessons || 0} Lessons Completed</p>
                                  </td>
-                                 <td className="p-4 text-right">
-                                    <Button variant="ghost" onClick={() => enrId && handleUnenroll(enrId)} className="h-8 w-8 p-0 text-red-600 border border-gray-200 rounded-xl hover:bg-red-50">
-                                       <X size={14} />
+                                 <td className="p-5 text-right">
+                                    <Button variant="ghost" onClick={() => enrId && handleUnenroll(enrId)} className="h-9 w-9 p-0 text-[#DC2626] border border-transparent rounded-xl hover:bg-[#DC2626]/10">
+                                       <X size={16} />
                                     </Button>
                                  </td>
                               </tr>
@@ -545,79 +553,86 @@ export default function ManageCourseClient({ course, studentsProgress = [] }: { 
                       </table>
                     )}
                  </div>
-              </Card>
+              </div>
            </div>
         </div>
       )}
+      
       {activeTab === "gradebook" && (
-        <Card className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
-          <div className="p-4 bg-muted border-b border-gray-100">
-            <h3 className="text-xl font-medium text-[#1E1B2E] ">Student Gradebook</h3>
-            <p className="text-xs font-bold text-muted-foreground">Enter final marks for {course.subject}</p>
+        <div className="p-8">
+          <div className="bg-white rounded-[16px] shadow-[0_4px_20px_rgba(0,0,0,0.04)] overflow-hidden border border-[rgba(30,27,46,0.04)]">
+            <div className="p-5 bg-[rgba(30,27,46,0.02)] border-b border-[rgba(30,27,46,0.06)]">
+              <h3 className="font-heading text-[18px] text-[#1E1B2E]">Student Gradebook</h3>
+              <p className="text-[13px] text-[#8E8E93] mt-1">Enter final marks for {course.subject}</p>
+            </div>
+            <div className="p-0">
+              {studentsProgress.length === 0 ? (
+                <div className="p-16 text-center">
+                  <FileText size={32} className="mx-auto text-[#8E8E93] opacity-50 mb-3" />
+                  <p className="text-[14px] text-[#8E8E93]">No students enrolled yet.</p>
+                </div>
+              ) : (
+                <table className="w-full text-left">
+                  <thead className="bg-white border-b border-[rgba(30,27,46,0.08)]">
+                    <tr>
+                      <th className="p-4 px-6 text-[11px] font-bold uppercase tracking-wider text-[#8E8E93]">Student</th>
+                      <th className="p-4 px-6 text-[11px] font-bold uppercase tracking-wider text-[#8E8E93] w-32">Score (%)</th>
+                      <th className="p-4 px-6 text-[11px] font-bold uppercase tracking-wider text-[#8E8E93] w-32 text-right">Action</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-[rgba(30,27,46,0.06)] bg-white">
+                      {studentsProgress.map((student: any) => (
+                        <tr key={student.id} className="hover:bg-[rgba(30,27,46,0.02)] transition-colors">
+                          <td className="p-4 px-6">
+                              <p className="font-medium text-[#1E1B2E] text-[14px]">{student.name}</p>
+                              <p className="text-[12px] text-[#8E8E93]">{student.email}</p>
+                          </td>
+                          <td className="p-4 px-6">
+                              <input 
+                                type="number" 
+                                min="0" max="100" 
+                                placeholder="0-100"
+                                className="h-10 w-full bg-white border border-[rgba(30,27,46,0.12)] rounded-xl px-3 text-[14px] text-[#1E1B2E] focus:outline-none focus:border-[#C9A96E] transition-all font-medium"
+                                id={`mark-${student.id}`}
+                              />
+                          </td>
+                          <td className="p-4 px-6 text-right">
+                              <Button 
+                                onClick={async () => {
+                                  const input = document.getElementById(`mark-${student.id}`) as HTMLInputElement;
+                                  if (!input || !input.value) return;
+                                  setLoading(true);
+                                  try {
+                                    const res = await fetch(`/api/marks`, {
+                                      method: "POST",
+                                      headers: { "Content-Type": "application/json" },
+                                      body: JSON.stringify({ studentId: student.id, subject: course.subject, score: parseFloat(input.value) })
+                                    });
+                                    if (res.ok) alert("Mark saved!");
+                                  } finally {
+                                    setLoading(false);
+                                  }
+                                }}
+                                disabled={loading} 
+                                className="w-full h-10 bg-[#C9A96E] hover:bg-[#D6B87D] text-[#1E1B2E] font-bold text-[12px] uppercase tracking-wider rounded-xl shadow-md transition-all"
+                              >
+                                Save
+                              </Button>
+                          </td>
+                        </tr>
+                      ))}
+                  </tbody>
+                </table>
+              )}
+            </div>
           </div>
-          <div className="p-4">
-            {studentsProgress.length === 0 ? (
-              <div className="p-12 text-center opacity-30 font-bold italic">No students enrolled.</div>
-            ) : (
-              <table className="w-full text-left">
-                 <thead>
-                   <tr className="border-b-2 border-black">
-                     <th className="p-2 font-medium text-[#1E1B2E] ">Student</th>
-                     <th className="p-2 font-medium text-[#1E1B2E]  w-32">Score (%)</th>
-                     <th className="p-2 font-medium text-[#1E1B2E]  w-24">Action</th>
-                   </tr>
-                 </thead>
-                 <tbody className="divide-y border-black">
-                    {studentsProgress.map((student: any) => (
-                      <tr key={student.id} className="hover:bg-muted/10">
-                         <td className="p-2">
-                            <p className="font-medium text-[#1E1B2E] text-sm ">{student.name}</p>
-                         </td>
-                         <td className="p-2">
-                            <Input 
-                              type="number" 
-                              min="0" max="100" 
-                              placeholder="0-100"
-                              className="border border-gray-200 rounded-xl font-bold h-10 w-full"
-                              id={`mark-${student.id}`}
-                            />
-                         </td>
-                         <td className="p-2">
-                            <Button 
-                              onClick={async () => {
-                                const input = document.getElementById(`mark-${student.id}`) as HTMLInputElement;
-                                if (!input || !input.value) return;
-                                setLoading(true);
-                                try {
-                                  const res = await fetch(`/api/marks`, {
-                                    method: "POST",
-                                    headers: { "Content-Type": "application/json" },
-                                    body: JSON.stringify({ studentId: student.id, subject: course.subject, score: parseFloat(input.value) })
-                                  });
-                                  if (res.ok) alert("Mark saved!");
-                                } finally {
-                                  setLoading(false);
-                                }
-                              }}
-                              disabled={loading} 
-                              className="w-full h-10 bg-[#34D399] text-black font-medium text-[#1E1B2E] border border-gray-200 rounded-xl"
-                            >
-                              Save
-                            </Button>
-                         </td>
-                      </tr>
-                    ))}
-                 </tbody>
-              </table>
-            )}
-          </div>
-        </Card>
+        </div>
       )}
 
       {activeTab === "assignments" && (
-        <div className="space-y-6">
-          <Card className="bg-white p-6 rounded-2xl shadow-sm border border-gray-100">
-            <h3 className="text-xl font-medium text-[#1E1B2E]  mb-4 flex items-center gap-2"><Plus size={24} /> New Assignment</h3>
+        <div className="space-y-6 p-8">
+          <div className="bg-white p-6 rounded-[16px] shadow-[0_4px_20px_rgba(0,0,0,0.04)] border border-[rgba(30,27,46,0.04)]">
+            <h3 className="font-heading text-[20px] text-[#1E1B2E] mb-6 flex items-center gap-2"><Plus size={20} className="text-[#C9A96E]"/> New Assignment</h3>
             <form onSubmit={async (e) => {
               e.preventDefault();
               const formData = new FormData(e.currentTarget);
@@ -640,31 +655,31 @@ export default function ManageCourseClient({ course, studentsProgress = [] }: { 
                 setLoading(false);
               }
             }} className="space-y-4">
-              <Input name="title" placeholder="Assignment Title" className="h-12 border border-gray-200 rounded-xl font-bold bg-white" required />
-              <Textarea name="description" placeholder="Instructions..." className="border border-gray-200 rounded-xl font-bold bg-white" required />
-              <div className="flex gap-4">
-                <Input name="dueDate" type="datetime-local" className="flex-1 h-12 border border-gray-200 rounded-xl font-bold bg-white" required />
-                <Button type="submit" disabled={loading} className="w-1/3 h-12 bg-[#1E1B2E] text-white rounded-xl font-medium">Create</Button>
+              <Input name="title" placeholder="Assignment Title" className="h-12 bg-white border border-[rgba(30,27,46,0.12)] rounded-xl px-4 text-[14px] text-[#1E1B2E] focus:outline-none focus:border-[#C9A96E] focus:ring-[3px] focus:ring-[rgba(201,169,110,0.15)] transition-all" required />
+              <Textarea name="description" placeholder="Instructions..." className="min-h-[100px] bg-white border border-[rgba(30,27,46,0.12)] rounded-xl p-4 text-[14px] text-[#1E1B2E] focus:outline-none focus:border-[#C9A96E] focus:ring-[3px] focus:ring-[rgba(201,169,110,0.15)] transition-all resize-y" required />
+              <div className="flex flex-col md:flex-row gap-4">
+                <Input name="dueDate" type="datetime-local" className="flex-1 h-12 bg-white border border-[rgba(30,27,46,0.12)] rounded-xl px-4 text-[14px] text-[#1E1B2E] focus:outline-none focus:border-[#C9A96E]" required />
+                <Button type="submit" disabled={loading} className="w-full md:w-48 h-12 bg-[#1E1B2E] text-white rounded-xl text-[14px] font-bold uppercase tracking-wider hover:scale-[1.02] shadow-md transition-all">Create Task</Button>
               </div>
             </form>
-          </Card>
+          </div>
           
           <div className="space-y-4">
              {course.assignments?.map((assignment: any) => (
-                <Card key={assignment.id} className="bg-white rounded-2xl shadow-sm border border-gray-100 p-4">
-                   <div className="flex justify-between items-start">
+                <div key={assignment.id} className="bg-white rounded-[16px] shadow-[0_4px_16px_rgba(0,0,0,0.04)] border border-[rgba(30,27,46,0.04)] p-6">
+                   <div className="flex flex-col md:flex-row justify-between md:items-start gap-4">
                       <div>
-                         <h4 className="text-lg font-medium text-[#1E1B2E] ">{assignment.title}</h4>
-                         <p className="text-xs font-bold opacity-70 mb-2">Due: {new Date(assignment.dueDate).toLocaleString()}</p>
-                         <p className="text-sm font-medium">{assignment.description}</p>
+                         <h4 className="font-heading text-[18px] text-[#1E1B2E]">{assignment.title}</h4>
+                         <p className="text-[12px] font-bold text-[#8E8E93] uppercase tracking-wider mt-1 mb-3 flex items-center gap-1.5"><FileText size={12}/> Due: {new Date(assignment.dueDate).toLocaleString()}</p>
+                         <p className="text-[14px] text-[#1E1B2E] leading-relaxed">{assignment.description}</p>
                       </div>
-                      <div className="text-right">
-                         <span className="text-xs font-medium text-[#1E1B2E] bg-muted px-2 py-1 rounded border border-gray-200 rounded-xl">
+                      <div className="shrink-0">
+                         <span className="inline-flex items-center justify-center px-4 py-1.5 text-[11px] font-bold uppercase tracking-widest text-[#C9A96E] bg-[rgba(201,169,110,0.1)] rounded-lg">
                             {assignment.submissions?.length || 0} Submissions
                          </span>
                       </div>
                    </div>
-                </Card>
+                </div>
              ))}
           </div>
         </div>

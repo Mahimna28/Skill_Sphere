@@ -1,10 +1,6 @@
 "use client";
 
-import { useState } from "react";
-import { motion, AnimatePresence } from "framer-motion";
-import { FadeIn } from "@/components/animations/FadeIn";
-import { SlideUp } from "@/components/animations/SlideUp";
-import { StaggerContainer, StaggerItem } from "@/components/animations/StaggerContainer";
+import { useState, useEffect } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { BookOpen, Users, Plus, Loader2, X, Globe, Lock, ShieldAlert } from "lucide-react";
@@ -87,179 +83,142 @@ export default function TeacherOverviewClient({ teacher, initialCourses }: Props
   };
 
   return (
-    <div className="font-sans flex flex-col h-full text-[#1E1B2E]">
-      <AnimatePresence>
-        {toast && (
-          <motion.div
-            initial={{ opacity: 0, y: -20 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -20 }}
-            className={`fixed top-6 right-6 z-50 px-6 py-4 rounded-xl font-medium text-[14px] shadow-[0_8px_30px_rgba(0,0,0,0.12)] ${
-              toast.type === "success" ? "bg-[rgba(201,169,110,0.1)] border border-[rgba(201,169,110,0.2)] text-[#C9A96E]" : "bg-[rgba(220,38,38,0.1)] border border-[rgba(220,38,38,0.2)] text-[#DC2626]"
-            }`}
+    <div className="font-sans pb-12 text-[#1E1B2E]">
+      {toast && (
+        <div
+          className={`fixed top-6 right-6 z-50 px-6 py-4 rounded-xl font-medium text-[14px] shadow-[0_8px_30px_rgba(0,0,0,0.12)] transition-opacity duration-300 ${
+            toast.type === "success" ? "bg-[#22C55E]/10 border border-[#22C55E]/20 text-[#22C55E]" : "bg-[#DC2626]/10 border border-[#DC2626]/20 text-[#DC2626]"
+          }`}
+        >
+          {toast.message}
+        </div>
+      )}
+
+      {/* Welcome Section */}
+      <div className="pt-8 pb-8 flex flex-col md:flex-row md:items-end justify-between gap-6">
+        <div>
+          <h1 className="font-heading text-[28px] text-[#1E1B2E] mb-2">
+            Welcome, {teacher?.name?.split(" ")[0] || "Teacher"}!
+          </h1>
+          <p className="text-[14px] text-[#8E8E93]">
+            Manage your courses and track student progress.
+          </p>
+        </div>
+        <div className="flex gap-3">
+          {teacher?.role === "teacher" && (
+            <button 
+              onClick={() => setShowPromotionForm(true)}
+              className="h-[40px] px-5 rounded-xl border border-[#1E1B2E] text-[#1E1B2E] text-[14px] font-medium flex items-center justify-center gap-2 hover:bg-[#1E1B2E] hover:text-white transition-colors"
+            >
+              <ShieldAlert size={16} /> Request Promotion
+            </button>
+          )}
+          <button 
+            onClick={() => setShowForm(true)}
+            className="h-[40px] px-5 rounded-xl bg-[#C9A96E] text-[#1E1B2E] text-[14px] font-medium flex items-center justify-center gap-2 hover:bg-[#D6B87D] shadow-[0_4px_16px_rgba(201,169,110,0.2)] transition-all"
           >
-            {toast.message}
-          </motion.div>
-        )}
-      </AnimatePresence>
+            <Plus size={16} /> Create New Course
+          </button>
+        </div>
+      </div>
 
-      <div className="pt-8 px-8 pb-8">
+      {/* Stats Cards */}
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-10">
+        {[
+          { label: "Active Courses", value: courses.length, subtext: "Published", icon: BookOpen },
+          { label: "Total Students", value: totalStudents, subtext: "Across all courses", icon: Users },
+        ].map((stat, i) => (
+          <div 
+            key={i}
+            className="bg-white rounded-[16px] p-6 shadow-[0_4px_20px_rgba(0,0,0,0.06)] h-full border border-[rgba(30,27,46,0.04)]"
+          >
+            <div className="flex items-center justify-between mb-4">
+              <span className="text-[12px] uppercase tracking-[0.08em] font-medium text-[#8E8E93]">{stat.label}</span>
+              <stat.icon className="w-5 h-5 text-[#8E8E93]" />
+            </div>
+            <div className="font-heading text-[32px] text-[#1E1B2E] mb-1 leading-tight">{stat.value}</div>
+            <div className="text-[13px] text-[#8E8E93]">{stat.subtext}</div>
+          </div>
+        ))}
+      </div>
+
+      {/* Your Courses Section */}
+      <div>
+        <h2 className="font-heading text-[24px] text-[#1E1B2E] mb-6">Your Courses</h2>
         
-        {/* Welcome Section */}
-        <FadeIn>
-          <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-8">
-            <div>
-              <h1 className="font-heading text-[28px] text-[#1E1B2E] mb-2">
-                Welcome, {teacher?.name?.split(" ")[0] || "Teacher"}!
-              </h1>
-              <p className="text-[14px] text-[#8E8E93]">
-                Manage your courses and track student progress.
-              </p>
-            </div>
-            <div className="flex gap-3">
-              {teacher?.role === "teacher" && (
-                <motion.button 
-                  whileHover={{ scale: 1.02 }}
-                  whileTap={{ scale: 0.98 }}
-                  onClick={() => setShowPromotionForm(true)}
-                  className="h-[40px] px-5 rounded-xl border border-[#1E1B2E] text-[#1E1B2E] text-[14px] font-medium flex items-center justify-center gap-2 hover:bg-[#1E1B2E] hover:text-white transition-colors"
-                >
-                  <ShieldAlert size={16} /> Request Promotion
-                </motion.button>
-              )}
-              <motion.button 
-                whileHover={{ scale: 1.02 }}
-                whileTap={{ scale: 0.98 }}
-                onClick={() => setShowForm(true)}
-                className="h-[40px] px-5 rounded-xl bg-[#C9A96E] text-[#1E1B2E] text-[14px] font-medium flex items-center justify-center gap-2 hover:shadow-[0_4px_16px_rgba(201,169,110,0.3)] transition-all"
-              >
-                <Plus size={16} /> Create New Course
-              </motion.button>
-            </div>
+        {courses.length === 0 ? (
+          <div
+            className="bg-white rounded-[16px] py-[60px] px-8 shadow-[0_4px_16px_rgba(0,0,0,0.05)] text-center flex flex-col items-center max-w-[640px] mx-auto border border-black/5"
+          >
+            <BookOpen size={48} className="text-[#1E1B2E] opacity-25 mb-4" />
+            <h3 className="font-heading text-[20px] text-[#1E1B2E] mb-2">No Courses Yet</h3>
+            <p className="text-[14px] text-[#8E8E93] max-w-[360px] mb-5">
+              Create your first course to start teaching!
+            </p>
+            <button 
+              onClick={() => setShowForm(true)}
+              className="h-[44px] px-6 rounded-xl bg-[#C9A96E] hover:bg-[#D6B87D] text-[#1E1B2E] text-[14px] font-bold transition-all shadow-md"
+            >
+              Create New Course
+            </button>
           </div>
-        </FadeIn>
-
-        {/* Stats Cards */}
-        <StaggerContainer staggerDelay={0.1} className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-10">
-          {[
-            { label: "Active Courses", value: courses.length, subtext: "Published", icon: BookOpen },
-            { label: "Total Students", value: totalStudents, subtext: "Across all courses", icon: Users },
-          ].map((stat, i) => (
-            <StaggerItem key={i}>
-              <motion.div 
-                whileHover={{ y: -4, boxShadow: "0 12px 32px rgba(0,0,0,0.08)" }}
-                transition={{ duration: 0.2 }}
-                className="bg-white rounded-[16px] p-6 shadow-[0_4px_20px_rgba(0,0,0,0.06)] h-full border border-[rgba(30,27,46,0.04)]"
+        ) : (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {courses.map((course, i) => (
+              <div 
+                key={course.id}
+                className="group bg-white rounded-[16px] overflow-hidden shadow-[0_4px_16px_rgba(0,0,0,0.05)] h-full flex flex-col border border-[rgba(30,27,46,0.04)] hover:shadow-[0_12px_32px_rgba(0,0,0,0.08)] transition-all duration-300"
               >
-                <div className="flex items-center justify-between mb-4">
-                  <span className="text-[12px] uppercase tracking-[0.08em] font-medium text-[#8E8E93]">{stat.label}</span>
-                  <stat.icon className="w-5 h-5 text-[#8E8E93]" />
+                <div className="h-40 bg-[rgba(245,241,235,0.6)] relative overflow-hidden flex items-center justify-center shrink-0">
+                  {course.thumbnail ? (
+                    <img src={course.thumbnail} alt={course.title} className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105" />
+                  ) : (
+                    <BookOpen size={32} className="text-[#8E8E93]" />
+                  )}
+                  <div className={`absolute top-3 right-3 flex items-center gap-1.5 px-2.5 py-1 rounded-full ${
+                    course.isPublic ? "bg-[rgba(201,169,110,0.9)] text-[#1E1B2E]" : "bg-[rgba(30,27,46,0.8)] text-white"
+                  }`}>
+                    {course.isPublic ? <Globe size={12} /> : <Lock size={12} />}
+                    <span className="text-[11px] font-bold uppercase tracking-wider">{course.isPublic ? "Public" : "Private"}</span>
+                  </div>
                 </div>
-                <div className="font-heading text-[32px] text-[#1E1B2E] mb-1">{stat.value}</div>
-                <div className="text-[13px] text-[#8E8E93]">{stat.subtext}</div>
-              </motion.div>
-            </StaggerItem>
-          ))}
-        </StaggerContainer>
-
-        {/* Your Courses Section */}
-        <SlideUp delay={0.2}>
-          <div>
-            <h2 className="font-heading text-[24px] text-[#1E1B2E] mb-6">Your Courses</h2>
-            
-            {courses.length === 0 ? (
-              <div
-                className="bg-white rounded-[16px] py-[60px] px-8 shadow-[0_4px_16px_rgba(0,0,0,0.05)] text-center flex flex-col items-center max-w-[640px] mx-auto"
-              >
-                <BookOpen size={48} className="text-[#1E1B2E] opacity-25 mb-4" />
-                <h3 className="font-heading text-[20px] text-[#1E1B2E] mb-2">No Courses Yet</h3>
-                <p className="text-[14px] text-[#8E8E93] max-w-[360px] mb-5">
-                  Create your first course to start teaching!
-                </p>
-                <button 
-                  onClick={() => setShowForm(true)}
-                  className="h-[44px] px-6 rounded-xl bg-[#C9A96E] text-[#1E1B2E] text-[14px] font-medium hover:scale-[1.02] transition-transform"
-                >
-                  Create New Course
-                </button>
-              </div>
-            ) : (
-              <StaggerContainer staggerDelay={0.08} className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                {courses.map((course, i) => (
-                  <StaggerItem key={course.id}>
-                    <motion.div 
-                      whileHover={{ y: -6, boxShadow: "0 16px 40px rgba(0,0,0,0.1)" }}
-                      transition={{ duration: 0.25, ease: [0.25, 0.1, 0.25, 1.0] }}
-                      className="bg-white rounded-[16px] overflow-hidden shadow-[0_4px_16px_rgba(0,0,0,0.05)] h-full flex flex-col border border-[rgba(30,27,46,0.04)]"
+                
+                <div className="p-5 flex-1 flex flex-col">
+                  <h3 className="font-heading text-[18px] text-[#1E1B2E] mb-1">{course.title}</h3>
+                  <div className="flex items-center gap-1.5 text-[13px] text-[#8E8E93] mb-2 font-medium">
+                    <Users size={14} /> {course._count?.enrollments || 0} enrolled
+                  </div>
+                  <p className="text-[13px] text-[#8E8E93] line-clamp-2 leading-relaxed flex-1">
+                    {course.description}
+                  </p>
+                </div>
+                
+                <div className="px-5 pb-5 flex gap-2.5 shrink-0 mt-auto">
+                  <Link href={`/dashboard/teacher/courses/${course.id}`} className="flex-1">
+                    <button 
+                      className="w-full h-[36px] rounded-xl bg-[#C9A96E] hover:bg-[#D6B87D] text-[#1E1B2E] text-[12px] font-bold uppercase tracking-wider transition-all flex items-center justify-center shadow-sm"
                     >
-                      <div className="h-40 bg-[rgba(245,241,235,0.6)] relative overflow-hidden flex items-center justify-center shrink-0">
-                        {course.thumbnail ? (
-                          <img src={course.thumbnail} alt={course.title} className="w-full h-full object-cover" />
-                        ) : (
-                          <BookOpen size={32} className="text-[#8E8E93]" />
-                        )}
-                        <div className={`absolute top-3 right-3 flex items-center gap-1.5 px-2.5 py-1 rounded-full ${
-                          course.isPublic ? "bg-[rgba(201,169,110,0.1)] text-[#C9A96E]" : "bg-[rgba(30,27,46,0.08)] text-[#8E8E93]"
-                        }`}>
-                          {course.isPublic ? <Globe size={12} /> : <Lock size={12} />}
-                          <span className="text-[11px] font-medium">{course.isPublic ? "Public" : "Private"}</span>
-                        </div>
-                      </div>
-                      
-                      <div className="p-5 flex-1 flex flex-col">
-                        <h3 className="font-heading text-[18px] text-[#1E1B2E] mb-1">{course.title}</h3>
-                        <div className="flex items-center gap-1.5 text-[13px] text-[#8E8E93] mb-2">
-                          <Users size={14} /> {course._count?.enrollments || 0} enrolled
-                        </div>
-                        <p className="text-[13px] text-[#8E8E93] line-clamp-2 leading-relaxed flex-1">
-                          {course.description}
-                        </p>
-                      </div>
-                      
-                      <div className="px-5 pb-5 flex gap-2.5 shrink-0 mt-auto">
-                        <Link href={`/dashboard/teacher/courses/${course.id}`} className="flex-1">
-                          <motion.button 
-                            whileHover={{ scale: 1.02 }}
-                            whileTap={{ scale: 0.98 }}
-                            className="w-full h-[36px] rounded-xl bg-[#C9A96E] text-[#1E1B2E] text-[13px] font-medium transition-transform flex items-center justify-center"
-                          >
-                            Manage
-                          </motion.button>
-                        </Link>
-                        <Link href={`/dashboard/teacher/courses/${course.id}`} className="flex-1">
-                          <motion.button 
-                            whileHover={{ scale: 1.02 }}
-                            whileTap={{ scale: 0.98 }}
-                            className="w-full h-[36px] rounded-xl border border-[#1E1B2E] text-[#1E1B2E] text-[13px] font-medium hover:bg-[#1E1B2E] hover:text-white transition-colors flex items-center justify-center"
-                          >
-                            View Students
-                          </motion.button>
-                        </Link>
-                      </div>
-                    </motion.div>
-                  </StaggerItem>
-                ))}
-              </StaggerContainer>
-            )}
+                      Manage
+                    </button>
+                  </Link>
+                  <Link href={`/dashboard/teacher/courses/${course.id}`} className="flex-1">
+                    <button 
+                      className="w-full h-[36px] rounded-xl bg-[#F5F1EB] hover:bg-[#EBE5DB] text-[#8E8E93] hover:text-[#1E1B2E] text-[12px] font-bold uppercase tracking-wider transition-colors flex items-center justify-center border border-[rgba(30,27,46,0.1)]"
+                    >
+                      Students
+                    </button>
+                  </Link>
+                </div>
+              </div>
+            ))}
           </div>
-        </SlideUp>
+        )}
       </div>
 
       {/* Modals */}
-      <AnimatePresence>
-        {showForm && (
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            className="fixed inset-0 bg-black/40 backdrop-blur-sm z-50 flex items-center justify-center p-4"
-          >
-            <motion.div
-              initial={{ scale: 0.95, opacity: 0, y: 20 }}
-              animate={{ scale: 1, opacity: 1, y: 0 }}
-              exit={{ scale: 0.95, opacity: 0, y: 20 }}
-              className="bg-white rounded-[24px] shadow-[0_12px_40px_rgba(0,0,0,0.12)] w-full max-w-[600px] overflow-hidden"
-            >
+      {showForm && (
+        <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+          <div className="bg-white rounded-[24px] shadow-2xl w-full max-w-[600px] overflow-hidden animate-in fade-in zoom-in-95 duration-200">
               <div className="px-8 py-6 border-b border-[rgba(30,27,46,0.06)] flex items-center justify-between">
                 <h2 className="font-heading text-[20px] text-[#1E1B2E]">Create New Course</h2>
                 <button onClick={() => setShowForm(false)} className="w-8 h-8 rounded-full bg-[rgba(30,27,46,0.04)] flex items-center justify-center text-[#8E8E93] hover:bg-[rgba(30,27,46,0.08)] transition-colors">
@@ -355,23 +314,13 @@ export default function TeacherOverviewClient({ teacher, initialCourses }: Props
                   </div>
                 </form>
               </div>
-            </motion.div>
-          </motion.div>
-        )}
+          </div>
+        </div>
+      )}
 
-        {showPromotionForm && (
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            className="fixed inset-0 bg-black/40 backdrop-blur-sm z-50 flex items-center justify-center p-4"
-          >
-            <motion.div
-              initial={{ scale: 0.95, opacity: 0, y: 20 }}
-              animate={{ scale: 1, opacity: 1, y: 0 }}
-              exit={{ scale: 0.95, opacity: 0, y: 20 }}
-              className="bg-white rounded-[24px] shadow-[0_12px_40px_rgba(0,0,0,0.12)] w-full max-w-[500px] overflow-hidden"
-            >
+      {showPromotionForm && (
+        <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+          <div className="bg-white rounded-[24px] shadow-2xl w-full max-w-[500px] overflow-hidden animate-in fade-in zoom-in-95 duration-200">
               <div className="px-8 py-6 border-b border-[rgba(30,27,46,0.06)] flex items-center justify-between">
                 <h2 className="font-heading text-[20px] text-[#1E1B2E] flex items-center gap-2"><ShieldAlert size={20} /> Request Promotion</h2>
                 <button onClick={() => setShowPromotionForm(false)} className="w-8 h-8 rounded-full bg-[rgba(30,27,46,0.04)] flex items-center justify-center text-[#8E8E93] hover:bg-[rgba(30,27,46,0.08)] transition-colors">
@@ -394,11 +343,9 @@ export default function TeacherOverviewClient({ teacher, initialCourses }: Props
                   </div>
                 </form>
               </div>
-            </motion.div>
-          </motion.div>
-        )}
-      </AnimatePresence>
-
+          </div>
+        </div>
+      )}
     </div>
   );
 }

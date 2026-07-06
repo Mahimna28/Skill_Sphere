@@ -1,6 +1,7 @@
 import { prisma } from "@/lib/prisma";
 import { cookies } from "next/headers";
 import { verifyToken } from "@/lib/auth";
+import { redirect } from "next/navigation";
 import TeacherOverviewClient from "./TeacherOverviewClient";
 
 export default async function TeacherDashboard() {

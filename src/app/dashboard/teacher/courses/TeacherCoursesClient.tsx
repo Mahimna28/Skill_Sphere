@@ -1,14 +1,8 @@
 "use client";
 
 import { useState } from "react";
-import { motion, AnimatePresence } from "framer-motion";
-import { FadeIn, SlideUp, StaggerContainer, StaggerItem } from "@/components/animations";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 import { BookOpen, Plus, Loader2, X, Globe, Lock, Users, Save, Upload } from "lucide-react";
 
 const SUBJECTS = ["AI & ML", "Python", "Web Dev", "Mathematics", "Physics", "History", "Literature", "Other"];
@@ -57,137 +51,104 @@ export default function TeacherCoursesClient({ courses: initialCourses }: Props)
   };
 
   return (
-    <div className="flex flex-col h-full bg-[#F5F1EB] font-sans">
+    <div className="flex flex-col h-full bg-[#F5F1EB] font-sans text-[#1E1B2E]">
       {/* Toast */}
-      <AnimatePresence>
-        {toast && (
-          <motion.div
-            initial={{ opacity: 0, y: -20 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -20 }}
-            className={`fixed top-6 right-6 z-50 px-6 py-4 rounded-xl font-medium shadow-[0_8px_30px_rgba(0,0,0,0.12)] flex items-center gap-3 ${toast.type === "success" ? "bg-[#1E1B2E] text-white" : "bg-[#DC2626] text-white"}`}
-          >
-            {toast.message}
-          </motion.div>
-        )}
-      </AnimatePresence>
+      {toast && (
+        <div
+          className={`fixed top-6 right-6 z-50 px-6 py-4 rounded-xl font-medium shadow-[0_8px_30px_rgba(0,0,0,0.12)] flex items-center gap-3 transition-opacity duration-300 ${toast.type === "success" ? "bg-[#1E1B2E] text-white" : "bg-[#DC2626] text-white"}`}
+        >
+          {toast.message}
+        </div>
+      )}
 
       <div className="w-full max-w-[1200px] mx-auto pb-20">
         
         {/* PAGE HEADER */}
-        <FadeIn>
-          <div className="pt-[8px] px-[32px]">
-            <p className="font-sans text-[14px] text-[#8E8E93]">Create and manage your course catalogue.</p>
-          </div>
-        </FadeIn>
+        <div className="pt-8 px-8">
+          <h1 className="font-heading text-[28px] text-[#1E1B2E] mb-2">Manage Courses</h1>
+          <p className="font-sans text-[14px] text-[#8E8E93]">Create and manage your course catalogue.</p>
+        </div>
 
         {/* ACTION BAR */}
-        <FadeIn delay={0.1}>
-          <div className="flex justify-between items-center py-[20px] px-[32px]">
-            <div></div> {/* Empty left for future tabs */}
-            <motion.button 
-              whileHover={{ scale: 1.02 }}
-              whileTap={{ scale: 0.98 }}
-              onClick={() => setShowForm(true)}
-              className="h-10 px-5 rounded-xl bg-[#C9A96E] text-[#1E1B2E] text-[14px] font-medium flex items-center justify-center gap-2 hover:shadow-[0_4px_16px_rgba(201,169,110,0.3)] transition-all"
-            >
-              <Plus size={16} /> Create New Course
-            </motion.button>
-          </div>
-        </FadeIn>
+        <div className="flex justify-end items-center py-6 px-8">
+          <button 
+            onClick={() => setShowForm(true)}
+            className="h-10 px-5 rounded-xl bg-[#C9A96E] hover:bg-[#D6B87D] text-[#1E1B2E] text-[14px] font-bold flex items-center justify-center gap-2 shadow-[0_4px_16px_rgba(201,169,110,0.2)] transition-all"
+          >
+            <Plus size={16} /> Create New Course
+          </button>
+        </div>
 
         {/* COURSES GRID / EMPTY STATE */}
-        <div className="px-[32px] pb-[32px]">
+        <div className="px-8 pb-8">
           {courses.length === 0 ? (
-            <SlideUp delay={0.2}>
-              <div className="w-full bg-white rounded-[16px] p-[60px] flex flex-col items-center justify-center shadow-[0_4px_20px_rgba(0,0,0,0.04)] text-center">
-                <BookOpen size={48} className="text-[#1E1B2E] opacity-25" />
-                <h3 className="font-heading text-[20px] text-[#1E1B2E] mt-[16px]">No Courses Yet</h3>
-                <p className="font-sans text-[14px] text-[#8E8E93] mt-2">Create your first course to start building your catalogue.</p>
-                <motion.button 
-                  whileHover={{ scale: 1.02 }}
-                  whileTap={{ scale: 0.98 }}
-                  onClick={() => setShowForm(true)}
-                  className="mt-[20px] h-[44px] px-6 rounded-xl bg-[#C9A96E] text-[#1E1B2E] text-[14px] font-medium hover:shadow-[0_4px_16px_rgba(201,169,110,0.3)] transition-all"
-                >
-                  Create New Course
-                </motion.button>
-              </div>
-            </SlideUp>
+            <div className="w-full bg-white rounded-[16px] p-[60px] flex flex-col items-center justify-center shadow-[0_4px_20px_rgba(0,0,0,0.04)] text-center border border-black/5">
+              <BookOpen size={48} className="text-[#1E1B2E] opacity-25" />
+              <h3 className="font-heading text-[20px] text-[#1E1B2E] mt-[16px]">No Courses Yet</h3>
+              <p className="font-sans text-[14px] text-[#8E8E93] mt-2 max-w-[360px]">Create your first course to start building your catalogue.</p>
+              <button 
+                onClick={() => setShowForm(true)}
+                className="mt-6 h-[44px] px-6 rounded-xl bg-[#C9A96E] hover:bg-[#D6B87D] text-[#1E1B2E] text-[14px] font-bold shadow-md transition-all"
+              >
+                Create New Course
+              </button>
+            </div>
           ) : (
-            <StaggerContainer staggerDelay={0.1} className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-[24px]">
-              {courses.map((course, i) => (
-                <StaggerItem key={course.id}>
-                  <motion.div 
-                    whileHover={{ y: -6, boxShadow: "0 16px 40px rgba(0,0,0,0.1)" }}
-                    transition={{ duration: 0.25, ease: [0.25, 0.1, 0.25, 1.0] }}
-                    className="bg-white rounded-[16px] overflow-hidden shadow-[0_4px_16px_rgba(0,0,0,0.05)] flex flex-col h-full border border-[rgba(30,27,46,0.04)]"
-                  >
-                    <div className="relative aspect-video w-full bg-[rgba(245,241,235,0.6)] flex items-center justify-center">
-                      {course.thumbnail ? (
-                        <img src={course.thumbnail} alt={course.title} className="w-full h-full object-cover" />
-                      ) : (
-                        <BookOpen size={40} className="text-[#8E8E93] opacity-40" />
-                      )}
-                      <div className="absolute top-[12px] left-[12px] bg-[rgba(201,169,110,0.12)] text-[#C9A96E] font-sans text-[11px] font-semibold px-[10px] py-[4px] rounded-full uppercase tracking-wide">
-                        {course.subject}
-                      </div>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {courses.map((course) => (
+                <div 
+                  key={course.id}
+                  className="group bg-white rounded-[16px] overflow-hidden shadow-[0_4px_16px_rgba(0,0,0,0.05)] flex flex-col h-full border border-[rgba(30,27,46,0.04)] hover:shadow-[0_12px_32px_rgba(0,0,0,0.08)] transition-all duration-300"
+                >
+                  <div className="relative aspect-video w-full bg-[rgba(245,241,235,0.6)] flex items-center justify-center overflow-hidden shrink-0">
+                    {course.thumbnail ? (
+                      <img src={course.thumbnail} alt={course.title} className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105" />
+                    ) : (
+                      <BookOpen size={40} className="text-[#8E8E93] opacity-40" />
+                    )}
+                    <div className="absolute top-3 right-3 flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-[rgba(201,169,110,0.9)] text-[#1E1B2E] font-sans text-[11px] font-bold uppercase tracking-wide">
+                      {course.subject}
                     </div>
-                    
-                    <div className="p-[20px] flex-1 flex flex-col">
-                      <h3 className="font-heading text-[18px] text-[#1E1B2E] line-clamp-1">{course.title}</h3>
-                      <div className="flex items-center gap-1.5 mt-[6px] text-[#8E8E93] text-[13px] font-sans">
-                        <Users size={14} />
-                        <span>{course._count?.enrollments ?? 0} students enrolled</span>
-                      </div>
-                      <p className="font-sans text-[13px] text-[#8E8E93] line-clamp-2 mt-[8px] leading-[1.5] flex-1">
-                        {course.description}
-                      </p>
+                  </div>
+                  
+                  <div className="p-5 flex-1 flex flex-col">
+                    <h3 className="font-heading text-[18px] text-[#1E1B2E] line-clamp-1">{course.title}</h3>
+                    <div className="flex items-center gap-1.5 mt-1.5 text-[#8E8E93] text-[13px] font-medium font-sans">
+                      <Users size={14} />
+                      <span>{course._count?.enrollments ?? 0} students enrolled</span>
                     </div>
+                    <p className="font-sans text-[13px] text-[#8E8E93] line-clamp-2 mt-2 leading-[1.5] flex-1">
+                      {course.description}
+                    </p>
+                  </div>
 
-                    <div className="px-[20px] pb-[20px] flex items-center gap-[10px]">
-                      <Link href={`/dashboard/teacher/courses/${course.id}`} className="flex-1">
-                        <motion.button 
-                          whileHover={{ scale: 1.02 }}
-                          whileTap={{ scale: 0.98 }}
-                          className="w-full h-[36px] bg-[#C9A96E] text-[#1E1B2E] rounded-xl text-[13px] font-medium transition-transform"
-                        >
-                          Edit
-                        </motion.button>
-                      </Link>
-                      <Link href={`/dashboard/teacher/courses/${course.id}`} className="flex-1">
-                        <motion.button 
-                          whileHover={{ scale: 1.02 }}
-                          whileTap={{ scale: 0.98 }}
-                          className="w-full h-[36px] bg-transparent border border-[#1E1B2E] text-[#1E1B2E] rounded-xl text-[13px] font-medium hover:bg-[#1E1B2E] hover:text-white transition-colors"
-                        >
-                          View Students
-                        </motion.button>
-                      </Link>
-                    </div>
-                  </motion.div>
-                </StaggerItem>
+                  <div className="px-5 pb-5 flex items-center gap-2.5 shrink-0 mt-auto">
+                    <Link href={`/dashboard/teacher/courses/${course.id}`} className="flex-1">
+                      <button 
+                        className="w-full h-[36px] bg-[#C9A96E] hover:bg-[#D6B87D] text-[#1E1B2E] rounded-xl text-[12px] font-bold uppercase tracking-wider transition-all shadow-sm"
+                      >
+                        Edit
+                      </button>
+                    </Link>
+                    <Link href={`/dashboard/teacher/courses/${course.id}`} className="flex-1">
+                      <button 
+                        className="w-full h-[36px] bg-[#F5F1EB] hover:bg-[#EBE5DB] border border-[rgba(30,27,46,0.1)] text-[#8E8E93] hover:text-[#1E1B2E] rounded-xl text-[12px] font-bold uppercase tracking-wider transition-colors"
+                      >
+                        View Students
+                      </button>
+                    </Link>
+                  </div>
+                </div>
               ))}
-            </StaggerContainer>
+            </div>
           )}
         </div>
       </div>
 
       {/* CREATE COURSE MODAL */}
-      <AnimatePresence>
-        {showForm && (
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-[rgba(30,27,46,0.4)] backdrop-blur-sm"
-          >
-            <motion.div
-              initial={{ scale: 0.95, opacity: 0, y: 20 }}
-              animate={{ scale: 1, opacity: 1, y: 0 }}
-              exit={{ scale: 0.95, opacity: 0, y: 20 }}
-              className="bg-white w-full max-w-xl rounded-[24px] shadow-[0_12px_40px_rgba(0,0,0,0.12)] overflow-hidden"
-            >
+      {showForm && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm">
+          <div className="bg-white w-full max-w-xl rounded-[24px] shadow-2xl overflow-hidden animate-in fade-in zoom-in-95 duration-200">
               <div className="flex items-center justify-between p-[24px] border-b border-[rgba(30,27,46,0.08)]">
                 <h2 className="font-heading text-[24px] text-[#1E1B2E]">Create New Course</h2>
                 <button 
@@ -316,10 +277,9 @@ export default function TeacherCoursesClient({ courses: initialCourses }: Props)
                   </div>
                 </form>
               </div>
-            </motion.div>
-          </motion.div>
-        )}
-      </AnimatePresence>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
