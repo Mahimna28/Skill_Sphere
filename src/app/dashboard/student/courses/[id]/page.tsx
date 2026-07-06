@@ -31,7 +31,6 @@ export default async function CoursePlayerPage({ params }: { params: Promise<{ i
     redirect(`/courses/${id}`);
   }
 
-  // 2. Fetch course with modules and lessons
   const course = await prisma.course.findUnique({
     where: { id: id },
     include: {
@@ -51,5 +50,29 @@ export default async function CoursePlayerPage({ params }: { params: Promise<{ i
 
   if (!course) redirect("/dashboard/student/courses");
 
-  return <CoursePlayerClient course={course} />;
+  // Fetch user's certificate for this course if it exists
+  const earnedCertificate = await prisma.certificate.findFirst({
+    where: {
+      userId: decoded.id,
+      title: `Certificate of Completion: ${course.title}`,
+    },
+  });
+
+  // Fetch completed lessons for this course
+  const completedLessons = await prisma.lessonCompletion.findMany({
+    where: {
+      userId: decoded.id,
+      lesson: { module: { courseId: id } }
+    },
+    select: { lessonId: true }
+  });
+  const completedLessonIds = completedLessons.map(cl => cl.lessonId);
+
+  return (
+    <CoursePlayerClient 
+      course={course} 
+      earnedCertificate={earnedCertificate} 
+      completedLessonIds={completedLessonIds} 
+    />
+  );
 }

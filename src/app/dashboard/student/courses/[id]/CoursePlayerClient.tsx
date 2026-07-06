@@ -23,12 +23,21 @@ import {
 
 const easing = [0.25, 0.1, 0.25, 1.0] as const;
 
-export default function CoursePlayerClient({ course }: { course: any }) {
+export default function CoursePlayerClient({ 
+  course, 
+  earnedCertificate, 
+  completedLessonIds 
+}: { 
+  course: any; 
+  earnedCertificate?: any; 
+  completedLessonIds?: string[]; 
+}) {
   const allLessons = course.modules.flatMap((m: any) => m.lessons);
   const [activeLesson, setActiveLesson] = useState(allLessons[0] || null);
   const [loading, setLoading] = useState(false);
   const [completedCertId, setCompletedCertId] = useState<string | null>(null);
   const [showCertPreview, setShowCertPreview] = useState(false);
+  const [localCompletedIds, setLocalCompletedIds] = useState<string[]>(completedLessonIds || []);
   const shouldReduceMotion = useReducedMotion() ?? false;
 
   // Assignment submission modal state
@@ -53,6 +62,7 @@ export default function CoursePlayerClient({ course }: { course: any }) {
       const data = await res.json();
 
       if (res.ok) {
+        setLocalCompletedIds(prev => [...prev, activeLesson.id]);
         if (data.courseCompleted && data.certificateId) {
           setCompletedCertId(data.certificateId);
           setShowCertPreview(true);
@@ -548,7 +558,7 @@ export default function CoursePlayerClient({ course }: { course: any }) {
             </div>
           )}
 
-          <div className="pt-6 flex justify-between items-center border-t border-[#1E1B2E]/10 relative z-10">
+          <div className="pt-6 flex justify-between items-center border-t border-[#1E1B2E]/10 relative z-10 flex-wrap gap-4">
             <motion.button
               whileHover={shouldReduceMotion ? {} : { scale: 1.02 }}
               whileTap={shouldReduceMotion ? {} : { scale: 0.98 }}
@@ -558,22 +568,59 @@ export default function CoursePlayerClient({ course }: { course: any }) {
             >
               Previous Lesson
             </motion.button>
-            <motion.button
-              whileHover={shouldReduceMotion ? {} : { scale: 1.02 }}
-              whileTap={shouldReduceMotion ? {} : { scale: 0.98 }}
-              className="h-11 px-6 rounded-xl bg-[#22C55E] hover:bg-[#1DB954] text-white font-bold text-sm cursor-pointer shadow-[0_4px_14px_rgba(34,197,94,0.3)] flex items-center gap-2 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
-              onClick={handleComplete}
-              disabled={loading}
-            >
-              {loading ? (
-                <>
-                  <motion.div animate={{ rotate: 360 }} transition={{ repeat: Infinity, duration: 1 }} className="w-4 h-4 border-2 border-white border-t-transparent rounded-full" />
-                  Completing...
-                </>
-              ) : (
-                <>{isLastLesson ? "Finish Course" : "Complete & Next"}</>
-              )}
-            </motion.button>
+
+            {earnedCertificate ? (
+              <div className="flex items-center gap-3">
+                <div className="px-4 h-11 rounded-xl bg-[#22C55E]/10 text-[#22C55E] font-bold text-sm flex items-center gap-2 border border-[#22C55E]/20">
+                  <CheckCircle2 size={16} /> Completed
+                </div>
+                <Link href={`/certificates/${earnedCertificate.id}`} target="_blank">
+                  <motion.button
+                    whileHover={shouldReduceMotion ? {} : { scale: 1.02 }}
+                    whileTap={shouldReduceMotion ? {} : { scale: 0.98 }}
+                    className="h-11 px-5 rounded-xl bg-[#C9A96E] hover:bg-[#D6B87D] text-[#1E1B2E] font-bold text-sm shadow-[0_4px_14px_rgba(201,169,110,0.3)] flex items-center gap-2 transition-all cursor-pointer"
+                  >
+                    <Download size={16} /> Download Certificate
+                  </motion.button>
+                </Link>
+              </div>
+            ) : localCompletedIds.includes(activeLesson.id) ? (
+              <div className="flex items-center gap-3">
+                <div className="px-4 h-11 rounded-xl bg-[#22C55E]/10 text-[#22C55E] font-bold text-sm flex items-center gap-2">
+                  <CheckCircle2 size={16} /> Lesson Completed
+                </div>
+                {!isLastLesson && (
+                  <motion.button
+                    whileHover={shouldReduceMotion ? {} : { scale: 1.02 }}
+                    whileTap={shouldReduceMotion ? {} : { scale: 0.98 }}
+                    className="h-11 px-6 rounded-xl bg-[#C9A96E] hover:bg-[#D6B87D] text-[#1E1B2E] font-bold text-sm cursor-pointer shadow-[0_4px_14px_rgba(201,169,110,0.3)] flex items-center gap-2 transition-all"
+                    onClick={() => {
+                      const nextIndex = allLessons.findIndex((l: any) => l.id === activeLesson.id) + 1;
+                      if (nextIndex < allLessons.length) setActiveLesson(allLessons[nextIndex]);
+                    }}
+                  >
+                    Next Lesson <ChevronRight size={16} />
+                  </motion.button>
+                )}
+              </div>
+            ) : (
+              <motion.button
+                whileHover={shouldReduceMotion ? {} : { scale: 1.02 }}
+                whileTap={shouldReduceMotion ? {} : { scale: 0.98 }}
+                className="h-11 px-6 rounded-xl bg-[#22C55E] hover:bg-[#1DB954] text-white font-bold text-sm cursor-pointer shadow-[0_4px_14px_rgba(34,197,94,0.3)] flex items-center gap-2 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+                onClick={handleComplete}
+                disabled={loading}
+              >
+                {loading ? (
+                  <>
+                    <motion.div animate={{ rotate: 360 }} transition={{ repeat: Infinity, duration: 1 }} className="w-4 h-4 border-2 border-white border-t-transparent rounded-full" />
+                    Completing...
+                  </>
+                ) : (
+                  <>{isLastLesson ? "Finish Course" : "Complete & Next"}</>
+                )}
+              </motion.button>
+            )}
           </div>
         </div>
 

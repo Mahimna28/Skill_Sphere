@@ -27,5 +27,16 @@ export default async function CertificatePage({ params }: { params: Promise<{ id
     redirect("/dashboard/student");
   }
 
-  return <CertificateClient certificate={certificate} />;
+  // Extract course title from certificate title
+  const courseTitle = certificate.title.replace("Certificate of Completion: ", "");
+
+  // Fetch the related course to get level, instructor, duration, etc.
+  const course = await prisma.course.findFirst({
+    where: { title: courseTitle },
+    include: {
+      teacher: { select: { name: true } }
+    }
+  });
+
+  return <CertificateClient certificate={certificate} course={course} />;
 }

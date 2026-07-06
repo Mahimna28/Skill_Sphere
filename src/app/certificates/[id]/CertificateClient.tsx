@@ -6,7 +6,7 @@ import { Download, Award, ShieldCheck, Medal, ArrowLeft, Loader2 } from "lucide-
 import Link from "next/link";
 import "./certificate.css";
 
-export default function CertificateClient({ certificate }: { certificate: any }) {
+export default function CertificateClient({ certificate, course }: { certificate: any; course?: any }) {
   const certRef = useRef<HTMLDivElement>(null);
   const [downloading, setDownloading] = useState(false);
 
@@ -75,66 +75,82 @@ export default function CertificateClient({ certificate }: { certificate: any })
         </Button>
       </div>
 
-      {/* Certificate — this div is captured for PDF */}
-      <div
-        id="certificate-wrapper"
-        ref={certRef}
-        className="relative w-full max-w-5xl bg-white border-8 border-black p-4 shadow-[16px_16px_0px_0px_rgba(0,0,0,1)]"
-        style={{ aspectRatio: "1.414 / 1" }}
-      >
-        {/* Decorative Inner Border */}
-        <div className="absolute inset-4 border-[12px] border-[#F5C84C] border-double m-4 flex flex-col items-center justify-center p-12 text-center overflow-hidden">
-
-          {/* Watermark */}
-          <div className="absolute inset-0 flex items-center justify-center opacity-[0.03] pointer-events-none">
-            <Medal size={600} />
-          </div>
-
-          <div className="relative z-10 flex flex-col items-center w-full">
-            <div className="w-24 h-24 bg-primary text-white flex items-center justify-center rounded-full border-4 border-black mb-6 shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]">
-              <Award size={48} />
-            </div>
-
-            <h1 className="text-6xl font-black uppercase tracking-tighter text-black mb-4">
-              Certificate
-            </h1>
-            <p className="text-2xl font-bold uppercase tracking-[0.3em] text-[#4F7DF3] mb-12">
-              Of Completion
-            </p>
-
-            <p className="text-lg font-bold text-muted-foreground uppercase tracking-widest mb-4">
-              This is proudly presented to
-            </p>
-
-            <h2 className="text-5xl font-black mb-4 pb-2 border-b-4 border-black inline-block px-12">
+      {/* Certificate Container */}
+      <div className="w-full flex justify-center overflow-x-auto pb-12 custom-scrollbar">
+        <div
+          id="certificate-wrapper"
+          ref={certRef}
+          className="relative shrink-0 shadow-2xl"
+          style={{ 
+            width: "1200px", 
+            height: "675px", 
+            backgroundImage: "url('/images/certificate-template.jpg')",
+            backgroundSize: "cover",
+            backgroundPosition: "center",
+            fontFamily: "'Times New Roman', serif"
+          }}
+        >
+          {/* Student Name (covers the placeholder) */}
+          <div className="absolute top-[31%] left-0 w-full flex justify-center">
+            <h2 
+              className="text-[52px] font-bold text-[#142646] uppercase tracking-wide bg-white px-10 py-2 rounded"
+              style={{ minWidth: '400px', textAlign: 'center' }}
+            >
               {certificate.user.name}
             </h2>
+          </div>
 
-            <p className="text-lg font-bold text-muted-foreground max-w-2xl mx-auto leading-relaxed mt-8 mb-12">
-              For successfully completing the course requirements and demonstrating exceptional proficiency in:
-              <span className="text-3xl font-black text-black mt-4 block">{courseName}</span>
-            </p>
+          {/* Course Name (covers the placeholder) */}
+          <div className="absolute top-[49%] left-0 w-full flex justify-center">
+            <h3 
+              className="text-[42px] font-bold text-[#142646] uppercase tracking-wider bg-white px-8 py-1 rounded"
+              style={{ minWidth: '500px', textAlign: 'center' }}
+            >
+              {courseName}
+            </h3>
+          </div>
 
-            {/* Footer Signatures */}
-            <div className="w-full max-w-4xl flex justify-between items-end mt-8 px-12">
-              <div className="flex flex-col items-center">
-                <div className="w-48 border-b-4 border-black mb-2 flex justify-center pb-2">
-                  <span className="font-bold text-2xl opacity-80 italic">Skill Sphere Admin</span>
-                </div>
-                <p className="text-sm font-black uppercase tracking-widest text-muted-foreground">Authorized Signature</p>
-              </div>
+          {/* Bottom Row Overlays */}
+          <div className="absolute top-[71%] left-[10.5%] w-[79%] h-[60px] flex items-center">
+            
+            {/* Duration */}
+            <div className="w-1/5 h-full flex flex-col justify-center items-center bg-white">
+              <span className="text-[10px] font-bold text-[#142646] uppercase mb-0.5">Course Duration</span>
+              <span className="text-[14px] font-bold text-[#4F7DF3] uppercase">
+                {course?.duration || "40 HOURS"}
+              </span>
+            </div>
 
-              <div className="flex flex-col items-center">
-                <ShieldCheck size={48} className="text-[#34D399] mb-4" />
-                <p className="text-sm font-black uppercase tracking-widest">ID: {certificate.id.slice(0, 10).toUpperCase()}</p>
-              </div>
+            {/* Level */}
+            <div className="w-1/5 h-full flex flex-col justify-center items-center bg-white border-l border-gray-200">
+              <span className="text-[10px] font-bold text-[#142646] uppercase mb-0.5">Level</span>
+              <span className="text-[14px] font-bold text-[#4F7DF3] uppercase">
+                {course?.level || "INTERMEDIATE"}
+              </span>
+            </div>
 
-              <div className="flex flex-col items-center">
-                <div className="w-48 border-b-4 border-black mb-2 flex justify-center pb-2">
-                  <span className="font-black text-xl">{formattedDate}</span>
-                </div>
-                <p className="text-sm font-black uppercase tracking-widest text-muted-foreground">Date of Issue</p>
-              </div>
+            {/* Completion Date */}
+            <div className="w-1/5 h-full flex flex-col justify-center items-center bg-white border-l border-gray-200">
+              <span className="text-[10px] font-bold text-[#142646] uppercase mb-0.5">Completion Date</span>
+              <span className="text-[14px] font-bold text-[#34D399] uppercase">
+                {formattedDate}
+              </span>
+            </div>
+
+            {/* Certificate ID */}
+            <div className="w-1/5 h-full flex flex-col justify-center items-center bg-white border-l border-gray-200">
+              <span className="text-[10px] font-bold text-[#142646] uppercase mb-0.5">Certificate ID</span>
+              <span className="text-[14px] font-bold text-[#4F7DF3] uppercase">
+                {certificate.id.slice(0, 10)}
+              </span>
+            </div>
+
+            {/* Instructor */}
+            <div className="w-1/5 h-full flex flex-col justify-center items-center bg-white border-l border-gray-200">
+              <span className="text-[10px] font-bold text-[#142646] uppercase mb-0.5">Instructor</span>
+              <span className="text-[14px] font-bold text-[#4F7DF3] uppercase truncate w-[120px] text-center">
+                {course?.teacher?.name || "Skill Sphere"}
+              </span>
             </div>
           </div>
         </div>
