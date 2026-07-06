@@ -26,7 +26,7 @@ export async function GET(req: Request) {
         { name: { contains: cleanUsername } }
       ]
     },
-    select: { id: true, name: true, email: true, username: true, role: true, image: true, isProfilePublic: true },
+    select: { id: true, name: true, email: true, username: true, role: true, image: true, isProfilePublic: true, lastActiveAt: true },
     take: 10
   });
 

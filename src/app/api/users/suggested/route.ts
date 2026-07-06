@@ -23,7 +23,8 @@ export async function GET(req: Request) {
         username: true,
         role: true,
         image: true,
-        isProfilePublic: true
+        isProfilePublic: true,
+        lastActiveAt: true
       },
       take: 10,
       orderBy: { lastActiveAt: "desc" }

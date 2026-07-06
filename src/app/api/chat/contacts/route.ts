@@ -11,21 +11,17 @@ export async function GET(req: Request) {
     const decoded: any = token ? verifyToken(token) : null;
     if (!decoded) return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
 
-    const last24h = new Date(Date.now() - 24 * 60 * 60 * 1000);
-
-    // Find all users who have exchanged messages with the current user in the last 24h
+    // Find all users who have exchanged messages with the current user
     const sentTo = await prisma.privateMessage.findMany({
       where: { 
-        senderId: decoded.id,
-        createdAt: { gte: last24h }
+        senderId: decoded.id
       },
       select: { receiverId: true },
       distinct: ["receiverId"],
     });
     const receivedFrom = await prisma.privateMessage.findMany({
       where: { 
-        receiverId: decoded.id,
-        createdAt: { gte: last24h }
+        receiverId: decoded.id
       },
       select: { senderId: true },
       distinct: ["senderId"],
@@ -55,9 +51,15 @@ export async function GET(req: Request) {
       return NextResponse.json({ contacts: [] });
     }
 
+    // Update user's lastActiveAt timestamp for online status
+    await prisma.user.update({
+      where: { id: decoded.id },
+      data: { lastActiveAt: new Date() }
+    });
+
     const contacts = await prisma.user.findMany({
       where: { id: { in: Array.from(contactIds) } },
-      select: { id: true, name: true, email: true, username: true, image: true, role: true, isProfilePublic: true },
+      select: { id: true, name: true, email: true, username: true, image: true, role: true, isProfilePublic: true, lastActiveAt: true },
     });
 
     // For each contact, get the last message
@@ -65,7 +67,6 @@ export async function GET(req: Request) {
       contacts.map(async (contact) => {
         const lastMsg = await prisma.privateMessage.findFirst({
           where: {
-            createdAt: { gte: last24h },
             OR: [
               { senderId: decoded.id, receiverId: contact.id },
               { senderId: contact.id, receiverId: decoded.id },

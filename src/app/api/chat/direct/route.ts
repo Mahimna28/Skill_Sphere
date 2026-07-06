@@ -13,11 +13,14 @@ export async function GET(req: Request) {
 
   if (!decoded || !otherId) return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
 
-  const last24h = new Date(Date.now() - 24 * 60 * 60 * 1000);
+  // Update user's lastActiveAt timestamp for online status
+  await prisma.user.update({
+    where: { id: decoded.id },
+    data: { lastActiveAt: new Date() }
+  });
 
   const messages = await prisma.privateMessage.findMany({
     where: {
-      createdAt: { gte: last24h },
       OR: [
         { senderId: decoded.id, receiverId: otherId },
         { senderId: otherId, receiverId: decoded.id },

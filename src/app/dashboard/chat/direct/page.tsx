@@ -140,6 +140,11 @@ export default function MessagesPage() {
     return new Date(dateString).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
   };
 
+  const isUserOnline = (lastActiveAt?: string) => {
+    if (!lastActiveAt) return false;
+    return (new Date().getTime() - new Date(lastActiveAt).getTime()) < 5 * 60 * 1000;
+  };
+
   // USERNAME SETUP GATE
   if (myUsername === undefined) return <div className="flex items-center justify-center h-full"><Loader2 className="animate-spin text-[#C9A96E]" size={32} /></div>;
   if (myUsername === null) {
@@ -312,7 +317,7 @@ export default function MessagesPage() {
                         <div className="flex-1 min-w-0 pr-2">
                           <div className="flex justify-between items-center mb-0.5">
                             <p className="font-medium text-[14px] text-[#1E1B2E] truncate">{c.name}</p>
-                            <p className="text-[11px] text-[#8E8E93] shrink-0 ml-2">Active</p>
+                            <p className={`text-[11px] shrink-0 ml-2 font-medium ${isUserOnline(c.lastActiveAt) ? "text-[#22C55E]" : "text-[#8E8E93]"}`}>{isUserOnline(c.lastActiveAt) ? "Online" : "Offline"}</p>
                           </div>
                           <p className="text-[12px] text-[#8E8E93] truncate">@{c.username || "---"}</p>
                         </div>
@@ -489,8 +494,9 @@ export default function MessagesPage() {
                     <span className="font-heading text-[18px] text-[#1E1B2E] leading-tight">
                       {activeGroup ? activeGroup.name : otherUser?.name}
                     </span>
-                    <span className="text-[12px] text-[#8E8E93] mt-0.5">
-                      {activeGroup ? `${activeGroup.memberCount} members` : "Online"}
+                    <span className="text-[12px] text-[#8E8E93] mt-0.5 flex items-center gap-1.5">
+                      {!activeGroup && <span className={`w-2 h-2 rounded-full ${isUserOnline(otherUser?.lastActiveAt) ? "bg-[#22C55E]" : "bg-[#8E8E93]"}`} />}
+                      {activeGroup ? `${activeGroup.memberCount} members` : (isUserOnline(otherUser?.lastActiveAt) ? "Online" : "Offline")}
                     </span>
                   </div>
                 </div>
