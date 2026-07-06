@@ -14,6 +14,7 @@ import {
   ArrowRight,
   ShieldAlert,
   Compass,
+  Download,
 } from "lucide-react";
 
 // Shimmer skeleton component for image loading
@@ -53,6 +54,7 @@ interface Course {
   totalLessons?: number;
   completedLessons?: number;
   progress?: number;
+  certificateId?: string;
 }
 
 interface Props {
@@ -381,44 +383,89 @@ export default function CoursesClient({
                 </div>
 
                 {/* Card Footer Actions */}
-                <div className="p-5 pt-0 flex items-center gap-3 bg-transparent">
+                <div className="p-5 pt-0 flex flex-col gap-3 bg-transparent">
                   {isEnrolled ? (
                     <>
-                      {/* Fluid Gold Continue Button */}
-                      <motion.button
-                        whileHover={shouldReduceMotion ? {} : { scale: 1.03 }}
-                        whileTap={shouldReduceMotion ? {} : { scale: 0.98 }}
-                        onClick={() => router.push(`/dashboard/student/courses/${course.id}`)}
-                        disabled={isLoading}
-                        className="flex-1 relative overflow-hidden py-3.5 px-4 rounded-2xl bg-[#C9A96E] hover:bg-[#D4B57A] transition-colors text-[#1E1B2E] font-bold text-xs uppercase tracking-wider shadow-[0_4px_14px_rgba(201,169,110,0.3)] hover:shadow-[0_6px_20px_rgba(201,169,110,0.45)] flex items-center justify-center gap-2 cursor-pointer"
-                      >
-                        <Play className="w-4 h-4 fill-current shrink-0" />
-                        <span>Continue</span>
-                      </motion.button>
-
-                      {/* Leave / Unenroll Button */}
-                      {course.isPublic ? (
-                        <button
-                          onClick={() => handleUnenroll(course.id)}
-                          disabled={isLoading}
-                          className="px-3.5 py-3.5 rounded-2xl bg-[#F5F1EB] hover:bg-red-50 hover:text-red-600 text-[#8E8E93] font-bold text-xs transition-colors border border-[#1E1B2E]/10 flex items-center justify-center cursor-pointer"
-                          title="Unenroll from course"
-                        >
-                          {isLoading ? <Loader2 className="w-4 h-4 animate-spin" /> : "Leave"}
-                        </button>
-                      ) : pendingLeave.has(course.id) ? (
-                        <span className="px-3.5 py-3.5 rounded-2xl bg-[#F5F1EB] text-[#8E8E93] font-semibold text-xs border border-dashed border-[#8E8E93]/40 flex items-center gap-1">
-                          <Clock className="w-3.5 h-3.5" /> Pending
-                        </span>
+                      {course.certificateId ? (
+                        <div className="flex flex-col gap-3 w-full">
+                           <div className="px-4 py-2.5 rounded-xl bg-[#22C55E]/10 text-[#22C55E] font-bold text-xs uppercase tracking-wider flex items-center justify-center gap-2 border border-[#22C55E]/20">
+                             <CheckCircle2 size={16} /> Course Completed
+                           </div>
+                           <div className="flex items-center gap-3 w-full">
+                             <motion.button
+                               whileHover={shouldReduceMotion ? {} : { scale: 1.03 }}
+                               whileTap={shouldReduceMotion ? {} : { scale: 0.98 }}
+                               onClick={() => window.open(`/certificates/${course.certificateId}`, '_blank')}
+                               disabled={isLoading}
+                               className="flex-1 relative overflow-hidden py-3.5 px-3 rounded-2xl bg-[#C9A96E] hover:bg-[#D4B57A] transition-colors text-[#1E1B2E] font-bold text-[11px] uppercase tracking-wider shadow-md flex items-center justify-center gap-1.5 cursor-pointer"
+                             >
+                               <Download className="w-3.5 h-3.5 shrink-0" />
+                               <span>Certificate</span>
+                             </motion.button>
+                             {course.isPublic ? (
+                               <button
+                                 onClick={() => handleUnenroll(course.id)}
+                                 disabled={isLoading}
+                                 className="px-3.5 py-3.5 rounded-2xl bg-[#F5F1EB] hover:bg-red-50 hover:text-red-600 text-[#8E8E93] font-bold text-xs transition-colors border border-[#1E1B2E]/10 flex items-center justify-center cursor-pointer"
+                                 title="Unenroll from course"
+                               >
+                                 {isLoading ? <Loader2 className="w-4 h-4 animate-spin" /> : "Leave"}
+                               </button>
+                             ) : pendingLeave.has(course.id) ? (
+                               <span className="px-3.5 py-3.5 rounded-2xl bg-[#F5F1EB] text-[#8E8E93] font-semibold text-xs border border-dashed border-[#8E8E93]/40 flex items-center gap-1">
+                                 <Clock className="w-3.5 h-3.5" /> Pending
+                               </span>
+                             ) : (
+                               <button
+                                 onClick={() => handleRequestLeave(course.id)}
+                                 disabled={isLoading}
+                                 className="px-3.5 py-3.5 rounded-2xl bg-[#F5F1EB] hover:bg-amber-50 hover:text-amber-700 text-[#8E8E93] font-bold text-xs transition-colors border border-[#1E1B2E]/10 flex items-center gap-1 cursor-pointer"
+                                 title="Request leave from teacher"
+                               >
+                                 {isLoading ? <Loader2 className="w-4 h-4 animate-spin" /> : <ShieldAlert className="w-4 h-4" />}
+                               </button>
+                             )}
+                           </div>
+                        </div>
                       ) : (
-                        <button
-                          onClick={() => handleRequestLeave(course.id)}
-                          disabled={isLoading}
-                          className="px-3.5 py-3.5 rounded-2xl bg-[#F5F1EB] hover:bg-amber-50 hover:text-amber-700 text-[#8E8E93] font-bold text-xs transition-colors border border-[#1E1B2E]/10 flex items-center gap-1 cursor-pointer"
-                          title="Request leave from teacher"
-                        >
-                          {isLoading ? <Loader2 className="w-4 h-4 animate-spin" /> : <ShieldAlert className="w-4 h-4" />}
-                        </button>
+                        <div className="flex items-center gap-3 w-full">
+                          {/* Fluid Gold Continue Button */}
+                          <motion.button
+                            whileHover={shouldReduceMotion ? {} : { scale: 1.03 }}
+                            whileTap={shouldReduceMotion ? {} : { scale: 0.98 }}
+                            onClick={() => router.push(`/dashboard/student/courses/${course.id}`)}
+                            disabled={isLoading}
+                            className="flex-1 relative overflow-hidden py-3.5 px-4 rounded-2xl bg-[#C9A96E] hover:bg-[#D4B57A] transition-colors text-[#1E1B2E] font-bold text-xs uppercase tracking-wider shadow-[0_4px_14px_rgba(201,169,110,0.3)] hover:shadow-[0_6px_20px_rgba(201,169,110,0.45)] flex items-center justify-center gap-2 cursor-pointer"
+                          >
+                            <Play className="w-4 h-4 fill-current shrink-0" />
+                            <span>Continue</span>
+                          </motion.button>
+
+                          {/* Leave / Unenroll Button */}
+                          {course.isPublic ? (
+                            <button
+                              onClick={() => handleUnenroll(course.id)}
+                              disabled={isLoading}
+                              className="px-3.5 py-3.5 rounded-2xl bg-[#F5F1EB] hover:bg-red-50 hover:text-red-600 text-[#8E8E93] font-bold text-xs transition-colors border border-[#1E1B2E]/10 flex items-center justify-center cursor-pointer"
+                              title="Unenroll from course"
+                            >
+                              {isLoading ? <Loader2 className="w-4 h-4 animate-spin" /> : "Leave"}
+                            </button>
+                          ) : pendingLeave.has(course.id) ? (
+                            <span className="px-3.5 py-3.5 rounded-2xl bg-[#F5F1EB] text-[#8E8E93] font-semibold text-xs border border-dashed border-[#8E8E93]/40 flex items-center gap-1">
+                              <Clock className="w-3.5 h-3.5" /> Pending
+                            </span>
+                          ) : (
+                            <button
+                              onClick={() => handleRequestLeave(course.id)}
+                              disabled={isLoading}
+                              className="px-3.5 py-3.5 rounded-2xl bg-[#F5F1EB] hover:bg-amber-50 hover:text-amber-700 text-[#8E8E93] font-bold text-xs transition-colors border border-[#1E1B2E]/10 flex items-center gap-1 cursor-pointer"
+                              title="Request leave from teacher"
+                            >
+                              {isLoading ? <Loader2 className="w-4 h-4 animate-spin" /> : <ShieldAlert className="w-4 h-4" />}
+                            </button>
+                          )}
+                        </div>
                       )}
                     </>
                   ) : (

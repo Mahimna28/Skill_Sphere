@@ -8,7 +8,7 @@ export default async function StudentCourses() {
   const token = cookieStore.get("token")?.value;
   const decoded: any = token ? verifyToken(token) : null;
 
-  const [allCourses, enrollments, leaveRequests, lessonCompletions] = await Promise.all([
+  const [allCourses, enrollments, leaveRequests, lessonCompletions, certificates] = await Promise.all([
     prisma.course.findMany({
       include: { 
         teacher: { select: { name: true } }, 
@@ -29,6 +29,9 @@ export default async function StudentCourses() {
           include: { lesson: { select: { moduleId: true } } }
         })
       : Promise.resolve([]),
+    decoded?.id
+      ? prisma.certificate.findMany({ where: { userId: decoded.id } })
+      : Promise.resolve([]),
   ]);
 
   const enrolledIds = enrollments.map((e) => e.courseId);
@@ -39,12 +42,14 @@ export default async function StudentCourses() {
     const totalLessons = course.modules.reduce((sum, mod) => sum + mod._count.lessons, 0);
     const courseModuleIds = course.modules.map(m => m.id);
     const completedLessons = lessonCompletions.filter(lc => courseModuleIds.includes(lc.lesson.moduleId)).length;
+    const cert = certificates.find(c => c.title === `Certificate of Completion: ${course.title}`);
     
     return {
       ...course,
       totalLessons,
       completedLessons,
-      progress: totalLessons === 0 ? 0 : Math.round((completedLessons / totalLessons) * 100)
+      progress: totalLessons === 0 ? 0 : Math.round((completedLessons / totalLessons) * 100),
+      certificateId: cert?.id
     };
   });
 
