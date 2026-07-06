@@ -109,23 +109,23 @@ export default function CertificateClient({ certificate, course }: { certificate
             }}
           >
             {/* Outer Border */}
-            <div className="absolute inset-4 border-[3px] border-[#C9A96E]/40 rounded-xl z-0 pointer-events-none"></div>
+            <div className="absolute inset-4 border-[3px] rounded-xl z-0 pointer-events-none" style={{ borderColor: "rgba(201, 169, 110, 0.4)" }}></div>
             {/* Inner Border */}
-            <div className="absolute inset-8 border border-[#C9A96E]/20 rounded-lg z-0 pointer-events-none"></div>
+            <div className="absolute inset-8 border rounded-lg z-0 pointer-events-none" style={{ borderColor: "rgba(201, 169, 110, 0.2)" }}></div>
 
             {/* Corner Ornaments */}
-            <div className="absolute top-6 left-6 w-16 h-16 border-t-2 border-l-2 border-[#C9A96E] z-0 opacity-70"></div>
-            <div className="absolute top-6 right-6 w-16 h-16 border-t-2 border-r-2 border-[#C9A96E] z-0 opacity-70"></div>
-            <div className="absolute bottom-6 left-6 w-16 h-16 border-b-2 border-l-2 border-[#C9A96E] z-0 opacity-70"></div>
-            <div className="absolute bottom-6 right-6 w-16 h-16 border-b-2 border-r-2 border-[#C9A96E] z-0 opacity-70"></div>
+            <div className="absolute top-6 left-6 w-16 h-16 border-t-2 border-l-2 border-[#C9A96E] z-0" style={{ opacity: 0.7 }}></div>
+            <div className="absolute top-6 right-6 w-16 h-16 border-t-2 border-r-2 border-[#C9A96E] z-0" style={{ opacity: 0.7 }}></div>
+            <div className="absolute bottom-6 left-6 w-16 h-16 border-b-2 border-l-2 border-[#C9A96E] z-0" style={{ opacity: 0.7 }}></div>
+            <div className="absolute bottom-6 right-6 w-16 h-16 border-b-2 border-r-2 border-[#C9A96E] z-0" style={{ opacity: 0.7 }}></div>
 
             {/* Content */}
             <div className="relative z-10 w-full h-full flex flex-col items-center justify-between py-8 text-center">
               
               {/* Header */}
               <div className="flex flex-col items-center space-y-4">
-                <div className="w-20 h-20 rounded-full border border-[#C9A96E]/30 flex items-center justify-center bg-[#C9A96E]/5 mb-2">
-                  <Award className="w-10 h-10 text-[#C9A96E]" />
+                <div className="w-20 h-20 rounded-full border flex items-center justify-center mb-2" style={{ borderColor: "rgba(201, 169, 110, 0.3)", backgroundColor: "rgba(201, 169, 110, 0.05)" }}>
+                  <Award className="w-10 h-10" style={{ color: "#C9A96E" }} />
                 </div>
                 <h4 className="uppercase tracking-[0.3em] text-[#C9A96E] text-sm font-bold">Skill Sphere Academy</h4>
                 <h1 
@@ -138,7 +138,7 @@ export default function CertificateClient({ certificate, course }: { certificate
 
               {/* Body */}
               <div className="flex flex-col items-center space-y-8 flex-1 justify-center">
-                <p className="text-xl italic text-white/70 tracking-wide">
+                <p className="text-xl italic tracking-wide" style={{ color: "rgba(255, 255, 255, 0.7)" }}>
                   This certificate is proudly presented to
                 </p>
                 
@@ -149,9 +149,9 @@ export default function CertificateClient({ certificate, course }: { certificate
                   {certificate.user.name}
                 </h2>
 
-                <div className="w-64 h-[1px] bg-gradient-to-r from-transparent via-[#C9A96E]/50 to-transparent my-4"></div>
+                <div className="w-64 h-[1px] my-4" style={{ background: "linear-gradient(to right, transparent, rgba(201, 169, 110, 0.5), transparent)" }}></div>
 
-                <p className="text-lg text-white/70 tracking-wide max-w-3xl">
+                <p className="text-lg tracking-wide max-w-3xl" style={{ color: "rgba(255, 255, 255, 0.7)" }}>
                   for successfully completing and mastering the curriculum of
                 </p>
 
@@ -173,19 +173,19 @@ export default function CertificateClient({ certificate, course }: { certificate
                   >
                     {formattedDate}
                   </span>
-                  <div className="w-48 h-[1px] bg-[#C9A96E]/40 mb-2"></div>
-                  <span className="text-sm uppercase tracking-widest text-white/50">Date of Issue</span>
+                  <div className="w-48 h-[1px] mb-2" style={{ backgroundColor: "rgba(201, 169, 110, 0.4)" }}></div>
+                  <span className="text-sm uppercase tracking-widest" style={{ color: "rgba(255, 255, 255, 0.5)" }}>Date of Issue</span>
                 </div>
 
                 {/* Badge */}
-                <div className="flex flex-col items-center opacity-80">
+                <div className="flex flex-col items-center" style={{ opacity: 0.8 }}>
                   <div className="w-24 h-24 rounded-full border-[2px] border-[#C9A96E] flex items-center justify-center p-2">
                     <div className="w-full h-full rounded-full border border-[#C9A96E] flex items-center justify-center relative">
                       <ShieldCheck className="w-10 h-10 text-[#C9A96E]" />
                       <div className="absolute -bottom-1 bg-[#1E1B2E] px-2 text-[10px] tracking-widest text-[#C9A96E] uppercase">Verified</div>
                     </div>
                   </div>
-                  <span className="text-[10px] text-white/30 uppercase tracking-widest mt-4">ID: {certificate.id.substring(0, 8)}</span>
+                  <span className="text-[10px] uppercase tracking-widest mt-4" style={{ color: "rgba(255, 255, 255, 0.3)" }}>ID: {certificate.id.substring(0, 8)}</span>
                 </div>
 
                 {/* Signature */}
@@ -196,8 +196,8 @@ export default function CertificateClient({ certificate, course }: { certificate
                   >
                     {course?.teacher?.name || "Skill Sphere"}
                   </span>
-                  <div className="w-48 h-[1px] bg-[#C9A96E]/40 mb-2 mt-1"></div>
-                  <span className="text-sm uppercase tracking-widest text-white/50">Instructor Signature</span>
+                  <div className="w-48 h-[1px] mb-2 mt-1" style={{ backgroundColor: "rgba(201, 169, 110, 0.4)" }}></div>
+                  <span className="text-sm uppercase tracking-widest" style={{ color: "rgba(255, 255, 255, 0.5)" }}>Instructor Signature</span>
                 </div>
               </div>
 

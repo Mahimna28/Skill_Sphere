@@ -111,7 +111,6 @@ export default function StudentSidebar({
           { href: "/dashboard/teacher/students", label: "My Students", icon: Users },
           { href: "/dashboard/teacher/institutions", label: "Institutions", icon: School },
           { href: "/dashboard/admin/institute", label: "My Institute", icon: Shield },
-          { href: "/dashboard/admin/feedback", label: "Review Feedback", icon: Heart },
         ] as NavItem[],
         bottom: [
           { href: "/dashboard/feedback", label: "Give Feedback", icon: Heart },

@@ -15,7 +15,7 @@ export default async function TeacherDashboard() {
   if (!decoded || !["teacher", "institute_admin", "superadmin"].includes(decoded.role)) redirect("/login");
   teacher = await prisma.user.findUnique({ where: { id: decoded.id } });
   courses = await prisma.course.findMany({
-    where: { teacherId: decoded.id, isPublic: true },
+    where: { teacherId: decoded.id },
     include: { _count: { select: { enrollments: true } } },
     orderBy: { createdAt: "desc" },
   });
