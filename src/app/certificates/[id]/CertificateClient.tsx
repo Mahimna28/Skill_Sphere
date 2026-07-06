@@ -109,104 +109,57 @@ export default function CertificateClient({ certificate, course }: { certificate
               fontFamily: "'Playfair Display', serif"
             }}
           >
-            {/* Ornate Borders */}
-            <div className="absolute inset-0 pointer-events-none" style={{ backgroundColor: "#1E1B2E" }}>
-              <div className="absolute inset-[15px] border-[12px] border-double" style={{ borderColor: "#C9A96E" }}></div>
-              <div className="absolute inset-[32px] border-[2px]" style={{ borderColor: "#C9A96E", opacity: 0.8 }}></div>
-              <div className="absolute inset-[40px] border border-dashed" style={{ borderColor: "#C9A96E", opacity: 0.5 }}></div>
-            </div>
+            {/* The Background Template Image */}
+            <img 
+              src="/images/certificate-template.jpg" 
+              alt="Certificate Template" 
+              className="absolute inset-0 w-full h-full object-cover z-0" 
+              crossOrigin="anonymous"
+            />
 
-            {/* Corner Ornaments */}
-            <div className="absolute top-[32px] left-[32px] w-16 h-16 border-t-[4px] border-l-[4px]" style={{ borderColor: "#C9A96E" }}></div>
-            <div className="absolute top-[32px] right-[32px] w-16 h-16 border-t-[4px] border-r-[4px]" style={{ borderColor: "#C9A96E" }}></div>
-            <div className="absolute bottom-[32px] left-[32px] w-16 h-16 border-b-[4px] border-l-[4px]" style={{ borderColor: "#C9A96E" }}></div>
-            <div className="absolute bottom-[32px] right-[32px] w-16 h-16 border-b-[4px] border-r-[4px]" style={{ borderColor: "#C9A96E" }}></div>
-
-            {/* Background Watermark */}
-            <div className="absolute inset-0 flex items-center justify-center opacity-[0.03] pointer-events-none">
-              <Medal size={700} style={{ color: "#C9A96E" }} />
-            </div>
-
-            {/* Content Container */}
-            <div className="relative z-10 w-full h-full flex flex-col items-center pt-16 px-20 text-center">
+            {/* Content Container - Absolutely positioned over the template's blank spaces */}
+            <div className="relative z-10 w-full h-full">
               
-              {/* Header */}
-              <div className="flex flex-col items-center mb-6">
-                <div className="w-16 h-16 mb-4 flex items-center justify-center">
-                  <Award size={48} style={{ color: "#C9A96E" }} />
-                </div>
-                <h2 className="text-[14px] uppercase tracking-[0.4em] mb-2 font-bold" style={{ color: "rgba(255,255,255,0.7)", fontFamily: "sans-serif" }}>
-                  Skill Sphere Education
-                </h2>
-                <h1 className="text-[64px] font-black uppercase tracking-widest drop-shadow-md leading-none" style={{ color: "#C9A96E", fontFamily: "'Cinzel', serif" }}>
-                  Certificate
-                </h1>
-                <h1 className="text-[28px] font-bold uppercase tracking-[0.3em] drop-shadow-md" style={{ color: "#C9A96E", fontFamily: "'Cinzel', serif" }}>
-                  Of Completion
-                </h1>
-              </div>
-              
-              {/* Divider */}
-              <div className="w-48 h-[2px] rounded-full mb-8 opacity-70" style={{ backgroundColor: "#C9A96E" }} />
-
-              <p className="text-[18px] italic tracking-wider mb-6" style={{ color: "rgba(255,255,255,0.8)" }}>
-                This is to certify that
-              </p>
-
               {/* Student Name */}
-              <h2 className="text-[72px] font-bold drop-shadow-lg leading-none mb-6" style={{ color: "#FFFFFF", fontFamily: "'Great Vibes', cursive" }}>
-                {certificate.user.name}
-              </h2>
-
-              <p className="text-[16px] uppercase tracking-[0.2em] max-w-3xl leading-relaxed mb-8" style={{ color: "rgba(255,255,255,0.7)", fontFamily: "sans-serif" }}>
-                has successfully completed the comprehensive curriculum and demonstrated exceptional mastery in
-              </p>
+              <div className="absolute top-[340px] left-0 w-full flex justify-center">
+                <h2 
+                  className="text-[72px] font-bold drop-shadow-lg leading-none" 
+                  style={{ color: "#FFFFFF", fontFamily: "'Great Vibes', cursive" }}
+                >
+                  {certificate.user.name}
+                </h2>
+              </div>
 
               {/* Course Name */}
-              <h3 className="text-[36px] font-bold uppercase tracking-[0.15em] drop-shadow-md max-w-4xl leading-tight mb-auto" style={{ color: "#C9A96E", fontFamily: "'Cinzel', serif" }}>
-                {courseName}
-              </h3>
-
-              {/* Footer Section */}
-              <div className="w-full flex justify-between items-end pb-12 mt-12 px-8">
-                
-                {/* Date */}
-                <div className="flex flex-col items-center w-[220px]">
-                  <span className="text-[18px] font-bold uppercase tracking-widest mb-2" style={{ color: "#FFFFFF", fontFamily: "'Cinzel', serif" }}>
-                    {formattedDate}
-                  </span>
-                  <div className="w-full h-[1px] mb-2" style={{ backgroundColor: "#C9A96E" }} />
-                  <span className="text-[11px] font-bold uppercase tracking-[0.2em]" style={{ color: "rgba(255,255,255,0.5)", fontFamily: "sans-serif" }}>
-                    Date of Completion
-                  </span>
-                </div>
-
-                {/* Seal */}
-                <div className="flex flex-col items-center transform translate-y-4">
-                  <div className="w-32 h-32 rounded-full border-4 flex flex-col items-center justify-center relative shadow-[0_0_30px_rgba(201,169,110,0.3)] bg-[#1E1B2E]" style={{ borderColor: "#C9A96E" }}>
-                    <div className="w-[114px] h-[114px] rounded-full border border-dashed flex flex-col items-center justify-center" style={{ borderColor: "#C9A96E" }}>
-                      <ShieldCheck size={32} style={{ color: "#C9A96E", marginBottom: "4px" }} />
-                      <span className="text-[8px] uppercase font-bold tracking-widest" style={{ color: "#C9A96E", fontFamily: "sans-serif" }}>Official</span>
-                      <span className="text-[10px] uppercase font-black tracking-widest" style={{ color: "#C9A96E", fontFamily: "'Cinzel', serif" }}>Seal</span>
-                    </div>
-                  </div>
-                  <span className="text-[10px] font-bold uppercase tracking-widest mt-4" style={{ color: "rgba(255,255,255,0.4)", fontFamily: "sans-serif" }}>
-                    ID: {certificate.id.slice(0, 10).toUpperCase()}
-                  </span>
-                </div>
-
-                {/* Signature */}
-                <div className="flex flex-col items-center w-[220px]">
-                  <span className="text-[32px] capitalize mb-1 -translate-y-2" style={{ color: "#FFFFFF", fontFamily: "'Great Vibes', cursive" }}>
-                    {course?.teacher?.name || "Skill Sphere"}
-                  </span>
-                  <div className="w-full h-[1px] mb-2" style={{ backgroundColor: "#C9A96E" }} />
-                  <span className="text-[11px] font-bold uppercase tracking-[0.2em]" style={{ color: "rgba(255,255,255,0.5)", fontFamily: "sans-serif" }}>
-                    Lead Instructor
-                  </span>
-                </div>
-
+              <div className="absolute top-[510px] left-0 w-full flex justify-center">
+                <h3 
+                  className="text-[36px] font-bold uppercase tracking-[0.15em] drop-shadow-md leading-tight text-center px-12" 
+                  style={{ color: "#C9A96E", fontFamily: "'Cinzel', serif" }}
+                >
+                  {courseName}
+                </h3>
               </div>
+              
+              {/* Date */}
+              <div className="absolute bottom-[65px] left-[175px] w-[200px] flex justify-center">
+                <span 
+                  className="text-[16px] font-bold uppercase tracking-widest" 
+                  style={{ color: "#FFFFFF", fontFamily: "'Cinzel', serif" }}
+                >
+                  {formattedDate}
+                </span>
+              </div>
+
+              {/* Instructor Signature (Text representation) */}
+              <div className="absolute bottom-[60px] right-[160px] w-[200px] flex justify-center">
+                <span 
+                  className="text-[32px] capitalize" 
+                  style={{ color: "#FFFFFF", fontFamily: "'Great Vibes', cursive" }}
+                >
+                  {course?.teacher?.name || "Skill Sphere"}
+                </span>
+              </div>
+
             </div>
           </div>
         </div>
