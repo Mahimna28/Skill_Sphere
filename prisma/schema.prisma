@@ -39,7 +39,8 @@ model User {
   parentNotes     String?
 
   // Privacy
-  isProfilePublic Boolean @default(true)
+  isProfilePublic     Boolean @default(true)
+  hideFromLeaderboard Boolean @default(false)
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt

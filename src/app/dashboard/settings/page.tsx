@@ -42,6 +42,7 @@ export default async function SettingsPage() {
       qualification: true,
       parentNotes: true,
       isProfilePublic: true,
+      hideFromLeaderboard: true,
     },
   });
 
@@ -71,7 +72,7 @@ export default async function SettingsPage() {
     qualification: user.qualification || "",
     parentNotes: user.parentNotes || "",
     isProfilePublic: user.isProfilePublic ?? true,
-    hideFromLeaderboard: false, // not in schema — default false
+    hideFromLeaderboard: user.hideFromLeaderboard ?? false,
   };
 
   return <SettingsClient initialUser={initialUser} />;

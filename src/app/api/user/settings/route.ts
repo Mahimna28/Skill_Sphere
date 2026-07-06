@@ -44,6 +44,7 @@ export async function GET() {
         qualification: true,
         parentNotes: true,
         isProfilePublic: true,
+        hideFromLeaderboard: true,
       },
     });
 
@@ -76,7 +77,7 @@ export async function GET() {
         qualification: user.qualification || "",
         parentNotes: user.parentNotes || "",
         isProfilePublic: user.isProfilePublic ?? true,
-        hideFromLeaderboard: false,
+        hideFromLeaderboard: user.hideFromLeaderboard ?? false,
       },
     });
   } catch (error: any) {
@@ -99,7 +100,7 @@ export async function PUT(req: Request) {
     const {
       name, username, connectGoogle, disconnectGoogle,
       bio, skills, learningGoal, degree, specialization, expertise,
-      experienceYears, qualification, parentNotes, isProfilePublic
+      experienceYears, qualification, parentNotes, isProfilePublic, hideFromLeaderboard
     } = body;
 
     const user = await prisma.user.findUnique({
@@ -123,6 +124,7 @@ export async function PUT(req: Request) {
     if (qualification !== undefined) updateData.qualification = qualification;
     if (parentNotes !== undefined) updateData.parentNotes = parentNotes;
     if (isProfilePublic !== undefined) updateData.isProfilePublic = isProfilePublic;
+    if (hideFromLeaderboard !== undefined) updateData.hideFromLeaderboard = hideFromLeaderboard;
 
     if (username !== undefined && username !== user.username) {
       if (username !== "" && !/^[a-zA-Z0-9_]{3,20}$/.test(username)) {
@@ -176,7 +178,7 @@ export async function PUT(req: Request) {
         qualification: updated.qualification || "",
         parentNotes: updated.parentNotes || "",
         isProfilePublic: updated.isProfilePublic ?? true,
-        hideFromLeaderboard: false,
+        hideFromLeaderboard: updated.hideFromLeaderboard ?? false,
       },
     });
   } catch (error: any) {

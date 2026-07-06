@@ -11,6 +11,7 @@ export default async function StudentLeaderboard() {
   const users = await prisma.user.findMany({
     where: {
       role: "student",
+      hideFromLeaderboard: false,
     },
     orderBy: { points: "desc" },
     select: {
