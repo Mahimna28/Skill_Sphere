@@ -277,7 +277,7 @@ export default function MessagesPage() {
                   </span>
                 )}
                 {activeTab === tab && (
-                  <div layoutId="chat-tab-border" className="absolute bottom-0 left-0 right-0 h-[2px] bg-[#C9A96E]" />
+                  <motion.div layoutId="chat-tab-border" className="absolute bottom-0 left-0 right-0 h-[2px] bg-[#C9A96E]" />
                 )}
               </button>
             ))}
