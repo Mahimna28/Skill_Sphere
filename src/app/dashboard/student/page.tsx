@@ -48,6 +48,7 @@ export default async function StudentDashboard() {
       enrollments={enrollments}
       marks={marks}
       certificates={certificates}
+      recentActivity={[]}
     />
   );
 }

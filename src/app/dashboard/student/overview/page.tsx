@@ -48,6 +48,7 @@ export default async function StudentOverviewPage() {
       enrollments={enrollments}
       marks={marks}
       certificates={certificates}
+      recentActivity={[]}
     />
   );
 }
