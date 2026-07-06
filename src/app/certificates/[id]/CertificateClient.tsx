@@ -95,7 +95,7 @@ export default function CertificateClient({ certificate, course }: { certificate
       </div>
 
       {/* Certificate Container */}
-      <div className="w-full flex justify-center pb-12" style={{ height: `${800 * scale}px` }}>
+      <div className="w-full flex justify-center pb-12" style={{ height: `${900 * scale}px` }}>
         <div style={{ transform: `scale(${scale})`, transformOrigin: "top center", transition: "transform 0.2s ease" }}>
           <div
             id="certificate-wrapper"
@@ -103,7 +103,7 @@ export default function CertificateClient({ certificate, course }: { certificate
             className="relative shrink-0 shadow-[0_20px_50px_rgba(0,0,0,0.5)] overflow-hidden bg-[#1E1B2E] flex flex-col items-center justify-center p-[40px]"
             style={{ 
               width: "1200px", 
-              height: "800px", 
+              height: "900px", 
               color: "#FFFFFF",
               fontFamily: "'Playfair Display', serif"
             }}
