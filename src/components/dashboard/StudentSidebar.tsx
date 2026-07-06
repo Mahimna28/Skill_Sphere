@@ -68,12 +68,10 @@ export default function StudentSidebar({
           { href: "/dashboard/teacher/courses", label: "Manage Courses", icon: BookOpen },
           { href: "/dashboard/teacher/students", label: "My Students", icon: Users },
           { href: "/dashboard/teacher/institutions", label: "Institutions", icon: School },
-          { href: "/dashboard/qa", label: "Q&A Forum", icon: HelpCircle },
-        ],
+        ] as NavItem[],
         bottom: [
-          { href: "/dashboard/chat/direct", label: "Messages", icon: MessageSquare },
           { href: "/dashboard/feedback", label: "Give Feedback", icon: Heart },
-        ],
+        ] as NavItem[],
       };
     }
 
@@ -81,11 +79,11 @@ export default function StudentSidebar({
       return {
         top: [
           { href: "/dashboard/parent", label: "Overview", icon: LayoutDashboard },
-        ],
+        ] as NavItem[],
         bottom: [
           { href: "/dashboard/chat/direct", label: "Messages", icon: MessageSquare },
           { href: "/dashboard/feedback", label: "Give Feedback", icon: Heart },
-        ],
+        ] as NavItem[],
       };
     }
 
@@ -97,25 +95,27 @@ export default function StudentSidebar({
           { href: "/dashboard/admin/courses", label: "Global Courses", icon: BookOpen },
           { href: "/dashboard/admin/feedback", label: "Review Feedback", icon: Heart },
           { href: "/dashboard/admin/promote", label: "Promote Admins", icon: ShieldAlert },
-        ],
+        ] as NavItem[],
         bottom: [
           { href: "/dashboard/chat/direct", label: "Messages", icon: MessageSquare },
           { href: "/dashboard/feedback", label: "Give Feedback", icon: Heart },
-        ],
+        ] as NavItem[],
       };
     }
 
     if (userRole === "institute_admin") {
       return {
         top: [
-          { href: "/dashboard/teacher", label: "Teacher Dashboard", icon: BookOpen },
+          { href: "/dashboard/teacher", label: "Overview", icon: LayoutDashboard },
+          { href: "/dashboard/teacher/courses", label: "Manage Courses", icon: BookOpen },
+          { href: "/dashboard/teacher/students", label: "My Students", icon: Users },
+          { href: "/dashboard/teacher/institutions", label: "Institutions", icon: School },
           { href: "/dashboard/admin/institute", label: "My Institute", icon: Shield },
           { href: "/dashboard/admin/feedback", label: "Review Feedback", icon: Heart },
-        ],
+        ] as NavItem[],
         bottom: [
-          { href: "/dashboard/chat/direct", label: "Messages", icon: MessageSquare },
           { href: "/dashboard/feedback", label: "Give Feedback", icon: Heart },
-        ],
+        ] as NavItem[],
       };
     }
 
@@ -125,12 +125,12 @@ export default function StudentSidebar({
         { href: "/dashboard/student", label: "Overview", icon: LayoutDashboard },
         { href: "/dashboard/student/courses", label: "My Courses", icon: BookOpen },
         { href: "/dashboard/student/leaderboard", label: "Leaderboard", icon: Trophy },
-      ],
+      ] as NavItem[],
       bottom: [
         { href: "/dashboard/student/ai-tutor", label: "AI Study Tutor", icon: Sparkles },
         { href: "/dashboard/student/institutions", label: "Institutions", icon: School },
         { href: "/dashboard/feedback", label: "Give Feedback", icon: Heart },
-      ],
+      ] as NavItem[],
     };
   };
 
@@ -222,8 +222,8 @@ export default function StudentSidebar({
           </motion.div>
         ))}
 
-        {/* Community Hub only for students */}
-        {userRole === "student" && (
+        {/* Community Hub only for students, teachers, and institute admins */}
+        {(userRole === "student" || userRole === "teacher" || userRole === "institute_admin") && (
           <motion.div variants={navItemVariants as any}>
             <CommunityHubSidebarGroup />
           </motion.div>
