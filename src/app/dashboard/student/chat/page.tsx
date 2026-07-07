@@ -14,12 +14,28 @@ export default async function StudentChatPage() {
   let user: any = null;
 
   if (decoded?.id) {
-    user = await prisma.user.findUnique({ where: { id: decoded.id }, select: { id: true, name: true } });
+    user = await prisma.user.findUnique({ where: { id: decoded.id }, select: { id: true, name: true, role: true } });
     enrollments = await prisma.enrollment.findMany({
       where: { userId: decoded.id },
       include: { course: { select: { id: true, title: true, subject: true } } },
       orderBy: { enrolledAt: "asc" },
     });
+
+    if (user?.role === "teacher" || user?.role === "institute_admin" || user?.role === "superadmin" || user?.role === "admin") {
+      const teachingCourses = await prisma.course.findMany({
+        where: { teacherId: decoded.id },
+        select: { id: true, title: true, subject: true }
+      });
+      
+      const existingCourseIds = new Set(enrollments.map(e => e.course.id));
+      teachingCourses.forEach(course => {
+        if (!existingCourseIds.has(course.id)) {
+          enrollments.push({
+            course: course
+          });
+        }
+      });
+    }
   }
 
   return (
