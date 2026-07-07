@@ -47,7 +47,7 @@ export default function DashboardTopBar({
   };
 
   return (
-    <header className="sticky top-0 z-30 bg-white/85 backdrop-blur-md border-b border-[rgba(30,27,46,0.06)] px-4 sm:px-6 md:px-10 py-3.5 flex items-center justify-between gap-4 transition-all shadow-[0_4px_20px_rgba(0,0,0,0.02)]">
+    <header className="sticky top-0 z-50 bg-white/85 backdrop-blur-md border-b border-[rgba(30,27,46,0.06)] px-4 sm:px-6 md:px-10 py-3.5 flex items-center justify-between gap-4 transition-all shadow-[0_4px_20px_rgba(0,0,0,0.02)]">
       {/* Left side: Page Title */}
       <div className="flex items-center gap-6 flex-1 min-w-0">
         <h2 className="text-xl font-bold text-[#1E1B2E] tracking-tight shrink-0 font-sans">
