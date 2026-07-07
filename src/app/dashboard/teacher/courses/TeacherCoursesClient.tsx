@@ -3,7 +3,8 @@
 import { useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { BookOpen, Plus, Loader2, X, Globe, Lock, Users, Save, Upload } from "lucide-react";
+import { BookOpen, Plus, Loader2, X, Globe, Lock, Users, Sparkles, Upload } from "lucide-react";
+import { motion, AnimatePresence } from "framer-motion";
 
 const SUBJECTS = ["AI & ML", "Python", "Web Dev", "Mathematics", "Physics", "History", "Literature", "Other"];
 
@@ -51,235 +52,311 @@ export default function TeacherCoursesClient({ courses: initialCourses }: Props)
   };
 
   return (
-    <div className="flex flex-col h-full bg-[#F5F1EB] font-sans text-[#1E1B2E]">
-      {/* Toast */}
-      {toast && (
-        <div
-          className={`fixed top-6 right-6 z-50 px-6 py-4 rounded-xl font-medium shadow-[0_8px_30px_rgba(0,0,0,0.12)] flex items-center gap-3 transition-opacity duration-300 ${toast.type === "success" ? "bg-[#1E1B2E] text-white" : "bg-[#DC2626] text-white"}`}
-        >
-          {toast.message}
-        </div>
-      )}
+    <div className="flex flex-col min-h-screen bg-[#F5F1EB] font-sans text-[#1E1B2E]">
+      <AnimatePresence>
+        {toast && (
+          <motion.div
+            initial={{ opacity: 0, y: -20, scale: 0.9 }}
+            animate={{ opacity: 1, y: 0, scale: 1 }}
+            exit={{ opacity: 0, y: -20, scale: 0.9 }}
+            className={`fixed top-6 right-6 z-[200] px-6 py-4 rounded-xl font-medium shadow-[0_12px_40px_rgba(0,0,0,0.12)] flex items-center gap-3 transition-colors ${toast.type === "success" ? "bg-[#1E1B2E] text-white" : "bg-[#DC2626] text-white"}`}
+          >
+            {toast.message}
+          </motion.div>
+        )}
+      </AnimatePresence>
 
       <div className="w-full max-w-[1200px] mx-auto pb-20">
         
         {/* PAGE HEADER */}
-        <div className="pt-8 px-8">
-          <h1 className="font-heading text-[28px] text-[#1E1B2E] mb-2">Manage Courses</h1>
-          <p className="font-sans text-[14px] text-[#8E8E93]">Create and manage your course catalogue.</p>
-        </div>
-
-        {/* ACTION BAR */}
-        <div className="flex justify-end items-center py-6 px-8">
-          <button 
+        <div className="pt-12 px-8 flex flex-col md:flex-row md:items-end justify-between gap-6">
+          <div>
+            <h1 className="font-heading text-[32px] md:text-[40px] text-[#1E1B2E] leading-tight tracking-tight mb-2">Course Studio</h1>
+            <p className="font-sans text-[15px] text-[#8E8E93] max-w-md">Design, build, and manage your premium course catalogue.</p>
+          </div>
+          <motion.button 
+            whileHover={{ scale: 1.02 }}
+            whileTap={{ scale: 0.98 }}
             onClick={() => setShowForm(true)}
-            className="h-10 px-5 rounded-xl bg-[#C9A96E] hover:bg-[#D6B87D] text-[#1E1B2E] text-[14px] font-bold flex items-center justify-center gap-2 shadow-[0_4px_16px_rgba(201,169,110,0.2)] transition-all"
+            className="h-12 px-6 rounded-xl bg-gradient-to-r from-[#C9A96E] to-[#E2C48D] hover:to-[#D6B87D] text-[#1E1B2E] text-[14px] font-bold uppercase tracking-wider flex items-center justify-center gap-2 shadow-[0_8px_24px_rgba(201,169,110,0.3)] transition-all shrink-0"
           >
-            <Plus size={16} /> Create New Course
-          </button>
+            <Plus size={18} /> New Course
+          </motion.button>
         </div>
 
         {/* COURSES GRID / EMPTY STATE */}
-        <div className="px-8 pb-8">
+        <div className="mt-12 px-8">
           {courses.length === 0 ? (
-            <div className="w-full bg-white rounded-[16px] p-[60px] flex flex-col items-center justify-center shadow-[0_4px_20px_rgba(0,0,0,0.04)] text-center border border-black/5">
-              <BookOpen size={48} className="text-[#1E1B2E] opacity-25" />
-              <h3 className="font-heading text-[20px] text-[#1E1B2E] mt-[16px]">No Courses Yet</h3>
-              <p className="font-sans text-[14px] text-[#8E8E93] mt-2 max-w-[360px]">Create your first course to start building your catalogue.</p>
-              <button 
+            <motion.div 
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              className="w-full relative overflow-hidden bg-white/70 backdrop-blur-xl rounded-[32px] p-[80px] flex flex-col items-center justify-center shadow-[0_12px_40px_rgba(30,27,46,0.04)] border border-white/60 text-center"
+            >
+              <div className="absolute top-0 right-0 w-96 h-96 bg-[#C9A96E]/10 rounded-full blur-3xl pointer-events-none" />
+              <div className="absolute bottom-0 left-0 w-96 h-96 bg-[#1E1B2E]/5 rounded-full blur-3xl pointer-events-none" />
+              
+              <div className="relative z-10 w-24 h-24 mb-8 rounded-full bg-white shadow-[0_8px_32px_rgba(0,0,0,0.06)] flex items-center justify-center">
+                <Sparkles size={40} className="text-[#C9A96E]" />
+              </div>
+              <h3 className="relative z-10 font-heading text-[28px] text-[#1E1B2E] mb-4">Your Studio is Empty</h3>
+              <p className="relative z-10 font-sans text-[15px] text-[#8E8E93] max-w-[400px] mb-8 leading-relaxed">
+                Start crafting your first premium learning experience. Share your expertise with the world.
+              </p>
+              <motion.button 
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
                 onClick={() => setShowForm(true)}
-                className="mt-6 h-[44px] px-6 rounded-xl bg-[#C9A96E] hover:bg-[#D6B87D] text-[#1E1B2E] text-[14px] font-bold shadow-md transition-all"
+                className="relative z-10 h-[48px] px-8 rounded-xl bg-[#1E1B2E] hover:bg-[#2A2540] text-white text-[14px] font-bold uppercase tracking-wider shadow-[0_8px_24px_rgba(30,27,46,0.2)] transition-all flex items-center gap-2"
               >
-                Create New Course
-              </button>
-            </div>
+                <Plus size={18} /> Create First Course
+              </motion.button>
+            </motion.div>
           ) : (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {courses.map((course) => (
-                <div 
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+              {courses.map((course, i) => (
+                <motion.div 
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: i * 0.05 }}
                   key={course.id}
-                  className="group bg-white rounded-[16px] overflow-hidden shadow-[0_4px_16px_rgba(0,0,0,0.05)] flex flex-col h-full border border-[rgba(30,27,46,0.04)] hover:shadow-[0_12px_32px_rgba(0,0,0,0.08)] transition-all duration-300"
+                  className="group relative bg-white rounded-[24px] overflow-hidden shadow-[0_4px_20px_rgba(30,27,46,0.04)] flex flex-col h-full border border-white hover:shadow-[0_20px_40px_rgba(30,27,46,0.08)] hover:-translate-y-2 transition-all duration-500"
                 >
-                  <div className="relative aspect-video w-full bg-[rgba(245,241,235,0.6)] flex items-center justify-center overflow-hidden shrink-0">
+                  <div className="relative aspect-[16/10] w-full bg-[#1E1B2E] overflow-hidden shrink-0">
                     {course.thumbnail ? (
-                      <img src={course.thumbnail} alt={course.title} className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105" />
+                      <img src={course.thumbnail} alt={course.title} className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110 opacity-90 group-hover:opacity-100" />
                     ) : (
-                      <BookOpen size={40} className="text-[#8E8E93] opacity-40" />
+                      <div className="w-full h-full flex flex-col items-center justify-center bg-gradient-to-br from-[#1E1B2E] to-[#2D2844]">
+                        <BookOpen size={48} className="text-[#C9A96E]/30 mb-3" />
+                        <span className="text-[10px] font-bold uppercase tracking-widest text-[#C9A96E]/40">No Cover</span>
+                      </div>
                     )}
-                    <div className="absolute top-3 right-3 flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-[rgba(201,169,110,0.9)] text-[#1E1B2E] font-sans text-[11px] font-bold uppercase tracking-wide">
+                    
+                    <div className="absolute top-4 right-4 flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-white/90 backdrop-blur-md text-[#1E1B2E] font-sans text-[10px] font-bold uppercase tracking-wider shadow-sm">
+                      {course.isPublic ? <Globe size={12} className="text-[#C9A96E]" /> : <Lock size={12} className="text-[#8E8E93]" />}
+                      {course.isPublic ? "Public" : "Draft"}
+                    </div>
+
+                    <div className="absolute bottom-4 left-4 flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-[#1E1B2E]/80 backdrop-blur-md text-white font-sans text-[11px] font-medium tracking-wide border border-white/10">
                       {course.subject}
                     </div>
                   </div>
                   
-                  <div className="p-5 flex-1 flex flex-col">
-                    <h3 className="font-heading text-[18px] text-[#1E1B2E] line-clamp-1">{course.title}</h3>
-                    <div className="flex items-center gap-1.5 mt-1.5 text-[#8E8E93] text-[13px] font-medium font-sans">
-                      <Users size={14} />
-                      <span>{course._count?.enrollments ?? 0} students enrolled</span>
+                  <div className="p-6 flex-1 flex flex-col relative z-10 bg-white">
+                    <h3 className="font-heading text-[20px] text-[#1E1B2E] line-clamp-2 leading-tight group-hover:text-[#C9A96E] transition-colors">{course.title}</h3>
+                    
+                    <div className="flex items-center gap-4 mt-4 text-[#8E8E93] text-[13px] font-medium font-sans">
+                      <div className="flex items-center gap-1.5">
+                        <Users size={16} className="text-[#C9A96E]" />
+                        <span>{course._count?.enrollments ?? 0} Students</span>
+                      </div>
                     </div>
-                    <p className="font-sans text-[13px] text-[#8E8E93] line-clamp-2 mt-2 leading-[1.5] flex-1">
+                    
+                    <p className="font-sans text-[14px] text-[#8E8E93] line-clamp-2 mt-4 leading-relaxed flex-1">
                       {course.description}
                     </p>
                   </div>
 
-                  <div className="px-5 pb-5 flex items-center gap-2.5 shrink-0 mt-auto">
+                  <div className="px-6 pb-6 pt-2 bg-white flex items-center gap-3 shrink-0">
                     <Link href={`/dashboard/teacher/courses/${course.id}`} className="flex-1">
                       <button 
-                        className="w-full h-[36px] bg-[#C9A96E] hover:bg-[#D6B87D] text-[#1E1B2E] rounded-xl text-[12px] font-bold uppercase tracking-wider transition-all shadow-sm"
+                        className="w-full h-[44px] bg-[#1E1B2E] hover:bg-[#C9A96E] text-white hover:text-[#1E1B2E] rounded-xl text-[12px] font-bold uppercase tracking-widest transition-all shadow-md flex items-center justify-center gap-2"
                       >
-                        Edit
-                      </button>
-                    </Link>
-                    <Link href={`/dashboard/teacher/courses/${course.id}`} className="flex-1">
-                      <button 
-                        className="w-full h-[36px] bg-[#F5F1EB] hover:bg-[#EBE5DB] border border-[rgba(30,27,46,0.1)] text-[#8E8E93] hover:text-[#1E1B2E] rounded-xl text-[12px] font-bold uppercase tracking-wider transition-colors"
-                      >
-                        View Students
+                        Manage Studio
                       </button>
                     </Link>
                   </div>
-                </div>
+                </motion.div>
               ))}
             </div>
           )}
         </div>
       </div>
 
-      {/* CREATE COURSE MODAL */}
-      {showForm && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm">
-          <div className="bg-white w-full max-w-xl rounded-[24px] shadow-2xl overflow-hidden animate-in fade-in zoom-in-95 duration-200">
-              <div className="flex items-center justify-between p-[24px] border-b border-[rgba(30,27,46,0.08)]">
-                <h2 className="font-heading text-[24px] text-[#1E1B2E]">Create New Course</h2>
-                <button 
-                  onClick={() => setShowForm(false)}
-                  className="w-8 h-8 flex items-center justify-center rounded-full hover:bg-[rgba(30,27,46,0.04)] text-[#8E8E93] transition-colors"
-                >
-                  <X size={20} />
-                </button>
-              </div>
-              
-              <div className="p-[32px]">
-                <form onSubmit={handleCreate} className="space-y-[24px]">
-                  <div>
-                    <label className="block text-[12px] uppercase tracking-[0.08em] font-medium text-[#8E8E93] mb-2">Course Title *</label>
-                    <input
-                      required
-                      placeholder="e.g. Introduction to Python"
-                      className="w-full h-12 bg-white border border-[rgba(30,27,46,0.12)] rounded-xl px-4 text-[14px] text-[#1E1B2E] focus:outline-none focus:border-[#C9A96E] focus:ring-[3px] focus:ring-[rgba(201,169,110,0.15)] transition-all"
-                      value={form.title}
-                      onChange={(e) => setForm({ ...form, title: e.target.value })}
-                    />
-                  </div>
+      <AnimatePresence>
+        {showForm && (
+          <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 sm:p-6 bg-[#1E1B2E]/80 backdrop-blur-md">
+            <motion.div 
+              initial={{ opacity: 0, scale: 0.95, y: 20 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              exit={{ opacity: 0, scale: 0.95, y: 20 }}
+              className="bg-white w-full max-w-5xl rounded-[32px] shadow-2xl overflow-hidden flex flex-col md:flex-row h-full max-h-[85vh]"
+            >
+                {/* Left Panel - Visual */}
+                <div className="hidden md:flex md:w-[40%] bg-gradient-to-br from-[#1E1B2E] to-[#2D2844] relative overflow-hidden flex-col justify-between p-12">
+                  <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-[#C9A96E]/20 rounded-full blur-[80px] -translate-y-1/2 translate-x-1/3 pointer-events-none" />
                   
-                  <div>
-                    <label className="block text-[12px] uppercase tracking-[0.08em] font-medium text-[#8E8E93] mb-2">Subject *</label>
-                    <select
-                      className="w-full h-12 bg-white border border-[rgba(30,27,46,0.12)] rounded-xl px-4 text-[14px] text-[#1E1B2E] focus:outline-none focus:border-[#C9A96E] focus:ring-[3px] focus:ring-[rgba(201,169,110,0.15)] transition-all appearance-none"
-                      value={form.subject}
-                      onChange={(e) => setForm({ ...form, subject: e.target.value })}
+                  <div className="relative z-10">
+                    <div className="w-12 h-12 bg-[#C9A96E] rounded-2xl flex items-center justify-center mb-8 shadow-[0_8px_32px_rgba(201,169,110,0.3)]">
+                      <Sparkles size={24} className="text-[#1E1B2E]" />
+                    </div>
+                    <h2 className="font-heading text-[40px] text-white leading-tight mb-4">Craft Your Masterpiece</h2>
+                    <p className="font-sans text-[16px] text-white/60 leading-relaxed">
+                      Define the core details of your new course. You can always enhance the curriculum and settings later in the studio.
+                    </p>
+                  </div>
+
+                  <div className="relative z-10 p-6 rounded-2xl bg-white/5 backdrop-blur-sm border border-white/10">
+                    <div className="flex items-center gap-4 mb-2">
+                      <div className="w-10 h-10 rounded-full bg-white/10 flex items-center justify-center"><BookOpen size={18} className="text-[#C9A96E]" /></div>
+                      <div>
+                        <div className="text-[14px] font-bold text-white tracking-wide">Pro Tip</div>
+                        <div className="text-[12px] text-white/50">Keep titles concise and engaging.</div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Right Panel - Form */}
+                <div className="w-full md:w-[60%] flex flex-col h-full bg-[#F5F1EB]">
+                  <div className="flex items-center justify-between p-6 border-b border-[rgba(30,27,46,0.06)] bg-white/50 backdrop-blur-sm shrink-0">
+                    <h2 className="font-heading text-[24px] text-[#1E1B2E] md:hidden">Create Course</h2>
+                    <div className="hidden md:block"></div>
+                    <button 
+                      onClick={() => setShowForm(false)}
+                      className="w-10 h-10 flex items-center justify-center rounded-full bg-white hover:bg-[rgba(30,27,46,0.04)] text-[#8E8E93] hover:text-[#1E1B2E] transition-colors shadow-sm"
                     >
-                      {SUBJECTS.map((s) => <option key={s}>{s}</option>)}
-                    </select>
+                      <X size={20} />
+                    </button>
                   </div>
                   
-                  <div>
-                    <label className="block text-[12px] uppercase tracking-[0.08em] font-medium text-[#8E8E93] mb-2">Description *</label>
-                    <textarea
-                      required
-                      rows={3}
-                      placeholder="Describe what students will learn in this course..."
-                      className="w-full bg-white border border-[rgba(30,27,46,0.12)] rounded-xl p-3 text-[14px] text-[#1E1B2E] focus:outline-none focus:border-[#C9A96E] focus:ring-[3px] focus:ring-[rgba(201,169,110,0.15)] transition-all resize-y"
-                      value={form.description}
-                      onChange={(e) => setForm({ ...form, description: e.target.value })}
-                    />
-                  </div>
-                  
-                  <div>
-                    <label className="block text-[12px] uppercase tracking-[0.08em] font-medium text-[#8E8E93] mb-2">Cover Photo</label>
-                    <div className="flex gap-4 items-center">
-                      {form.thumbnail ? (
-                        <div className="relative w-24 h-16 rounded-xl overflow-hidden shrink-0 shadow-sm">
-                           <img src={form.thumbnail} alt="Preview" className="w-full h-full object-cover" />
-                           <button type="button" onClick={() => setForm({...form, thumbnail: ""})} className="absolute top-1 right-1 w-5 h-5 bg-white rounded-full flex items-center justify-center text-red-600 shadow-md">
-                             <X size={12} />
-                           </button>
-                        </div>
-                      ) : (
-                        <div className="relative flex-1">
-                          <input 
-                            type="file" 
-                            accept="image/*"
-                            className="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10" 
-                            onChange={async (e) => {
-                              const file = e.target.files?.[0];
-                              if (!file) return;
-                              setLoading(true);
-                              try {
-                                const formData = new FormData();
-                                formData.append("file", file);
-                                const res = await fetch("/api/upload", {
-                                  method: "POST",
-                                  body: formData
-                                });
-                                const data = await res.json();
-                                if (res.ok) {
-                                  setForm({ ...form, thumbnail: data.url });
-                                  showToast("Image uploaded successfully!", "success");
-                                } else {
-                                  showToast(data.message || "Upload failed", "error");
-                                }
-                              } catch (err) {
-                                showToast("Upload failed", "error");
-                              } finally {
-                                setLoading(false);
-                              }
-                            }} 
-                            disabled={loading}
-                          />
-                          <div className="h-12 border-2 border-dashed border-[rgba(30,27,46,0.15)] rounded-xl flex items-center justify-center gap-2 hover:border-[#C9A96E] hover:bg-[rgba(201,169,110,0.03)] transition-all text-[#8E8E93] text-[14px]">
-                            {loading ? <><Loader2 size={16} className="animate-spin" /> Uploading...</> : <><Upload size={16} /> Select Image</>}
+                  <div className="p-8 overflow-y-auto flex-1 custom-scrollbar">
+                    <form onSubmit={handleCreate} className="space-y-8 max-w-lg mx-auto">
+                      
+                      <div className="space-y-2">
+                        <label className="block text-[11px] uppercase tracking-[0.1em] font-bold text-[#8E8E93]">Course Title <span className="text-[#DC2626]">*</span></label>
+                        <input
+                          required
+                          placeholder="e.g. Advanced Machine Learning"
+                          className="w-full h-[52px] bg-white border-2 border-transparent rounded-xl px-5 text-[15px] font-medium text-[#1E1B2E] shadow-sm focus:outline-none focus:border-[#C9A96E] focus:ring-[4px] focus:ring-[rgba(201,169,110,0.1)] transition-all placeholder:text-[#8E8E93]/50 placeholder:font-normal"
+                          value={form.title}
+                          onChange={(e) => setForm({ ...form, title: e.target.value })}
+                        />
+                      </div>
+                      
+                      <div className="space-y-2">
+                        <label className="block text-[11px] uppercase tracking-[0.1em] font-bold text-[#8E8E93]">Subject Area <span className="text-[#DC2626]">*</span></label>
+                        <div className="relative">
+                          <select
+                            className="w-full h-[52px] bg-white border-2 border-transparent rounded-xl px-5 text-[15px] font-medium text-[#1E1B2E] shadow-sm focus:outline-none focus:border-[#C9A96E] focus:ring-[4px] focus:ring-[rgba(201,169,110,0.1)] transition-all appearance-none cursor-pointer"
+                            value={form.subject}
+                            onChange={(e) => setForm({ ...form, subject: e.target.value })}
+                          >
+                            {SUBJECTS.map((s) => <option key={s} value={s}>{s}</option>)}
+                          </select>
+                          <div className="absolute right-5 top-1/2 -translate-y-1/2 pointer-events-none text-[#8E8E93]">
+                            ▼
                           </div>
                         </div>
-                      )}
-                    </div>
-                  </div>
-
-                  <div>
-                    <label className="block text-[12px] uppercase tracking-[0.08em] font-medium text-[#8E8E93] mb-2">Course Type *</label>
-                    <div className="flex gap-3">
-                      <div onClick={() => setForm({ ...form, isPublic: true })} className={`flex-1 flex items-center p-3 rounded-xl border cursor-pointer transition-all ${form.isPublic ? "border-[#C9A96E] bg-[rgba(201,169,110,0.06)]" : "border-[rgba(30,27,46,0.12)] bg-white hover:border-[rgba(30,27,46,0.2)]"}`}>
-                        <div className={`w-4 h-4 rounded-full border flex items-center justify-center shrink-0 mr-3 ${form.isPublic ? "border-[#C9A96E]" : "border-[rgba(30,27,46,0.12)]"}`}>
-                          {form.isPublic && <div className="w-2 h-2 rounded-full bg-[#C9A96E]" />}
-                        </div>
-                        <div>
-                          <div className="text-[13px] font-medium text-[#1E1B2E]">Public</div>
+                      </div>
+                      
+                      <div className="space-y-2">
+                        <label className="block text-[11px] uppercase tracking-[0.1em] font-bold text-[#8E8E93]">Short Description <span className="text-[#DC2626]">*</span></label>
+                        <textarea
+                          required
+                          rows={4}
+                          placeholder="What will students accomplish by the end of this course?"
+                          className="w-full bg-white border-2 border-transparent rounded-xl p-5 text-[15px] font-medium text-[#1E1B2E] shadow-sm focus:outline-none focus:border-[#C9A96E] focus:ring-[4px] focus:ring-[rgba(201,169,110,0.1)] transition-all resize-none placeholder:text-[#8E8E93]/50 placeholder:font-normal leading-relaxed"
+                          value={form.description}
+                          onChange={(e) => setForm({ ...form, description: e.target.value })}
+                        />
+                      </div>
+                      
+                      <div className="space-y-2">
+                        <label className="block text-[11px] uppercase tracking-[0.1em] font-bold text-[#8E8E93]">Cover Photo</label>
+                        <div className="flex gap-4 items-center bg-white p-2 pl-4 rounded-2xl shadow-sm border border-white">
+                          {form.thumbnail ? (
+                            <div className="relative w-[120px] h-[80px] rounded-xl overflow-hidden shrink-0 shadow-inner group">
+                               <img src={form.thumbnail} alt="Preview" className="w-full h-full object-cover transition-transform group-hover:scale-105" />
+                               <button type="button" onClick={() => setForm({...form, thumbnail: ""})} className="absolute top-1 right-1 w-6 h-6 bg-white/90 backdrop-blur-sm rounded-full flex items-center justify-center text-[#DC2626] shadow-sm hover:scale-110 transition-transform">
+                                 <X size={14} />
+                               </button>
+                            </div>
+                          ) : (
+                            <div className="relative flex-1">
+                              <input 
+                                type="file" 
+                                accept="image/*"
+                                className="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10" 
+                                onChange={async (e) => {
+                                  const file = e.target.files?.[0];
+                                  if (!file) return;
+                                  setLoading(true);
+                                  try {
+                                    const formData = new FormData();
+                                    formData.append("file", file);
+                                    const res = await fetch("/api/upload", {
+                                      method: "POST",
+                                      body: formData
+                                    });
+                                    const data = await res.json();
+                                    if (res.ok) {
+                                      setForm({ ...form, thumbnail: data.url });
+                                      showToast("Image uploaded successfully!", "success");
+                                    } else {
+                                      showToast(data.message || "Upload failed", "error");
+                                    }
+                                  } catch (err) {
+                                    showToast("Upload failed", "error");
+                                  } finally {
+                                    setLoading(false);
+                                  }
+                                }} 
+                                disabled={loading}
+                              />
+                              <div className="h-[80px] border-2 border-dashed border-[rgba(30,27,46,0.15)] rounded-xl flex items-center justify-center gap-2 hover:border-[#C9A96E] hover:bg-[rgba(201,169,110,0.03)] transition-colors text-[#8E8E93] text-[14px] font-medium bg-[#F5F1EB]">
+                                {loading ? <><Loader2 size={18} className="animate-spin text-[#C9A96E]" /> Uploading...</> : <><Upload size={18} /> Browse Files</>}
+                              </div>
+                            </div>
+                          )}
+                          <div className="hidden sm:block flex-1 pl-2">
+                            <p className="text-[12px] text-[#8E8E93] leading-relaxed">
+                              Upload a 16:9 high-res image. Max size 5MB.
+                            </p>
+                          </div>
                         </div>
                       </div>
-                      <div onClick={() => setForm({ ...form, isPublic: false })} className={`flex-1 flex items-center p-3 rounded-xl border cursor-pointer transition-all ${!form.isPublic ? "border-[#C9A96E] bg-[rgba(201,169,110,0.06)]" : "border-[rgba(30,27,46,0.12)] bg-white hover:border-[rgba(30,27,46,0.2)]"}`}>
-                        <div className={`w-4 h-4 rounded-full border flex items-center justify-center shrink-0 mr-3 ${!form.isPublic ? "border-[#C9A96E]" : "border-[rgba(30,27,46,0.12)]"}`}>
-                          {!form.isPublic && <div className="w-2 h-2 rounded-full bg-[#C9A96E]" />}
-                        </div>
-                        <div>
-                          <div className="text-[13px] font-medium text-[#1E1B2E]">Private</div>
+
+                      <div className="space-y-2">
+                        <label className="block text-[11px] uppercase tracking-[0.1em] font-bold text-[#8E8E93]">Visibility <span className="text-[#DC2626]">*</span></label>
+                        <div className="flex gap-4">
+                          <label className={`flex-1 relative flex items-start gap-4 p-5 rounded-2xl cursor-pointer transition-all border-2 ${form.isPublic ? "bg-[rgba(201,169,110,0.05)] border-[#C9A96E]" : "bg-white border-transparent hover:border-[rgba(30,27,46,0.1)] shadow-sm"}`}>
+                            <input type="radio" name="visibility" className="hidden" checked={form.isPublic} onChange={() => setForm({...form, isPublic: true})} />
+                            <div className={`w-5 h-5 rounded-full border-2 mt-0.5 flex items-center justify-center shrink-0 transition-colors ${form.isPublic ? "border-[#C9A96E]" : "border-[rgba(30,27,46,0.2)]"}`}>
+                              {form.isPublic && <motion.div layoutId="radio" className="w-2.5 h-2.5 rounded-full bg-[#C9A96E]" />}
+                            </div>
+                            <div>
+                              <div className="text-[15px] font-bold text-[#1E1B2E]">Public</div>
+                              <div className="text-[13px] text-[#8E8E93] mt-1 leading-snug">Visible to all students in the marketplace.</div>
+                            </div>
+                          </label>
+                          <label className={`flex-1 relative flex items-start gap-4 p-5 rounded-2xl cursor-pointer transition-all border-2 ${!form.isPublic ? "bg-[rgba(30,27,46,0.03)] border-[#1E1B2E]" : "bg-white border-transparent hover:border-[rgba(30,27,46,0.1)] shadow-sm"}`}>
+                            <input type="radio" name="visibility" className="hidden" checked={!form.isPublic} onChange={() => setForm({...form, isPublic: false})} />
+                            <div className={`w-5 h-5 rounded-full border-2 mt-0.5 flex items-center justify-center shrink-0 transition-colors ${!form.isPublic ? "border-[#1E1B2E]" : "border-[rgba(30,27,46,0.2)]"}`}>
+                              {!form.isPublic && <motion.div layoutId="radio" className="w-2.5 h-2.5 rounded-full bg-[#1E1B2E]" />}
+                            </div>
+                            <div>
+                              <div className="text-[15px] font-bold text-[#1E1B2E]">Private</div>
+                              <div className="text-[13px] text-[#8E8E93] mt-1 leading-snug">Hidden from directory. Invite only.</div>
+                            </div>
+                          </label>
                         </div>
                       </div>
-                    </div>
-                  </div>
 
-                  <div className="flex gap-3 pt-2">
-                    <button type="button" onClick={() => setShowForm(false)} className="flex-1 h-12 rounded-xl border border-[rgba(30,27,46,0.12)] text-[#1E1B2E] text-[14px] font-medium hover:bg-[rgba(30,27,46,0.04)] transition-all">
-                      Cancel
-                    </button>
-                    <button type="submit" disabled={loading} className="flex-1 h-12 rounded-xl bg-[#1E1B2E] text-white text-[14px] font-medium flex items-center justify-center gap-2 hover:scale-[1.02] hover:shadow-[0_4px_16px_rgba(30,27,46,0.2)] transition-all disabled:opacity-50">
-                      {loading ? <><Loader2 className="animate-spin" size={16} /> Publishing...</> : "Publish Course"}
-                    </button>
+                      <div className="pt-6 border-t border-[rgba(30,27,46,0.06)] flex gap-4">
+                        <button type="button" onClick={() => setShowForm(false)} className="flex-1 h-[56px] rounded-xl bg-white text-[#1E1B2E] text-[15px] font-bold tracking-wide hover:bg-[rgba(30,27,46,0.04)] transition-colors border border-[rgba(30,27,46,0.1)] shadow-sm">
+                          Cancel
+                        </button>
+                        <button type="submit" disabled={loading} className="flex-[2] h-[56px] rounded-xl bg-[#1E1B2E] text-white text-[15px] font-bold uppercase tracking-widest flex items-center justify-center gap-2 hover:scale-[1.02] shadow-[0_8px_24px_rgba(30,27,46,0.2)] transition-all disabled:opacity-50 disabled:hover:scale-100">
+                          {loading ? <><Loader2 className="animate-spin" size={20} /> Initializing Studio...</> : "Initialize Studio"}
+                        </button>
+                      </div>
+                    </form>
                   </div>
-                </form>
-              </div>
+                </div>
+            </motion.div>
           </div>
-        </div>
-      )}
+        )}
+      </AnimatePresence>
     </div>
   );
 }

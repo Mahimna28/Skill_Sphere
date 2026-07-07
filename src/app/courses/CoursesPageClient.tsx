@@ -139,7 +139,7 @@ export default function CoursesPageClient({ courses, userRole, initialEnrolledId
       {/* COURSE GRID */}
       <section className="px-[32px] py-[40px] max-w-[1200px] mx-auto w-full">
         {currentCourses.length > 0 ? (
-          <StaggerContainer key={selectedCategory} staggerDelay={getStaggerDelay(0.15)} className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-[24px]">
+          <StaggerContainer key={`${selectedCategory}-${currentPage}`} staggerDelay={getStaggerDelay(0.15)} className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-[24px]">
             {currentCourses.map((course, i) => {
               const isEnrolled = enrolledIds.has(course.id);
               return (
