@@ -57,6 +57,9 @@ export default function ManageCourseClient({ course, studentsProgress = [] }: { 
 
   const [editingLesson, setEditingLesson] = useState<{ id: string; title: string; content: string; videoUrl: string } | null>(null);
   const [gradeStates, setGradeStates] = useState<{[key: string]: "idle" | "saving" | "saved"}>({});
+  
+  const [globalAssignmentFileUrl, setGlobalAssignmentFileUrl] = useState("");
+  const [uploadingAssignment, setUploadingAssignment] = useState(false);
 
   const handleUpdate = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -465,8 +468,8 @@ export default function ManageCourseClient({ course, studentsProgress = [] }: { 
                                     {editingLesson?.id === lesson.id && (
                                       <div className="absolute inset-0 z-10 bg-white/95 backdrop-blur-md rounded-[16px] p-4 flex flex-col gap-3 shadow-[0_8px_32px_rgba(30,27,46,0.1)] border border-[#C9A96E]/30">
                                         <div className="flex gap-2">
-                                          <input className="flex-1 h-10 bg-transparent border-b border-[rgba(30,27,46,0.1)] focus:border-[#C9A96E] text-[14px] font-medium text-[#1E1B2E] outline-none px-1" value={editingLesson.title} onChange={e => setEditingLesson(prev => prev ? {...prev, title: e.target.value} : null)} />
-                                          <input placeholder="YouTube URL" className="flex-1 h-10 bg-transparent border-b border-[rgba(30,27,46,0.1)] focus:border-[#C9A96E] text-[14px] text-[#1E1B2E] outline-none px-1" value={editingLesson.videoUrl} onChange={e => setEditingLesson(prev => prev ? {...prev, videoUrl: e.target.value} : null)} />
+                                          <input className="flex-1 h-10 bg-transparent border-b border-[rgba(30,27,46,0.1)] focus:border-[#C9A96E] text-[14px] font-medium text-[#1E1B2E] outline-none px-1" value={editingLesson?.title || ""} onChange={e => setEditingLesson(prev => prev ? {...prev, title: e.target.value} : null)} />
+                                          <input placeholder="YouTube URL" className="flex-1 h-10 bg-transparent border-b border-[rgba(30,27,46,0.1)] focus:border-[#C9A96E] text-[14px] text-[#1E1B2E] outline-none px-1" value={editingLesson?.videoUrl || ""} onChange={e => setEditingLesson(prev => prev ? {...prev, videoUrl: e.target.value} : null)} />
                                         </div>
                                         <div className="flex justify-end gap-2">
                                           <button onClick={() => setEditingLesson(null)} className="h-8 px-4 rounded-lg text-[12px] font-bold text-[#8E8E93] hover:bg-[rgba(30,27,46,0.05)]">Cancel</button>
@@ -548,7 +551,16 @@ export default function ManageCourseClient({ course, studentsProgress = [] }: { 
                                      )}
 
                                      {activeModuleContentType === 'assignment' && (
-                                       <textarea rows={4} placeholder="Assignment instructions..." className="w-full bg-[#F5F1EB] rounded-xl p-4 text-[14px] text-[#1E1B2E] focus:outline-none focus:ring-[2px] focus:ring-[#C9A96E]/50 resize-none" value={newLesson.content} onChange={e => setNewLesson({...newLesson, content: e.target.value})} />
+                                       <div className="space-y-4">
+                                         <textarea rows={4} placeholder="Assignment instructions..." className="w-full bg-[#F5F1EB] rounded-xl p-4 text-[14px] text-[#1E1B2E] focus:outline-none focus:ring-[2px] focus:ring-[#C9A96E]/50 resize-none" value={newLesson.content} onChange={e => setNewLesson({...newLesson, content: e.target.value})} />
+                                         <div className="relative">
+                                           <input type="file" accept=".pdf,.ppt,.pptx,.doc,.docx" onChange={(e) => handleFileUpload(e, false)} className="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10" disabled={uploading} />
+                                           <div className="h-12 border-2 border-dashed border-[rgba(30,27,46,0.15)] rounded-xl flex items-center justify-center gap-2 bg-[#F5F1EB] text-[#8E8E93] text-[13px] font-medium hover:border-[#C9A96E] transition-colors">
+                                             {uploading ? <Loader2 className="animate-spin text-[#C9A96E]" size={18} /> : <Upload size={18} />}
+                                             {newLesson.fileUrl ? "Document Uploaded Successfully!" : "Click to Attach PDF/Document (Optional)"}
+                                           </div>
+                                         </div>
+                                       </div>
                                      )}
 
                                      <div className="flex justify-end pt-2">
@@ -749,9 +761,14 @@ export default function ManageCourseClient({ course, studentsProgress = [] }: { 
                     e.preventDefault();
                     const formData = new FormData(e.currentTarget);
                     const title = formData.get("title");
-                    const description = formData.get("description");
+                    let description = formData.get("description") as string;
                     const dueDate = formData.get("dueDate");
                     if (!title || !description || !dueDate) return;
+                    
+                    if (globalAssignmentFileUrl) {
+                      description += `\n\n**Attached Document:** [Download File](${globalAssignmentFileUrl})`;
+                    }
+
                     setLoading(true);
                     try {
                       const res = await fetch(`/api/courses/${course.id}/assignments`, {
@@ -760,6 +777,7 @@ export default function ManageCourseClient({ course, studentsProgress = [] }: { 
                       });
                       if (res.ok) {
                         (e.target as HTMLFormElement).reset();
+                        setGlobalAssignmentFileUrl("");
                         router.refresh();
                       }
                     } finally {
@@ -774,6 +792,28 @@ export default function ManageCourseClient({ course, studentsProgress = [] }: { 
                       <label className="block text-[11px] uppercase tracking-[0.1em] font-bold text-[#8E8E93]">Instructions</label>
                       <textarea name="description" className="min-h-[120px] w-full bg-[#F5F1EB] border-2 border-transparent rounded-xl p-4 text-[14px] text-[#1E1B2E] focus:outline-none focus:border-[#C9A96E] transition-all resize-y leading-relaxed" required />
                     </div>
+                    
+                    <div className="space-y-2">
+                      <label className="block text-[11px] uppercase tracking-[0.1em] font-bold text-[#8E8E93]">Attach Document (Optional)</label>
+                      <div className="relative">
+                        <input type="file" accept=".pdf,.ppt,.pptx,.doc,.docx" onChange={async (e) => {
+                          const file = e.target.files?.[0];
+                          if (!file) return;
+                          setUploadingAssignment(true);
+                          try {
+                            const fd = new FormData(); fd.append("file", file);
+                            const res = await fetch("/api/upload", { method: "POST", body: fd });
+                            const data = await res.json();
+                            if (res.ok) setGlobalAssignmentFileUrl(data.url);
+                          } finally { setUploadingAssignment(false); }
+                        }} className="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10" disabled={uploadingAssignment} />
+                        <div className="h-12 border-2 border-dashed border-[rgba(30,27,46,0.15)] rounded-xl flex items-center justify-center gap-2 bg-[#F5F1EB] text-[#8E8E93] text-[13px] font-medium transition-colors hover:border-[#C9A96E]">
+                          {uploadingAssignment ? <Loader2 className="animate-spin text-[#C9A96E]" size={18} /> : <Upload size={18} />}
+                          {globalAssignmentFileUrl ? "Document Uploaded Successfully!" : "Click to Upload PDF/Document"}
+                        </div>
+                      </div>
+                    </div>
+
                     <div className="flex flex-col md:flex-row gap-6">
                       <div className="flex-1 space-y-2">
                         <label className="block text-[11px] uppercase tracking-[0.1em] font-bold text-[#8E8E93]">Due Date & Time</label>

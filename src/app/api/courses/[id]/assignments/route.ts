@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { cookies } from "next/headers";
 import { verifyToken } from "@/lib/auth";
+import { revalidatePath } from "next/cache";
 
 export async function POST(req: Request, { params }: { params: Promise<{ id: string }> }) {
   try {
@@ -35,6 +36,7 @@ export async function POST(req: Request, { params }: { params: Promise<{ id: str
       }
     });
 
+    revalidatePath(`/dashboard/teacher/courses/${courseId}`);
     return NextResponse.json(assignment);
   } catch (error) {
     console.error("Assignment error:", error);

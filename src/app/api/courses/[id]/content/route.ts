@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { cookies } from "next/headers";
 import { verifyToken } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
+import { revalidatePath } from "next/cache";
 
 export async function POST(req: Request, { params }: { params: Promise<{ id: string }> }) {
   try {
@@ -26,6 +27,7 @@ export async function POST(req: Request, { params }: { params: Promise<{ id: str
       const module = await prisma.module.create({
         data: { title, courseId, order: 0 },
       });
+      revalidatePath(`/dashboard/teacher/courses/${courseId}`);
       return NextResponse.json({ message: "Module created!", module });
     }
 
@@ -41,6 +43,7 @@ export async function POST(req: Request, { params }: { params: Promise<{ id: str
           order: 0 
         },
       });
+      revalidatePath(`/dashboard/teacher/courses/${courseId}`);
       return NextResponse.json({ message: "Lesson created!", lesson });
     }
 
@@ -61,11 +64,13 @@ export async function DELETE(req: Request, { params }: { params: Promise<{ id: s
   
       if (type === "module") {
         await prisma.module.delete({ where: { id: targetId } });
+        revalidatePath(`/dashboard/teacher/courses/${courseId}`);
         return NextResponse.json({ message: "Module deleted!" });
       }
   
       if (type === "lesson") {
         await prisma.lesson.delete({ where: { id: targetId } });
+        revalidatePath(`/dashboard/teacher/courses/${courseId}`);
         return NextResponse.json({ message: "Lesson deleted!" });
       }
   
