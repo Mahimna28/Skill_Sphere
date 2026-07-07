@@ -136,7 +136,7 @@ export function UserProfileDropdown() {
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: 8 }}
             transition={{ duration: 0.2, ease: [0.25, 0.1, 0.25, 1.0] }}
-            className="user-dropdown-menu absolute right-0 top-[44px] z-50 bg-white rounded-2xl border border-[rgba(30,27,46,0.06)] shadow-[0_12px_40px_rgba(0,0,0,0.12)] min-w-[240px] py-2"
+            className="user-dropdown-menu absolute right-0 top-[44px] z-50 bg-white rounded-2xl border border-[rgba(30,27,46,0.06)] shadow-[0_12px_40px_rgba(0,0,0,0.12)] w-[280px] py-2"
           >
             {/* Header Section */}
             <div className="px-5 py-3 flex items-center gap-3">
@@ -147,14 +147,14 @@ export function UserProfileDropdown() {
                   initials
                 )}
               </div>
-              <div className="flex-1 min-w-0">
-                <div className="flex items-center gap-2">
-                  <p className="text-sm font-medium text-[#1E1B2E] truncate">{user.name}</p>
-                  <span className="text-[11px] px-2.5 py-0.5 rounded-full bg-[rgba(201,169,110,0.12)] text-[#C9A96E] font-medium shrink-0">
+              <div className="flex-1 min-w-0 overflow-hidden">
+                <div className="flex items-center gap-2 mb-1">
+                  <p className="text-[14px] font-bold text-[#1E1B2E] truncate flex-shrink">{user.name}</p>
+                  <span className="text-[10px] px-2 py-0.5 rounded-md bg-[rgba(201,169,110,0.15)] text-[#C9A96E] font-bold uppercase tracking-wider shrink-0">
                     {getRoleDisplayName(user.role)}
                   </span>
                 </div>
-                <p className="text-xs text-[#8E8E93] truncate mt-0.5">{user.email}</p>
+                <p className="text-[12px] text-[#8E8E93] truncate w-full">{user.email}</p>
               </div>
             </div>
 
