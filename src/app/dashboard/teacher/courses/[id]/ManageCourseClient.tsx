@@ -558,6 +558,7 @@ export default function ManageCourseClient({ course, studentsProgress = [] }: { 
 
                                      {activeModuleContentType === 'assignment' && (
                                        <div className="space-y-4">
+                                         <input placeholder="Assignment Title" className="w-full h-12 bg-transparent border-b border-[rgba(30,27,46,0.1)] focus:border-[#C9A96E] text-[14px] font-medium text-[#1E1B2E] outline-none px-1" value={newLesson.title} onChange={e => setNewLesson({...newLesson, title: e.target.value})} />
                                          <textarea rows={4} placeholder="Assignment instructions..." className="w-full bg-[#F5F1EB] rounded-xl p-4 text-[14px] text-[#1E1B2E] focus:outline-none focus:ring-[2px] focus:ring-[#C9A96E]/50 resize-none" value={newLesson.content} onChange={e => setNewLesson({...newLesson, content: e.target.value})} />
                                          <div className="relative">
                                            <input type="file" accept=".pdf,.ppt,.pptx,.doc,.docx" onChange={(e) => handleFileUpload(e, false)} className="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10" disabled={uploading} />
