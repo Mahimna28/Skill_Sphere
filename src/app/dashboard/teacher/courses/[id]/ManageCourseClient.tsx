@@ -163,6 +163,9 @@ export default function ManageCourseClient({ course, studentsProgress = [] }: { 
       if (res.ok) {
         setNewModuleTitle("");
         router.refresh();
+      } else {
+        const error = await res.json();
+        alert(`Failed to add module: ${error.message || 'Unknown error'}`);
       }
     } finally {
       setLoading(false);
@@ -191,6 +194,9 @@ export default function ManageCourseClient({ course, studentsProgress = [] }: { 
         setNewLesson({ title: "", content: "", videoSource: "youtube", videoUrl: "", fileUrl: "", fileType: "" });
         setActiveModuleContentType(null);
         router.refresh();
+      } else {
+        const error = await res.json();
+        alert(`Failed to add content: ${error.message || 'Unknown error'}`);
       }
     } finally {
       setLoading(false);
@@ -779,6 +785,9 @@ export default function ManageCourseClient({ course, studentsProgress = [] }: { 
                         (e.target as HTMLFormElement).reset();
                         setGlobalAssignmentFileUrl("");
                         router.refresh();
+                      } else {
+                        const error = await res.json();
+                        alert(`Failed to create assignment: ${error.message || 'Unknown error'}`);
                       }
                     } finally {
                       setLoading(false);

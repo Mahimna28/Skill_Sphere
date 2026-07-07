@@ -11,12 +11,12 @@ export async function POST(req: Request, { params }: { params: Promise<{ id: str
     const token = cookieStore.get("token")?.value;
     const decoded: any = token ? verifyToken(token) : null;
 
-    if (!decoded || decoded.role !== "teacher") {
+    if (!decoded || !["teacher", "institute_admin", "superadmin"].includes(decoded.role)) {
       return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
     }
 
     const course = await prisma.course.findUnique({ where: { id: courseId } });
-    if (!course || course.teacherId !== decoded.id) {
+    if (!course || (course.teacherId !== decoded.id && decoded.role !== "superadmin" && decoded.role !== "institute_admin")) {
       return NextResponse.json({ message: "Forbidden" }, { status: 403 });
     }
 

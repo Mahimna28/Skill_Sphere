@@ -18,7 +18,7 @@ export async function PATCH(req: Request, { params }: { params: Promise<{ id: st
 
     // Verify ownership
     const existing = await prisma.course.findUnique({ where: { id } });
-    if (!existing || existing.teacherId !== decoded.id) {
+    if (!existing || (existing.teacherId !== decoded.id && decoded.role !== "superadmin" && decoded.role !== "institute_admin")) {
       return NextResponse.json({ message: "Forbidden" }, { status: 403 });
     }
 
@@ -46,7 +46,7 @@ export async function DELETE(req: Request, { params }: { params: Promise<{ id: s
 
     // Verify ownership
     const existing = await prisma.course.findUnique({ where: { id } });
-    if (!existing || existing.teacherId !== decoded.id) {
+    if (!existing || (existing.teacherId !== decoded.id && decoded.role !== "superadmin" && decoded.role !== "institute_admin")) {
       return NextResponse.json({ message: "Forbidden" }, { status: 403 });
     }
 

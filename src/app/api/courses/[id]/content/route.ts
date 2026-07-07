@@ -19,7 +19,7 @@ export async function POST(req: Request, { params }: { params: Promise<{ id: str
 
     // Verify course ownership
     const course = await prisma.course.findUnique({ where: { id: courseId } });
-    if (!course || course.teacherId !== decoded.id) {
+    if (!course || (course.teacherId !== decoded.id && decoded.role !== "superadmin" && decoded.role !== "institute_admin")) {
       return NextResponse.json({ message: "Forbidden" }, { status: 403 });
     }
 
