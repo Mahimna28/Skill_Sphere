@@ -292,7 +292,7 @@ export default function SettingsClient({ initialUser }: SettingsClientProps) {
     { key: "email" as const, label: "Email Notifications", desc: "Receive email updates about your activity", icon: Mail },
     { key: "courseUpdates" as const, label: "Course Updates", desc: "New lessons, assignments, and announcements", icon: BookOpen },
     { key: "mentions" as const, label: "Community Mentions", desc: "When someone mentions you in Q&A or chat", icon: MessageCircle },
-    { key: "streaks" as const, label: "Streak Reminders", desc: "Daily reminders to maintain your learning streak", icon: Award },
+    ...(user.role === "student" ? [{ key: "streaks" as const, label: "Streak Reminders", desc: "Daily reminders to maintain your learning streak", icon: Award }] : []),
     { key: "institutions" as const, label: "Institution Updates", desc: "Updates from your institution or teacher", icon: Users },
     { key: "announcements" as const, label: "Platform Announcements", desc: "Important updates from Skill Sphere", icon: Megaphone },
   ];
@@ -694,30 +694,32 @@ export default function SettingsClient({ initialUser }: SettingsClientProps) {
                 )}
 
                 {/* Hide from Leaderboard / Userboard Toggle */}
-                <div className="flex items-center justify-between p-4 border border-[rgba(30,27,46,0.1)] rounded-xl bg-[rgba(245,241,235,0.3)]">
-                  <div className="flex items-center gap-3">
-                    {hideFromLeaderboard ? <EyeOff className="w-5 h-5 text-[#F97316]" /> : <Award className="w-5 h-5 text-[#22C55E]" />}
-                    <div>
-                      <p className="text-sm font-medium text-[#1E1B2E]">{hideFromLeaderboard ? "Hidden from Leaderboard / Userboard" : "Visible on Leaderboard / Userboard"}</p>
-                      <p className="text-xs text-[#8E8E93] mt-0.5">
-                        {hideFromLeaderboard
-                          ? "Your profile, points, and ranking are hidden from public leaderboards and userboards."
-                          : "Your profile, points, and ranking are visible on public leaderboards and userboards."}
-                      </p>
+                {user.role === "student" && (
+                  <div className="flex items-center justify-between p-4 border border-[rgba(30,27,46,0.1)] rounded-xl bg-[rgba(245,241,235,0.3)]">
+                    <div className="flex items-center gap-3">
+                      {hideFromLeaderboard ? <EyeOff className="w-5 h-5 text-[#F97316]" /> : <Award className="w-5 h-5 text-[#22C55E]" />}
+                      <div>
+                        <p className="text-sm font-medium text-[#1E1B2E]">{hideFromLeaderboard ? "Hidden from Leaderboard / Userboard" : "Visible on Leaderboard / Userboard"}</p>
+                        <p className="text-xs text-[#8E8E93] mt-0.5">
+                          {hideFromLeaderboard
+                            ? "Your profile, points, and ranking are hidden from public leaderboards and userboards."
+                            : "Your profile, points, and ranking are visible on public leaderboards and userboards."}
+                        </p>
+                      </div>
                     </div>
+                    <button
+                      type="button"
+                      onClick={() => setHideFromLeaderboard(!hideFromLeaderboard)}
+                      className={`relative w-12 h-6 rounded-full transition-colors cursor-pointer focus:outline-none ${
+                        hideFromLeaderboard ? "bg-[#F97316]" : "bg-[#8E8E93]"
+                      }`}
+                    >
+                      <div className={`absolute top-0.5 w-5 h-5 bg-white rounded-full shadow-sm transition-transform ${
+                        hideFromLeaderboard ? "left-6.5" : "left-0.5"
+                      }`} />
+                    </button>
                   </div>
-                  <button
-                    type="button"
-                    onClick={() => setHideFromLeaderboard(!hideFromLeaderboard)}
-                    className={`relative w-12 h-6 rounded-full transition-colors cursor-pointer focus:outline-none ${
-                      hideFromLeaderboard ? "bg-[#F97316]" : "bg-[#8E8E93]"
-                    }`}
-                  >
-                    <div className={`absolute top-0.5 w-5 h-5 bg-white rounded-full shadow-sm transition-transform ${
-                      hideFromLeaderboard ? "left-6.5" : "left-0.5"
-                    }`} />
-                  </button>
-                </div>
+                )}
               </div>
 
               {/* Save Button for Profile Section */}
