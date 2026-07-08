@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { motion } from "framer-motion";
 import { FadeIn, SlideUp, StaggerContainer, StaggerItem } from "@/components/animations";
-import { Search, MessageSquare, Users } from "lucide-react";
+import { Search, MessageSquare, Users, ChevronDown } from "lucide-react";
 
 import { useRouter } from "next/navigation";
 
@@ -17,13 +17,15 @@ export default function TeacherStudentsClient({ enrollments }: { enrollments: En
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedCourse, setSelectedCourse] = useState("");
 
-  const uniqueCourses = Array.from(new Set(enrollments.map(e => e.course.title)));
+  const uniqueCourses = Array.from(
+    new Map(enrollments.map(e => [e.course.id, e.course])).values()
+  );
 
   const filtered = enrollments.filter(en => {
     const matchesSearch = en.user.name.toLowerCase().includes(searchQuery.toLowerCase()) || 
                           en.user.email.toLowerCase().includes(searchQuery.toLowerCase()) ||
                           en.course.title.toLowerCase().includes(searchQuery.toLowerCase());
-    const matchesCourse = selectedCourse ? en.course.title === selectedCourse : true;
+    const matchesCourse = selectedCourse ? en.course.id === selectedCourse : true;
     return matchesSearch && matchesCourse;
   });
 
@@ -41,16 +43,19 @@ export default function TeacherStudentsClient({ enrollments }: { enrollments: En
         {/* FILTER & SEARCH BAR */}
         <FadeIn delay={0.1}>
           <div className="px-[32px] pb-[16px] flex flex-col md:flex-row justify-between w-full gap-4">
-            <select
-              value={selectedCourse}
-              onChange={e => setSelectedCourse(e.target.value)}
-              className="w-full md:w-[280px] h-[44px] bg-white border border-[rgba(30,27,46,0.12)] rounded-full px-[16px] text-[14px] text-[#1E1B2E] focus:outline-none focus:border-[#C9A96E] focus:ring-[3px] focus:ring-[rgba(201,169,110,0.15)] transition-all cursor-pointer appearance-none"
-            >
-              <option value="">All Courses</option>
-              {uniqueCourses.map(course => (
-                <option key={course} value={course}>{course}</option>
-              ))}
-            </select>
+            <div className="relative w-full md:w-[280px]">
+              <select
+                value={selectedCourse}
+                onChange={e => setSelectedCourse(e.target.value)}
+                className="w-full h-[44px] bg-white border border-[rgba(30,27,46,0.12)] rounded-full px-[16px] pr-[40px] text-[14px] text-[#1E1B2E] focus:outline-none focus:border-[#C9A96E] focus:ring-[3px] focus:ring-[rgba(201,169,110,0.15)] transition-all cursor-pointer appearance-none"
+              >
+                <option value="">All Courses</option>
+                {uniqueCourses.map(course => (
+                  <option key={course.id} value={course.id}>{course.title}</option>
+                ))}
+              </select>
+              <ChevronDown size={16} className="absolute right-[14px] top-1/2 -translate-y-1/2 text-[#8E8E93] pointer-events-none" />
+            </div>
 
             <div className="relative">
               <Search className="absolute left-[16px] top-1/2 -translate-y-1/2 text-[#8E8E93]" size={18} />

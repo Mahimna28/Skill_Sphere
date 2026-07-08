@@ -1,5 +1,6 @@
 "use client";
 import { useState, useEffect, useRef } from "react";
+import { useSearchParams } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
 import { MessageSquare, Send, Search, Loader2, ArrowLeft, Trash2, Lock, UserPlus, CheckCheck, X, Clock, AtSign, Users, Plus, MoreHorizontal } from "lucide-react";
 
@@ -33,7 +34,36 @@ export default function MessagesPage() {
   const inputRef = useRef<HTMLInputElement>(null);
   const dropdownRef = useRef<HTMLDivElement>(null);
 
+  const searchParams = useSearchParams();
+
   useEffect(() => { checkUsername(); fetchContacts(); fetchRequests(); fetchGroups(); fetchSuggestions(); }, []);
+
+  // Auto-open chat when userId param is present
+  useEffect(() => {
+    const userId = searchParams.get("userId");
+    if (!userId) return;
+    const openUserById = async () => {
+      try {
+        const r = await fetch(`/api/users/profile?id=${userId}`);
+        if (r.ok) {
+          const d = await r.json();
+          if (d.user) handleUserClick(d.user);
+          else {
+            // If no direct API, pre-fill the search with student name to find them
+            const sr = await fetch(`/api/chat/direct?otherId=${userId}`);
+            const sd = await sr.json();
+            if (sr.ok) {
+              // User exists in chat — open directly
+              const contact = contacts.find((c: any) => c.id === userId);
+              if (contact) handleUserClick(contact);
+            }
+          }
+        }
+      } catch (e) {}
+    };
+    openUserById();
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [searchParams]);
 
   // Debounced search
   useEffect(() => {
