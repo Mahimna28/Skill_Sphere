@@ -5,19 +5,27 @@ import { motion } from "framer-motion";
 import { FadeIn, SlideUp, StaggerContainer, StaggerItem } from "@/components/animations";
 import { Search, MessageSquare, Users } from "lucide-react";
 
+import { useRouter } from "next/navigation";
+
 interface Enrollment {
-  user: { name: string; email: string };
-  course: { title: string };
+  user: { id: string; name: string; email: string };
+  course: { id: string; title: string };
 }
 
 export default function TeacherStudentsClient({ enrollments }: { enrollments: Enrollment[] }) {
+  const router = useRouter();
   const [searchQuery, setSearchQuery] = useState("");
+  const [selectedCourse, setSelectedCourse] = useState("");
 
-  const filtered = enrollments.filter(en => 
-    en.user.name.toLowerCase().includes(searchQuery.toLowerCase()) || 
-    en.user.email.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    en.course.title.toLowerCase().includes(searchQuery.toLowerCase())
-  );
+  const uniqueCourses = Array.from(new Set(enrollments.map(e => e.course.title)));
+
+  const filtered = enrollments.filter(en => {
+    const matchesSearch = en.user.name.toLowerCase().includes(searchQuery.toLowerCase()) || 
+                          en.user.email.toLowerCase().includes(searchQuery.toLowerCase()) ||
+                          en.course.title.toLowerCase().includes(searchQuery.toLowerCase());
+    const matchesCourse = selectedCourse ? en.course.title === selectedCourse : true;
+    return matchesSearch && matchesCourse;
+  });
 
   return (
     <div className="flex flex-col h-full bg-[#F5F1EB] font-sans pb-20 min-w-0 w-full">
@@ -30,9 +38,20 @@ export default function TeacherStudentsClient({ enrollments }: { enrollments: En
           </div>
         </FadeIn>
 
-        {/* SEARCH BAR (Right aligned above table) */}
+        {/* FILTER & SEARCH BAR */}
         <FadeIn delay={0.1}>
-          <div className="px-[32px] pb-[16px] flex justify-end w-full">
+          <div className="px-[32px] pb-[16px] flex flex-col md:flex-row justify-between w-full gap-4">
+            <select
+              value={selectedCourse}
+              onChange={e => setSelectedCourse(e.target.value)}
+              className="w-full md:w-[280px] h-[44px] bg-white border border-[rgba(30,27,46,0.12)] rounded-full px-[16px] text-[14px] text-[#1E1B2E] focus:outline-none focus:border-[#C9A96E] focus:ring-[3px] focus:ring-[rgba(201,169,110,0.15)] transition-all cursor-pointer appearance-none"
+            >
+              <option value="">All Courses</option>
+              {uniqueCourses.map(course => (
+                <option key={course} value={course}>{course}</option>
+              ))}
+            </select>
+
             <div className="relative">
               <Search className="absolute left-[16px] top-1/2 -translate-y-1/2 text-[#8E8E93]" size={18} />
               <input 
@@ -40,7 +59,7 @@ export default function TeacherStudentsClient({ enrollments }: { enrollments: En
                 placeholder="Search students by name or email..."
                 value={searchQuery}
                 onChange={e => setSearchQuery(e.target.value)}
-                className="w-[320px] h-[44px] bg-white border border-[rgba(30,27,46,0.12)] rounded-full pl-[44px] pr-[16px] text-[14px] text-[#1E1B2E] placeholder:text-[#8E8E93] focus:outline-none focus:border-[#C9A96E] focus:ring-[3px] focus:ring-[rgba(201,169,110,0.15)] transition-all"
+                className="w-full md:w-[320px] h-[44px] bg-white border border-[rgba(30,27,46,0.12)] rounded-full pl-[44px] pr-[16px] text-[14px] text-[#1E1B2E] placeholder:text-[#8E8E93] focus:outline-none focus:border-[#C9A96E] focus:ring-[3px] focus:ring-[rgba(201,169,110,0.15)] transition-all"
               />
             </div>
           </div>
@@ -103,6 +122,7 @@ export default function TeacherStudentsClient({ enrollments }: { enrollments: En
                             
                             <div className="py-[18px] px-[28px] text-right overflow-hidden min-w-0">
                               <motion.button 
+                                onClick={() => router.push(`/dashboard/chat/direct?userId=${en.user.id}`)}
                                 whileHover={{ scale: 1.02 }}
                                 whileTap={{ scale: 0.98 }}
                                 className="h-[36px] px-[18px] rounded-xl border border-[#1E1B2E] text-[#1E1B2E] bg-transparent text-[13px] font-medium inline-flex items-center gap-[6px] hover:bg-[#1E1B2E] hover:text-white transition-all duration-200 shrink-0"

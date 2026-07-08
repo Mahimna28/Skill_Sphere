@@ -17,8 +17,8 @@ export default async function TeacherStudents() {
       course: { teacherId: decoded.id }
     },
     include: {
-      user: { select: { name: true, email: true } },
-      course: { select: { title: true } }
+      user: { select: { id: true, name: true, email: true } },
+      course: { select: { id: true, title: true } }
     },
     orderBy: { enrolledAt: "desc" }
   });
