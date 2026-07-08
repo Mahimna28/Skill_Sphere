@@ -27,7 +27,6 @@ export default async function CoursePlayerPage({ params }: { params: Promise<{ i
   });
 
   if (!enrollment) {
-    // If not enrolled, redirect back to course details page so they can enroll
     redirect(`/courses/${id}`);
   }
 
@@ -43,7 +42,13 @@ export default async function CoursePlayerPage({ params }: { params: Promise<{ i
         },
       },
       assignments: {
-        orderBy: { dueDate: "asc" }
+        orderBy: { dueDate: "asc" },
+        include: {
+          submissions: {
+            where: { studentId: decoded.id },
+            select: { id: true, content: true, fileUrl: true, createdAt: true, grade: true, feedback: true }
+          }
+        }
       }
     },
   });
@@ -76,3 +81,4 @@ export default async function CoursePlayerPage({ params }: { params: Promise<{ i
     />
   );
 }
+

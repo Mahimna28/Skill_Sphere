@@ -38,32 +38,49 @@ export default function MessagesPage() {
 
   useEffect(() => { checkUsername(); fetchContacts(); fetchRequests(); fetchGroups(); fetchSuggestions(); }, []);
 
-  // Auto-open chat when userId param is present
+  // Auto-open or pre-fill chat when userId/username params are present
+  // Runs when contacts are loaded (contacts.length triggers re-check)
   useEffect(() => {
     const userId = searchParams.get("userId");
+    const usernameParam = searchParams.get("username");
     if (!userId) return;
-    const openUserById = async () => {
+
+    // Check if this user is already a contact
+    const existingContact = contacts.find((c: any) => c.id === userId);
+    if (existingContact) {
+      // Open the chat directly
+      handleUserClick(existingContact);
+      return;
+    }
+
+    // Not a contact yet — fetch their profile and decide what to do
+    const tryOpen = async () => {
       try {
         const r = await fetch(`/api/users/profile?id=${userId}`);
         if (r.ok) {
           const d = await r.json();
-          if (d.user) handleUserClick(d.user);
-          else {
-            // If no direct API, pre-fill the search with student name to find them
-            const sr = await fetch(`/api/chat/direct?otherId=${userId}`);
-            const sd = await sr.json();
-            if (sr.ok) {
-              // User exists in chat — open directly
-              const contact = contacts.find((c: any) => c.id === userId);
-              if (contact) handleUserClick(contact);
+          if (d.user) {
+            // If user has a public profile, open directly (teacher-to-student with public profile)
+            if (d.user.isProfilePublic) {
+              handleUserClick(d.user);
+            } else {
+              // Pre-fill the search box with their username so teacher can find and message them
+              const fillWith = usernameParam || d.user.username || d.user.name || "";
+              setSearchQuery(fillWith);
             }
           }
+        } else if (usernameParam) {
+          // API failed but we have username — just pre-fill search
+          setSearchQuery(usernameParam);
         }
-      } catch (e) {}
+      } catch (e) {
+        // Fallback: pre-fill with username param
+        if (usernameParam) setSearchQuery(usernameParam);
+      }
     };
-    openUserById();
+    tryOpen();
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [searchParams]);
+  }, [searchParams, contacts.length]);
 
   // Debounced search
   useEffect(() => {

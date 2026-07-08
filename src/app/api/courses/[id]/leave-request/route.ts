@@ -52,10 +52,10 @@ export async function PATCH(req: Request, { params }: { params: Promise<{ id: st
     const token = cookieStore.get("token")?.value;
     const decoded: any = token ? verifyToken(token) : null;
 
-    if (!decoded || decoded.role !== "teacher") return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
+    if (!decoded || !["teacher", "institute_admin", "superadmin"].includes(decoded.role)) return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
 
     const course = await prisma.course.findUnique({ where: { id: courseId } });
-    if (!course || course.teacherId !== decoded.id) return NextResponse.json({ message: "Forbidden" }, { status: 403 });
+    if (!course || (course.teacherId !== decoded.id && decoded.role !== "institute_admin" && decoded.role !== "superadmin")) return NextResponse.json({ message: "Forbidden" }, { status: 403 });
 
     const { requestId, action } = await req.json(); // action = "approve" or "reject"
     if (!requestId || !action) return NextResponse.json({ message: "Missing fields" }, { status: 400 });

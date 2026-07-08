@@ -140,12 +140,17 @@ export default function ManageCourseClient({ course, studentsProgress = [] }: { 
   const handleLeaveRequest = async (requestId: string, action: "approve" | "reject") => {
     setLoading(true);
     try {
-      await fetch(`/api/courses/${course.id}/leave-request`, {
+      const res = await fetch(`/api/courses/${course.id}/leave-request`, {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ requestId, action })
       });
-      router.refresh();
+      if (res.ok) {
+        router.refresh();
+      } else {
+        const data = await res.json();
+        alert(`Failed to ${action} drop request: ${data.message || "Unknown error"}`);
+      }
     } finally {
       setLoading(false);
     }
