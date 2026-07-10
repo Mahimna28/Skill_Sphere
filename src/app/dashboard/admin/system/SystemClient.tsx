@@ -73,19 +73,16 @@ export default function SystemClient({ initialUsers, initialInstitutions }: { in
   };
 
   return (
-    <div
-      className="flex flex-col bg-[#F5F1EB] min-h-screen w-full font-sans pb-20 overflow-x-hidden min-w-0"
-    >
+    <div className="flex flex-col w-full font-sans pb-10">
       
       {/* PAGE HEADER */}
-      <div className="pt-[8px] px-[32px] mb-[20px]">
+      <div className="pt-2 mb-6">
         <p className="font-sans text-[14px] text-[#8E8E93]">Master management of all platform data.</p>
       </div>
 
       {/* TAB NAVIGATION + SEARCH BAR */}
-      <div
-        className="bg-white rounded-[16px] shadow-[0_4px_16px_rgba(0,0,0,0.05)] mx-[32px] mb-[32px] p-[20px_24px] flex flex-col md:flex-row justify-between items-center gap-[16px] w-[calc(100%-64px)]"
-      >
+      <div className="mb-8 w-full">
+        <div className="bg-white rounded-2xl shadow-sm p-5 flex flex-col md:flex-row justify-between items-center gap-4 w-full">
         <div className="flex flex-row gap-[8px] w-full md:w-auto">
           <button 
             onClick={() => setActiveTab("users")}
@@ -119,12 +116,12 @@ export default function SystemClient({ initialUsers, initialInstitutions }: { in
             className="w-full h-[40px] bg-white border border-[rgba(30,27,46,0.12)] rounded-full pl-[40px] pr-[16px] font-sans text-[14px] text-[#1E1B2E] placeholder:text-[#8E8E93] focus:outline-none focus:border-[#C9A96E] focus:shadow-[0_0_0_3px_rgba(201,169,110,0.15)] transition-all duration-200"
           />
         </div>
+        </div>
       </div>
 
       {/* DATA TABLE */}
-      <div
-        className="bg-white rounded-[16px] shadow-[0_4px_20px_rgba(0,0,0,0.06)] mx-[32px] mb-[32px] overflow-hidden w-[calc(100%-64px)] flex flex-col"
-      >
+      <div className="w-full">
+        <div className="bg-white rounded-2xl shadow-sm overflow-hidden w-full flex flex-col">
         <div className="w-full overflow-x-auto min-w-0">
           {activeTab === "users" ? (
             <table className="w-full text-left table-fixed border-collapse min-w-0">
@@ -264,6 +261,7 @@ export default function SystemClient({ initialUsers, initialInstitutions }: { in
             </table>
           )}
         </div>
+      </div>
       </div>
     </div>
   );

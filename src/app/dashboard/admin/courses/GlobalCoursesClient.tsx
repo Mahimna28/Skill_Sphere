@@ -13,9 +13,10 @@ export default function GlobalCoursesClient({ superadmin, initialCourses }: { su
   const router = useRouter();
   const [courses, setCourses] = useState(initialCourses);
   const [showForm, setShowForm] = useState(false);
+  const [editingCourseId, setEditingCourseId] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
   const [toast, setToast] = useState<{ message: string; type: "success" | "error" } | null>(null);
-  const [form, setForm] = useState({ title: "", description: "", subject: "Python", thumbnail: "", isPublic: true });
+  const [form, setForm] = useState({ title: "", description: "", subject: "Python", thumbnail: "", isPublic: true, details: "" });
 
   const totalStudents = courses.reduce((sum: number, c: any) => sum + (c._count?.enrollments || 0), 0);
 
@@ -28,27 +29,43 @@ export default function GlobalCoursesClient({ superadmin, initialCourses }: { su
     e.preventDefault();
     setLoading(true);
     try {
-      const res = await fetch("/api/courses", {
-        method: "POST",
+      const url = editingCourseId ? `/api/courses/${editingCourseId}` : "/api/courses";
+      const method = editingCourseId ? "PATCH" : "POST";
+      const res = await fetch(url, {
+        method,
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(form),
       });
       const data = await res.json();
 
       if (res.ok) {
-        setCourses([{ ...data.course, _count: { enrollments: 0 } }, ...courses]);
+        showToast(editingCourseId ? "✅ Course Updated Successfully" : "✅ Course Created Successfully", "success");
         setShowForm(false);
-        setForm({ title: "", description: "", subject: "Python", thumbnail: "", isPublic: true });
-        showToast("✅ Course Created Successfully", "success");
+        setEditingCourseId(null);
+        setForm({ title: "", description: "", subject: "Python", thumbnail: "", isPublic: true, details: "" });
         router.refresh();
+        setTimeout(() => window.location.reload(), 1000);
       } else {
-        showToast(data.message || "Failed to create course", "error");
+        showToast(data.message || "Failed to save course", "error");
       }
     } catch {
       showToast("Network error. Please try again.", "error");
     } finally {
       setLoading(false);
     }
+  };
+
+  const handleEditClick = (course: any) => {
+    setForm({
+      title: course.title,
+      description: course.description || "",
+      subject: course.subject || "Python",
+      thumbnail: course.thumbnail || "",
+      isPublic: course.isPublic ?? true,
+      details: course.details || ""
+    });
+    setEditingCourseId(course.id);
+    setShowForm(true);
   };
 
   // Variants for animations
@@ -79,8 +96,8 @@ export default function GlobalCoursesClient({ superadmin, initialCourses }: { su
             className="w-full max-w-2xl bg-white rounded-[24px] shadow-[0_12px_40px_rgba(0,0,0,0.12)] overflow-hidden flex flex-col"
           >
             <div className="px-[24px] py-[20px] border-b border-[rgba(30,27,46,0.08)] flex items-center justify-between">
-              <h2 className="font-heading text-[22px] text-[#1E1B2E]">Deploy Global Course</h2>
-              <button onClick={() => setShowForm(false)} className="w-[32px] h-[32px] rounded-full flex items-center justify-center text-[#8E8E93] hover:bg-[rgba(30,27,46,0.04)] hover:text-[#1E1B2E] transition-colors">
+              <h2 className="font-heading text-[22px] text-[#1E1B2E]">{editingCourseId ? "Edit Global Course" : "Deploy Global Course"}</h2>
+              <button onClick={() => { setShowForm(false); setEditingCourseId(null); }} className="w-[32px] h-[32px] rounded-full flex items-center justify-center text-[#8E8E93] hover:bg-[rgba(30,27,46,0.04)] hover:text-[#1E1B2E] transition-colors">
                 <X size={18} />
               </button>
             </div>
@@ -150,7 +167,7 @@ export default function GlobalCoursesClient({ superadmin, initialCourses }: { su
                     Cancel
                   </button>
                   <button type="submit" disabled={loading} className="flex-1 h-[44px] rounded-xl bg-[#C9A96E] text-[#1E1B2E] font-sans text-[14px] font-medium hover:scale-[1.02] hover:shadow-[0_4px_16px_rgba(201,169,110,0.3)] transition-all flex items-center justify-center">
-                    {loading ? <><Loader2 className="mr-[8px] h-[16px] w-[16px] animate-spin" /> Deploying...</> : "Publish Global Course"}
+                    {loading ? <><Loader2 className="mr-[8px] h-[16px] w-[16px] animate-spin" /> Saving...</> : (editingCourseId ? "Update Global Course" : "Publish Global Course")}
                   </button>
                 </div>
               </form>
@@ -290,7 +307,10 @@ export default function GlobalCoursesClient({ superadmin, initialCourses }: { su
                 </div>
                 
                 <div className="px-[20px] pb-[20px] flex flex-row gap-[10px] mt-auto">
-                  <button className="flex-1 h-[36px] rounded-xl bg-[#C9A96E] text-[#1E1B2E] font-sans text-[13px] font-medium transition-colors hover:brightness-105">
+                  <button 
+                    onClick={() => handleEditClick(course)}
+                    className="flex-1 h-[36px] rounded-xl bg-[#C9A96E] text-[#1E1B2E] font-sans text-[13px] font-medium transition-colors hover:brightness-105"
+                  >
                     Edit
                   </button>
                   <Link href={`/dashboard/teacher/courses/${course.id}`} className="flex-1">

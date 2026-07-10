@@ -20,6 +20,7 @@ import {
   Settings,
   ShieldAlert,
   Shield,
+  PenTool,
 } from "lucide-react";
 import { isCommunityHubEnabled } from "@/lib/features";
 import { SidebarItem, CommunityHubSidebarGroup } from "@/components/ui/SidebarItem";
@@ -68,6 +69,7 @@ export default function StudentSidebar({
           { href: "/dashboard/teacher/courses", label: "Manage Courses", icon: BookOpen },
           { href: "/dashboard/teacher/students", label: "My Students", icon: Users },
           { href: "/dashboard/teacher/institutions", label: "Institutions", icon: School },
+          { href: "/dashboard/teacher/blog", label: "Upload Blog", icon: PenTool },
         ] as NavItem[],
         bottom: [
           { href: "/dashboard/feedback", label: "Give Feedback", icon: Heart },
@@ -94,6 +96,7 @@ export default function StudentSidebar({
           { href: "/dashboard/admin/courses", label: "Global Courses", icon: BookOpen },
           { href: "/dashboard/admin/feedback", label: "Review Feedback", icon: Heart },
           { href: "/dashboard/admin/promote", label: "Promote Admins", icon: ShieldAlert },
+          { href: "/dashboard/admin/blog", label: "Upload Blog", icon: PenTool },
         ] as NavItem[],
         bottom: [
           { href: "/dashboard/feedback", label: "Give Feedback", icon: Heart },
@@ -109,6 +112,7 @@ export default function StudentSidebar({
           { href: "/dashboard/teacher/students", label: "My Students", icon: Users },
           { href: "/dashboard/teacher/institutions", label: "Institutions", icon: School },
           { href: "/dashboard/admin/institute", label: "My Institute", icon: Shield },
+          { href: "/dashboard/teacher/blog", label: "Upload Blog", icon: PenTool },
         ] as NavItem[],
         bottom: [
           { href: "/dashboard/feedback", label: "Give Feedback", icon: Heart },
@@ -139,6 +143,10 @@ export default function StudentSidebar({
     }
     if (href === "/dashboard/student/ai-tutor") {
       return pathname?.startsWith("/dashboard/student/ai-tutor") || pathname?.startsWith("/dashboard/student/aitutor");
+    }
+    if (href === "/dashboard/admin/courses") {
+      return pathname?.startsWith("/dashboard/admin/courses") || 
+             (pathname?.startsWith("/dashboard/teacher/courses/") && pathname !== "/dashboard/teacher/courses");
     }
     if (href === "/") {
       return pathname === "/";

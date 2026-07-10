@@ -93,5 +93,5 @@ export default async function ManageCoursePage({ params }: { params: Promise<{ i
     };
   });
 
-  return <ManageCourseClient course={course} studentsProgress={studentsWithProgress} />;
+  return <ManageCourseClient course={course} studentsProgress={studentsWithProgress} userRole={decoded.role} />;
 }

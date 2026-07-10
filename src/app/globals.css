@@ -142,10 +142,4 @@ img {
 .scrollbar-thin {
   scrollbar-width: thin;
 }
-
-/* Ensure table doesn't break layout on mobile */
-table {
-  display: block;
-  overflow-x: auto;
-  -webkit-overflow-scrolling: touch;
-}
+

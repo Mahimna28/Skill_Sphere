@@ -7,7 +7,9 @@ import Image from "next/image";
 import Link from "next/link";
 import { cn } from "@/lib/utils";
 
-const appleEase = [0.4, 0, 0.2, 1];
+import { Easing } from "framer-motion";
+
+const appleEase: Easing = [0.4, 0, 0.2, 1];
 
 interface Article {
   id: string;
@@ -40,7 +42,34 @@ export default function BlogPageClient() {
       .catch(console.error);
   }, []);
 
-  const categories = ["All", "Learning Science", "Product Updates", "Student Stories", "Industry Trends"];
+  const categories = [
+    "All",
+    "AI & Machine Learning tutorials",
+    "Web Development guides",
+    "Career and internship tips",
+    "Interview preparation articles",
+    "Programming roadmaps",
+    "College admission and scholarship guides",
+    "Industry news and technology updates"
+  ];
+  
+  const categoryImages: Record<string, string> = {
+    "AI & Machine Learning tutorials": "https://images.unsplash.com/photo-1677442136019-21780ecad995?auto=format&fit=crop&q=80&w=1000",
+    "Web Development guides": "https://images.unsplash.com/photo-1633356122544-f134324a6cee?auto=format&fit=crop&q=80&w=1000",
+    "Career and internship tips": "https://images.unsplash.com/photo-1521737604893-d14cc237f11d?auto=format&fit=crop&q=80&w=1000",
+    "Interview preparation articles": "https://images.unsplash.com/photo-1573164713988-8665fc963095?auto=format&fit=crop&q=80&w=1000",
+    "Programming roadmaps": "https://images.unsplash.com/photo-1473341304170-971dccb5ac1e?auto=format&fit=crop&q=80&w=1000",
+    "College admission and scholarship guides": "https://images.unsplash.com/photo-1523050854058-8df90110c9f1?auto=format&fit=crop&q=80&w=1000",
+    "Industry news and technology updates": "https://images.unsplash.com/photo-1504384308090-c894fdcc538d?auto=format&fit=crop&q=80&w=1000",
+    "Default": "https://images.unsplash.com/photo-1456406644174-8ddd4cd52a06?auto=format&fit=crop&q=80&w=1000"
+  };
+
+  const getCoverImage = (article: any) => {
+    if (article.coverImage && article.coverImage !== "" && !article.coverImage.includes("placeholder")) {
+      return article.coverImage;
+    }
+    return categoryImages[article.category] || categoryImages["Default"];
+  };
   const featuredArticle = articles.length > 0 ? articles[0] : null;
   const gridArticles = articles.length > 1 ? articles.slice(1) : [];
 
@@ -98,9 +127,9 @@ export default function BlogPageClient() {
               transition={{ duration: 0.8, ease: appleEase }}
               className="w-full lg:w-[55%] relative rounded-[16px] overflow-hidden shadow-[0_8px_32px_rgba(30,27,46,0.08)] aspect-[16/9] lg:aspect-auto lg:h-[500px]"
             >
-              <motion.div style={{ y: yParallax }} className="absolute inset-0 -top-[100px] -bottom-[100px]">
+                <motion.div style={{ y: yParallax }} className="absolute inset-0 -top-[100px] -bottom-[100px]">
                   <img 
-                    src={featuredArticle.coverImage} 
+                    src={getCoverImage(featuredArticle)} 
                     alt={featuredArticle.title} 
                     className="w-full h-full object-cover transition-transform duration-700 ease-out group-hover:scale-[1.03]"
                   />
@@ -151,6 +180,47 @@ export default function BlogPageClient() {
       </section>
       )}
 
+      {/* EXPLORE TOPICS SECTION */}
+      <section className="py-16 bg-white border-y border-[rgba(30,27,46,0.06)]">
+        <div className="max-w-7xl mx-auto px-4 md:px-8">
+          <div className="flex flex-col items-center text-center mb-10">
+            <h2 className="font-heading text-[32px] text-[#1E1B2E] font-bold">Explore Core Topics</h2>
+            <p className="font-sans text-[16px] text-[#8E8E93] mt-2 max-w-2xl">Dive deep into our curated categories tailored for modern learners, developers, and tech enthusiasts.</p>
+          </div>
+          
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+            {categories.filter(c => c !== "All").map((cat, idx) => (
+              <motion.div
+                key={cat}
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ delay: idx * 0.05 }}
+                onClick={() => {
+                  setSelectedCategory(cat);
+                  const articlesSection = document.getElementById('articles-grid');
+                  if (articlesSection) {
+                    const y = articlesSection.getBoundingClientRect().top + window.scrollY - 100;
+                    window.scrollTo({ top: y, behavior: 'smooth' });
+                  }
+                }}
+                className="cursor-pointer group relative rounded-2xl overflow-hidden aspect-[4/3] shadow-md hover:shadow-xl transition-all duration-300"
+              >
+                <img 
+                  src={categoryImages[cat] || categoryImages["Default"]} 
+                  alt={cat} 
+                  className="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-[#1E1B2E]/90 via-[#1E1B2E]/40 to-transparent"></div>
+                <div className="absolute inset-0 p-6 flex flex-col justify-end">
+                  <h3 className="font-heading text-white text-lg font-bold leading-tight group-hover:text-[#C9A96E] transition-colors">{cat}</h3>
+                </div>
+              </motion.div>
+            ))}
+          </div>
+        </div>
+      </section>
+
       {/* 3. CATEGORY FILTERS */}
       <motion.div 
         initial={{ opacity: 0, y: -10 }}
@@ -179,7 +249,7 @@ export default function BlogPageClient() {
       </motion.div>
 
       {/* 4. ARTICLE GRID */}
-      <section className="py-[60px] flex-1">
+      <section id="articles-grid" className="py-[60px] flex-1">
         <div className="max-w-7xl mx-auto px-4 md:px-8">
           {filteredArticles.length > 0 ? (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
@@ -200,7 +270,7 @@ export default function BlogPageClient() {
                       {/* Image Top */}
                       <div className="w-full aspect-[16/9] relative overflow-hidden bg-[#1E1B2E]">
                         <img 
-                          src={article.coverImage} 
+                          src={getCoverImage(article)} 
                           alt={article.title} 
                           className="w-full h-full object-cover transition-transform duration-700 ease-out group-hover:scale-105"
                         />

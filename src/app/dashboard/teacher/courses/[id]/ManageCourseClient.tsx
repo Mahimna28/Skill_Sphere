@@ -24,7 +24,7 @@ function getEmbedUrl(url: string) {
   return url;
 }
 
-export default function ManageCourseClient({ course, studentsProgress = [] }: { course: any, studentsProgress?: any[] }) {
+export default function ManageCourseClient({ course, studentsProgress = [], userRole }: { course: any, studentsProgress?: any[], userRole?: string }) {
   const router = useRouter();
   const [loading, setLoading] = useState(false);
   const [activeTab, setActiveTab] = useState<"settings" | "curriculum" | "students" | "gradebook" | "assignments">("settings");
@@ -101,7 +101,13 @@ export default function ManageCourseClient({ course, studentsProgress = [] }: { 
     setLoading(true);
     try {
       const res = await fetch(`/api/courses/${course.id}`, { method: "DELETE" });
-      if (res.ok) router.push("/dashboard/teacher/courses");
+      if (res.ok) {
+        if (userRole === "superadmin" || userRole === "admin") {
+          router.push("/dashboard/admin/courses");
+        } else {
+          router.push("/dashboard/teacher/courses");
+        }
+      }
     } finally {
       setLoading(false);
     }
@@ -296,7 +302,7 @@ export default function ManageCourseClient({ course, studentsProgress = [] }: { 
         
         {/* Page Header */}
         <div className="pt-10 px-8 flex items-center gap-4 mb-4">
-          <Link href="/dashboard/teacher/courses">
+          <Link href={userRole === "superadmin" || userRole === "admin" ? "/dashboard/admin/courses" : "/dashboard/teacher/courses"}>
             <button className="w-10 h-10 rounded-full bg-white flex items-center justify-center border border-[rgba(30,27,46,0.1)] shadow-[0_2px_8px_rgba(0,0,0,0.04)] text-[#1E1B2E] hover:bg-[#1E1B2E] hover:text-white transition-all">
               <ArrowLeft size={18} />
             </button>
