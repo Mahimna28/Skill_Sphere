@@ -81,6 +81,7 @@ export default function SettingsClient({ initialUser }: SettingsClientProps) {
   const [experienceYears, setExperienceYears] = useState(initialUser.experienceYears || 0);
   const [qualification, setQualification] = useState(initialUser.qualification || "");
   const [parentNotes, setParentNotes] = useState(initialUser.parentNotes || "");
+  const [childEmail, setChildEmail] = useState("");
   const [isProfilePublic, setIsProfilePublic] = useState(initialUser.isProfilePublic ?? true);
   const [hideFromLeaderboard, setHideFromLeaderboard] = useState(initialUser.hideFromLeaderboard ?? false);
 
@@ -262,11 +263,13 @@ export default function SettingsClient({ initialUser }: SettingsClientProps) {
           parentNotes,
           isProfilePublic,
           hideFromLeaderboard,
+          childEmail
         }),
       });
       const data = await res.json();
       if (res.ok) {
         setUser(data.user);
+        setChildEmail("");
         showToast("Settings saved successfully!", "success");
       } else {
         showToast(data.message || "Failed to save settings", "error");
@@ -647,6 +650,22 @@ export default function SettingsClient({ initialUser }: SettingsClientProps) {
                       className="w-full bg-white border border-[rgba(30,27,46,0.15)] rounded-xl p-3.5 text-sm font-sans text-[#1E1B2E] placeholder-[#8E8E93] focus:outline-none focus:border-[#C9A96E] focus:ring-2 focus:ring-[rgba(201,169,110,0.15)] transition-all min-h-[90px] resize-none"
                       placeholder="Notes on child learning progress and focus areas..."
                     />
+                  </div>
+                  <div className="h-px bg-[rgba(30,27,46,0.06)]" />
+                  <div>
+                    <label className="block text-xs font-sans text-[#8E8E93] mb-2 font-medium">
+                      Link New Child (Email)
+                    </label>
+                    <input
+                      type="text"
+                      value={childEmail}
+                      onChange={(e) => setChildEmail(e.target.value)}
+                      className="w-full bg-white border border-[rgba(30,27,46,0.15)] rounded-xl h-11 px-4 text-sm font-sans text-[#1E1B2E] placeholder-[#8E8E93] focus:outline-none focus:border-[#C9A96E] focus:ring-2 focus:ring-[rgba(201,169,110,0.15)] transition-all"
+                      placeholder="Enter child's Gmail to link them (comma-separated for multiple)"
+                    />
+                    <p className="text-[11px] text-[#8E8E93] mt-1">
+                      Enter the Gmail of an existing Skill Sphere student to add them to your dashboard. Save settings to apply.
+                    </p>
                   </div>
                 </>
               )}

@@ -3,6 +3,7 @@
 import React, { useState, useEffect } from "react";
 import Link from "next/link";
 import { usePathname, useSearchParams } from "next/navigation";
+import { motion } from "framer-motion";
 import { Users, MessageSquare, HelpCircle, MessageCircle } from "lucide-react";
 
 export interface SidebarItemProps {
@@ -22,18 +23,26 @@ export function SidebarItem({
   badge,
 }: SidebarItemProps) {
   return (
-    <Link href={href} className="block">
-      <div className={`sidebar-item-glass ${active ? "active" : ""}`}>
-        <div className="flex items-center gap-3 min-w-0">
+    <Link href={href} className="block relative">
+      {active && (
+        <motion.div
+          layoutId="sidebar-active-indicator"
+          className="absolute inset-0 bg-[rgba(201,169,110,0.08)] border-l-[3px] border-[#C9A96E] rounded-[4px]"
+          initial={false}
+          transition={{ type: "spring", stiffness: 350, damping: 30 }}
+        />
+      )}
+      <div className={`sidebar-item-glass relative z-10 ${active ? "active" : ""}`}>
+        <div className="flex items-center gap-3 min-w-0 w-full">
           <div className="sidebar-icon-badge">
             <Icon size={16} />
           </div>
-          <span className="tracking-tight truncate">{label}</span>
+          <span className="tracking-tight truncate flex-1">{label}</span>
         </div>
 
         {/* Notification Badge */}
         {typeof badge === "number" && badge > 0 && (
-          <span className="px-2 py-0.5 text-[10px] font-black rounded-full bg-gradient-to-r from-[#C9A96E] to-[#E5C992] text-[#1E1B2E] shadow-sm">
+          <span className="px-2 py-0.5 text-[10px] font-black rounded-full bg-gradient-to-r from-[#C9A96E] to-[#E5C992] text-[#1E1B2E] shadow-sm ml-auto shrink-0">
             {badge > 99 ? "99+" : badge}
           </span>
         )}
@@ -42,7 +51,7 @@ export function SidebarItem({
   );
 }
 
-export function CommunityHubSidebarGroup() {
+export function CommunityHubSidebarGroup({ userRole }: { userRole?: string }) {
   const pathname = usePathname();
   const searchParams = useSearchParams();
   const currentTab = searchParams?.get("tab");
@@ -120,29 +129,61 @@ export function CommunityHubSidebarGroup() {
         role="group"
         aria-hidden={!open}
       >
-        <Link
-          href="/dashboard/student/chat"
-          className={`sidebar-child ${isChatActive ? "active" : ""}`}
-          aria-current={isChatActive ? "page" : undefined}
-        >
-          <MessageCircle size={15} className="shrink-0 opacity-80" />
-          <span>Chat</span>
-        </Link>
+        {userRole !== "parent" && (
+          <Link
+            href="/dashboard/student/chat"
+            className={`sidebar-child relative ${isChatActive ? "active" : ""}`}
+            aria-current={isChatActive ? "page" : undefined}
+          >
+            {isChatActive && (
+              <motion.div
+                layoutId="sidebar-active-indicator-child"
+                className="absolute inset-0 bg-[#C9A96E] rounded-md"
+                initial={false}
+                transition={{ type: "spring", stiffness: 350, damping: 30 }}
+              />
+            )}
+            <div className="relative z-10 flex items-center gap-3 min-w-0 w-full">
+              <MessageCircle size={15} className="shrink-0 opacity-80" />
+              <span>Chat</span>
+            </div>
+          </Link>
+        )}
         <Link
           href="/dashboard/qa"
-          className={`sidebar-child ${isForumActive ? "active" : ""}`}
+          className={`sidebar-child relative ${isForumActive ? "active" : ""}`}
           aria-current={isForumActive ? "page" : undefined}
         >
-          <HelpCircle size={15} className="shrink-0 opacity-80" />
-          <span>Forum</span>
+          {isForumActive && (
+            <motion.div
+              layoutId="sidebar-active-indicator-child"
+              className="absolute inset-0 bg-[#C9A96E] rounded-md"
+              initial={false}
+              transition={{ type: "spring", stiffness: 350, damping: 30 }}
+            />
+          )}
+          <div className="relative z-10 flex items-center gap-3 min-w-0 w-full">
+            <HelpCircle size={15} className="shrink-0 opacity-80" />
+            <span>Forum</span>
+          </div>
         </Link>
         <Link
           href="/dashboard/chat/direct"
-          className={`sidebar-child ${isMessagesActive ? "active" : ""}`}
+          className={`sidebar-child relative ${isMessagesActive ? "active" : ""}`}
           aria-current={isMessagesActive ? "page" : undefined}
         >
-          <MessageSquare size={15} className="shrink-0 opacity-80" />
-          <span>Messages</span>
+          {isMessagesActive && (
+            <motion.div
+              layoutId="sidebar-active-indicator-child"
+              className="absolute inset-0 bg-[#C9A96E] rounded-md"
+              initial={false}
+              transition={{ type: "spring", stiffness: 350, damping: 30 }}
+            />
+          )}
+          <div className="relative z-10 flex items-center gap-3 min-w-0 w-full">
+            <MessageSquare size={15} className="shrink-0 opacity-80" />
+            <span>Messages</span>
+          </div>
         </Link>
       </div>
     </div>

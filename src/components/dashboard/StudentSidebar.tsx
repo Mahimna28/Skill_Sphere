@@ -81,7 +81,6 @@ export default function StudentSidebar({
           { href: "/dashboard/parent", label: "Overview", icon: LayoutDashboard },
         ] as NavItem[],
         bottom: [
-          { href: "/dashboard/chat/direct", label: "Messages", icon: MessageSquare },
           { href: "/dashboard/feedback", label: "Give Feedback", icon: Heart },
         ] as NavItem[],
       };
@@ -97,7 +96,6 @@ export default function StudentSidebar({
           { href: "/dashboard/admin/promote", label: "Promote Admins", icon: ShieldAlert },
         ] as NavItem[],
         bottom: [
-          { href: "/dashboard/chat/direct", label: "Messages", icon: MessageSquare },
           { href: "/dashboard/feedback", label: "Give Feedback", icon: Heart },
         ] as NavItem[],
       };
@@ -221,12 +219,10 @@ export default function StudentSidebar({
           </motion.div>
         ))}
 
-        {/* Community Hub only for students, teachers, and institute admins */}
-        {(userRole === "student" || userRole === "teacher" || userRole === "institute_admin") && (
-          <motion.div variants={navItemVariants as any}>
-            <CommunityHubSidebarGroup />
-          </motion.div>
-        )}
+        {/* Community Hub for everyone */}
+        <motion.div variants={navItemVariants as any}>
+          <CommunityHubSidebarGroup userRole={userRole} />
+        </motion.div>
 
         <div className="my-2 border-t border-[rgba(255,255,255,0.08)] mx-2" />
 

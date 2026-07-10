@@ -34,13 +34,15 @@ export async function POST(req: Request) {
     }
 
     // 3. Special logic for Parent role
-    let childId = null;
+    let childIds: { id: string }[] = [];
     if (role === "parent" && childEmail) {
-       const child = await prisma.user.findUnique({ where: { email: childEmail } });
-       if (!child || child.role !== "student") {
-         return NextResponse.json({ message: "Invalid child account" }, { status: 400 });
+       const emails = childEmail.split(",").map((e: string) => e.trim()).filter((e: string) => e);
+       const children = await prisma.user.findMany({ where: { email: { in: emails }, role: "student" } });
+       
+       if (children.length !== emails.length) {
+         return NextResponse.json({ message: "One or more child accounts are invalid or not students" }, { status: 400 });
        }
-       childId = child.id;
+       childIds = children.map(c => ({ id: c.id }));
     }
 
     // 4. Determine final role — block manual superadmin/institute_admin attempts
@@ -60,7 +62,7 @@ export async function POST(req: Request) {
         email,
         password: hashedPassword,
         role: finalRole,
-        ...(childId ? { children: { connect: { id: childId } } } : {}),
+        ...(childIds.length > 0 ? { children: { connect: childIds } } : {}),
       },
     });
 

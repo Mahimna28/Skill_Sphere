@@ -355,18 +355,47 @@ export default function RegisterPage() {
 
               <form onSubmit={handleDetailsSubmit} className="space-y-4">
                 {formData.role === "parent" ? (
-                  <div className="space-y-1">
+                  <div className="space-y-3">
                     <Label className="font-sans text-[12px] uppercase tracking-[0.1em] text-[#8E8E93] flex items-center gap-1.5">
                       <Baby size={14} /> Link to Child's Account
                     </Label>
-                    <Input 
-                      type="email" required 
-                      placeholder="Enter your child's Gmail"
-                      className="h-[48px] bg-white border border-[rgba(30,27,46,0.08)] rounded-xl font-sans text-[15px] text-[#1E1B2E] placeholder:text-[#8E8E93] focus-visible:ring-0 focus-visible:border-[#C9A96E] focus-visible:shadow-[0_0_0_3px_rgba(201,169,110,0.15)] transition-all px-4"
-                      value={formData.childEmail}
-                      onChange={e => setFormData({ ...formData, childEmail: e.target.value })}
-                    />
-                    <p className="text-[11px] text-[#8E8E93] mt-1">Your child must already have a student account on Skill Sphere.</p>
+                    
+                    {formData.childEmail.split(",").map((email, idx, arr) => (
+                      <div key={idx} className="flex gap-2">
+                        <Input 
+                          type="email" required 
+                          placeholder="Enter your child's Gmail"
+                          className="h-[48px] flex-1 bg-white border border-[rgba(30,27,46,0.08)] rounded-xl font-sans text-[15px] text-[#1E1B2E] placeholder:text-[#8E8E93] focus-visible:ring-0 focus-visible:border-[#C9A96E] focus-visible:shadow-[0_0_0_3px_rgba(201,169,110,0.15)] transition-all px-4"
+                          value={email}
+                          onChange={e => {
+                            const newEmails = [...arr];
+                            newEmails[idx] = e.target.value;
+                            setFormData({ ...formData, childEmail: newEmails.join(",") });
+                          }}
+                        />
+                        {arr.length > 1 && (
+                          <button 
+                            type="button" 
+                            onClick={() => {
+                              const newEmails = arr.filter((_, i) => i !== idx);
+                              setFormData({ ...formData, childEmail: newEmails.join(",") });
+                            }}
+                            className="w-[48px] h-[48px] rounded-xl flex items-center justify-center bg-red-50 text-red-500 hover:bg-red-100 transition-colors"
+                          >
+                            ×
+                          </button>
+                        )}
+                      </div>
+                    ))}
+                    
+                    <button 
+                      type="button" 
+                      onClick={() => setFormData({ ...formData, childEmail: formData.childEmail ? formData.childEmail + "," : "," })}
+                      className="text-[#C9A96E] font-medium text-[13px] hover:underline flex items-center gap-1"
+                    >
+                      + Add another child
+                    </button>
+                    <p className="text-[11px] text-[#8E8E93] mt-1">Your children must already have student accounts on Skill Sphere.</p>
                   </div>
                 ) : (
                   <div className="py-6 text-center text-[#8E8E93] font-sans text-[14px]">

@@ -100,7 +100,8 @@ export async function PUT(req: Request) {
     const {
       name, username, connectGoogle, disconnectGoogle,
       bio, skills, learningGoal, degree, specialization, expertise,
-      experienceYears, qualification, parentNotes, isProfilePublic, hideFromLeaderboard
+      experienceYears, qualification, parentNotes, isProfilePublic, hideFromLeaderboard,
+      childEmail
     } = body;
 
     const user = await prisma.user.findUnique({
@@ -148,6 +149,19 @@ export async function PUT(req: Request) {
       updateData.googleId = `google_${user.id}_${Date.now()}`;
     } else if (disconnectGoogle) {
       updateData.googleId = null;
+    }
+
+    if (childEmail && user.role === "parent") {
+      const emails = childEmail.split(",").map((e: string) => e.trim()).filter((e: string) => e);
+      const children = await prisma.user.findMany({ where: { email: { in: emails }, role: "student" } });
+      
+      const missingEmails = emails.filter((e: string) => !children.some(c => c.email.toLowerCase() === e.toLowerCase()));
+      if (missingEmails.length > 0) {
+        return NextResponse.json({ message: `One or more child accounts are invalid or not students: ${missingEmails.join(', ')}` }, { status: 400 });
+      }
+      if (children.length > 0) {
+        updateData.children = { connect: children.map(c => ({ id: c.id })) };
+      }
     }
 
     const updated = await prisma.user.update({

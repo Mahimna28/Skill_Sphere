@@ -41,7 +41,7 @@ import "./hub.css";
 
 interface Props {
   enrollments: any[];
-  currentUser: { id: string; name: string };
+  currentUser: { id: string; name: string; role?: string };
 }
 
 export default function CommunityHubClient({ enrollments, currentUser }: Props) {
@@ -50,11 +50,11 @@ export default function CommunityHubClient({ enrollments, currentUser }: Props) 
   const pathname = usePathname();
   const prefersReduced = useReducedMotion() ?? false;
 
-  // Determine active tab from URL search params (or fallback to 'chat')
+  // Determine active tab from URL search params (or fallback to 'chat' for non-parents, 'forum' for parents)
   const tabParam = searchParams?.get("tab") as "chat" | "forum" | "messages" | null;
   const roomParam = searchParams?.get("room");
   const [activeTab, setActiveTab] = useState<"chat" | "forum" | "messages">(
-    tabParam === "forum" || tabParam === "messages" ? tabParam : "chat"
+    tabParam === "forum" || tabParam === "messages" ? tabParam : (currentUser.role === "parent" ? "forum" : "chat")
   );
 
   // Floating Slide-Over Panels state
@@ -148,12 +148,14 @@ export default function CommunityHubClient({ enrollments, currentUser }: Props) 
             The unified inline community workspace is gated behind an experimental feature flag. Enable <code className="bg-[#1E1B2E]/10 px-1.5 py-0.5 rounded text-xs">NEXT_PUBLIC_FEATURE_COMMUNITY_HUB=true</code> to access this experience.
           </p>
           <div className="flex flex-wrap justify-center gap-3">
-            <button
-              onClick={() => router.push("/dashboard/student/chat")}
-              className="h-10 px-5 rounded-xl bg-[#1E1B2E] text-[#C9A96E] font-bold text-xs flex items-center gap-2 cursor-pointer shadow-sm"
-            >
-              <MessageSquare size={14} /> Course Chat
-            </button>
+            {currentUser.role !== "parent" && (
+              <button
+                onClick={() => router.push("/dashboard/student/chat")}
+                className="h-10 px-5 rounded-xl bg-[#1E1B2E] text-[#C9A96E] font-bold text-xs flex items-center gap-2 cursor-pointer shadow-sm"
+              >
+                <MessageSquare size={14} /> Course Chat
+              </button>
+            )}
             <button
               onClick={() => router.push("/dashboard/qa")}
               className="h-10 px-5 rounded-xl bg-[#1E1B2E] text-[#C9A96E] font-bold text-xs flex items-center gap-2 cursor-pointer shadow-sm"
@@ -172,7 +174,10 @@ export default function CommunityHubClient({ enrollments, currentUser }: Props) 
     );
   }
 
-  const tabs = [
+  const tabs = currentUser.role === "parent" ? [
+    { id: "forum" as const, label: "Q&A Forum", icon: HelpCircle },
+    { id: "messages" as const, label: "Messages", icon: Send },
+  ] : [
     { id: "chat" as const, label: "Course Chat", icon: MessageSquare, badge: "Live" },
     { id: "forum" as const, label: "Q&A Forum", icon: HelpCircle },
     { id: "messages" as const, label: "Messages", icon: Send },

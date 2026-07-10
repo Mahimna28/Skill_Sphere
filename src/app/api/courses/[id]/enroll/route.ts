@@ -25,23 +25,26 @@ export async function POST(req: Request, { params }: { params: Promise<{ id: str
       if (!course || course.teacherId !== decoded.id) return NextResponse.json({ message: "Forbidden" }, { status: 403 });
 
       // --- Institution checks ---
-      const teacher = await prisma.user.findUnique({ where: { id: decoded.id }, select: { institutionId: true } });
+      const teacher = await prisma.user.findUnique({ where: { id: decoded.id }, select: { institutionId: true, departmentId: true } });
       if (!teacher?.institutionId) {
         return NextResponse.json({ message: "You must belong to an institution before enrolling students." }, { status: 400 });
       }
 
-      const student = await prisma.user.findUnique({ where: { email }, select: { id: true, institutionId: true } });
+      const student = await prisma.user.findUnique({ where: { email }, select: { id: true, institutionId: true, departmentId: true } });
       if (!student) return NextResponse.json({ message: "No student found with this email. They must register first." }, { status: 404 });
 
       if (student.institutionId && student.institutionId !== teacher.institutionId) {
         return NextResponse.json({ message: "This student already belongs to a different institution and cannot be added to your class." }, { status: 400 });
       }
 
-      // Auto-assign student to teacher's institution if they have none
-      if (!student.institutionId) {
+      // Auto-assign student to teacher's institution and department if they have none
+      if (!student.institutionId || !student.departmentId) {
         await prisma.user.update({
           where: { id: student.id },
-          data: { institutionId: teacher.institutionId },
+          data: { 
+            institutionId: student.institutionId || teacher.institutionId,
+            departmentId: student.departmentId || teacher.departmentId
+          },
         });
       }
 

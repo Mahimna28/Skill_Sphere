@@ -138,7 +138,7 @@ export default function CoursePlayerClient({
     },
   };
 
-  if (!activeLesson) {
+  if (!activeLesson && (!course.assignments || course.assignments.length === 0)) {
     return (
       <motion.div
         initial="hidden"
@@ -481,148 +481,156 @@ export default function CoursePlayerClient({
           </div>
         </div>
 
-        <h2
-          className="text-3xl md:text-4xl font-extrabold text-[#1E1B2E] tracking-tight"
-          style={{ fontFamily: "var(--font-heading, serif)" }}
-        >
-          {activeLesson.title}
-        </h2>
-
-        {/* Video Player or Notes Only View */}
-        {activeLesson.videoUrl ? (
-          <div className="aspect-video w-full bg-[#1E1B2E] rounded-2xl overflow-hidden shadow-[0_12px_40px_rgba(30,27,46,0.12)] border border-white/10 relative group">
-            <iframe
-              src={activeLesson.videoUrl}
-              className="w-full h-full"
-              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-              allowFullScreen
-            ></iframe>
-          </div>
-        ) : (
-          <div className="aspect-[21/9] w-full bg-white/70 backdrop-blur-xl border border-[#1E1B2E]/10 border-dashed rounded-2xl flex flex-col items-center justify-center text-center p-8">
-            <div className="w-16 h-16 rounded-2xl bg-[#C9A96E]/15 border border-[#C9A96E]/30 flex items-center justify-center mb-4">
-              <BookText size={32} className="text-[#C9A96E]" />
-            </div>
-            <p
-              className="text-lg font-extrabold text-[#1E1B2E]"
+        {activeLesson ? (
+          <>
+            <h2
+              className="text-3xl md:text-4xl font-extrabold text-[#1E1B2E] tracking-tight"
               style={{ fontFamily: "var(--font-heading, serif)" }}
             >
-              Lecture Notes Only
-            </p>
-            <p className="text-sm font-medium text-[#8E8E93] mt-1">
-              This lesson is reading-based. No video content available.
-            </p>
-          </div>
-        )}
+              {activeLesson.title}
+            </h2>
 
-        {/* Lesson Overview Card */}
-        <div className="rounded-2xl bg-white/70 backdrop-blur-xl border border-white/60 shadow-[0_8px_30px_rgba(30,27,46,0.05)] p-8 space-y-4 relative overflow-hidden">
-          <div className="absolute top-0 right-0 w-64 h-64 bg-[#C9A96E]/8 rounded-full blur-3xl pointer-events-none" />
-
-          <h3
-            className="text-xl font-extrabold text-[#1E1B2E] relative z-10"
-            style={{ fontFamily: "var(--font-heading, serif)" }}
-          >
-            Lesson Overview
-          </h3>
-          <div className="w-12 h-1 rounded-full bg-[#C9A96E]" />
-          <p className="text-base font-medium text-[#1E1B2E]/70 leading-relaxed relative z-10">
-            {activeLesson.content ||
-              "This lesson contains essential information to build your foundation in this subject."}
-          </p>
-
-          {activeLesson.fileUrl && (
-            <div className="mt-8 p-6 bg-[#C9A96E]/10 border border-[#C9A96E]/25 rounded-2xl flex flex-col md:flex-row items-center justify-between gap-6 relative z-10">
-              <div className="flex items-center gap-4 text-center md:text-left">
-                <div className="w-14 h-14 bg-white/80 border border-[#C9A96E]/30 rounded-xl flex items-center justify-center shadow-sm shrink-0">
-                  <File size={28} className="text-[#C9A96E]" />
-                </div>
-                <div>
-                  <h4 className="font-extrabold text-sm text-[#1E1B2E] uppercase tracking-wider">
-                    Academic Materials Attached
-                  </h4>
-                  <p className="text-xs font-bold text-[#8E8E93] uppercase">
-                    {activeLesson.fileType || "Document"} FILE READY
-                  </p>
-                </div>
+            {/* Video Player or Notes Only View */}
+            {activeLesson.videoUrl ? (
+              <div className="aspect-video w-full bg-[#1E1B2E] rounded-2xl overflow-hidden shadow-[0_12px_40px_rgba(30,27,46,0.12)] border border-white/10 relative group">
+                <iframe
+                  src={activeLesson.videoUrl}
+                  className="w-full h-full"
+                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                  allowFullScreen
+                ></iframe>
               </div>
-              <a href={activeLesson.fileUrl} download className="w-full md:w-auto">
+            ) : (
+              <div className="aspect-[21/9] w-full bg-white/70 backdrop-blur-xl border border-[#1E1B2E]/10 border-dashed rounded-2xl flex flex-col items-center justify-center text-center p-8">
+                <div className="w-16 h-16 rounded-2xl bg-[#C9A96E]/15 border border-[#C9A96E]/30 flex items-center justify-center mb-4">
+                  <BookText size={32} className="text-[#C9A96E]" />
+                </div>
+                <p
+                  className="text-lg font-extrabold text-[#1E1B2E]"
+                  style={{ fontFamily: "var(--font-heading, serif)" }}
+                >
+                  Lecture Notes Only
+                </p>
+                <p className="text-sm font-medium text-[#8E8E93] mt-1">
+                  This lesson is reading-based. No video content available.
+                </p>
+              </div>
+            )}
+
+            {/* Lesson Overview Card */}
+            <div className="rounded-2xl bg-white/70 backdrop-blur-xl border border-white/60 shadow-[0_8px_30px_rgba(30,27,46,0.05)] p-8 space-y-4 relative overflow-hidden">
+              <div className="absolute top-0 right-0 w-64 h-64 bg-[#C9A96E]/8 rounded-full blur-3xl pointer-events-none" />
+
+              <h3
+                className="text-xl font-extrabold text-[#1E1B2E] relative z-10"
+                style={{ fontFamily: "var(--font-heading, serif)" }}
+              >
+                Lesson Overview
+              </h3>
+              <div className="w-12 h-1 rounded-full bg-[#C9A96E]" />
+              <p className="text-base font-medium text-[#1E1B2E]/70 leading-relaxed relative z-10">
+                {activeLesson.content ||
+                  "This lesson contains essential information to build your foundation in this subject."}
+              </p>
+
+              {activeLesson.fileUrl && (
+                <div className="mt-8 p-6 bg-[#C9A96E]/10 border border-[#C9A96E]/25 rounded-2xl flex flex-col md:flex-row items-center justify-between gap-6 relative z-10">
+                  <div className="flex items-center gap-4 text-center md:text-left">
+                    <div className="w-14 h-14 bg-white/80 border border-[#C9A96E]/30 rounded-xl flex items-center justify-center shadow-sm shrink-0">
+                      <File size={28} className="text-[#C9A96E]" />
+                    </div>
+                    <div>
+                      <h4 className="font-extrabold text-sm text-[#1E1B2E] uppercase tracking-wider">
+                        Academic Materials Attached
+                      </h4>
+                      <p className="text-xs font-bold text-[#8E8E93] uppercase">
+                        {activeLesson.fileType || "Document"} FILE READY
+                      </p>
+                    </div>
+                  </div>
+                  <a href={activeLesson.fileUrl} download className="w-full md:w-auto">
+                    <motion.button
+                      whileHover={shouldReduceMotion ? {} : { scale: 1.02 }}
+                      whileTap={shouldReduceMotion ? {} : { scale: 0.98 }}
+                      className="w-full h-12 px-6 rounded-xl bg-[#C9A96E] hover:bg-[#D6B87D] text-[#1E1B2E] font-bold text-sm uppercase flex items-center justify-center gap-2 cursor-pointer shadow-[0_4px_14px_rgba(201,169,110,0.3)] transition-all"
+                    >
+                      <Download size={18} /> Download Materials
+                    </motion.button>
+                  </a>
+                </div>
+              )}
+
+              <div className="pt-6 flex justify-between items-center border-t border-[#1E1B2E]/10 relative z-10 flex-wrap gap-4">
                 <motion.button
                   whileHover={shouldReduceMotion ? {} : { scale: 1.02 }}
                   whileTap={shouldReduceMotion ? {} : { scale: 0.98 }}
-                  className="w-full h-12 px-6 rounded-xl bg-[#C9A96E] hover:bg-[#D6B87D] text-[#1E1B2E] font-bold text-sm uppercase flex items-center justify-center gap-2 cursor-pointer shadow-[0_4px_14px_rgba(201,169,110,0.3)] transition-all"
+                  className="h-11 px-5 rounded-xl bg-white/80 border border-[#1E1B2E]/15 text-[#1E1B2E] font-bold text-sm cursor-pointer hover:shadow-md transition-all disabled:opacity-40 disabled:cursor-not-allowed"
+                  disabled={allLessons.findIndex((l: any) => l.id === activeLesson?.id) === 0}
+                  onClick={handlePrevious}
                 >
-                  <Download size={18} /> Download Materials
+                  Previous Lesson
                 </motion.button>
-              </a>
-            </div>
-          )}
 
-          <div className="pt-6 flex justify-between items-center border-t border-[#1E1B2E]/10 relative z-10 flex-wrap gap-4">
-            <motion.button
-              whileHover={shouldReduceMotion ? {} : { scale: 1.02 }}
-              whileTap={shouldReduceMotion ? {} : { scale: 0.98 }}
-              className="h-11 px-5 rounded-xl bg-white/80 border border-[#1E1B2E]/15 text-[#1E1B2E] font-bold text-sm cursor-pointer hover:shadow-md transition-all disabled:opacity-40 disabled:cursor-not-allowed"
-              disabled={allLessons.findIndex((l: any) => l.id === activeLesson?.id) === 0}
-              onClick={handlePrevious}
-            >
-              Previous Lesson
-            </motion.button>
-
-            {earnedCertificate ? (
-              <div className="flex items-center gap-3">
-                <div className="px-4 h-11 rounded-xl bg-[#22C55E]/10 text-[#22C55E] font-bold text-sm flex items-center gap-2 border border-[#22C55E]/20">
-                  <CheckCircle2 size={16} /> Completed
-                </div>
-                <Link href={`/certificates/${earnedCertificate.id}`} target="_blank">
-                  <motion.button
-                    whileHover={shouldReduceMotion ? {} : { scale: 1.02 }}
-                    whileTap={shouldReduceMotion ? {} : { scale: 0.98 }}
-                    className="h-11 px-5 rounded-xl bg-[#C9A96E] hover:bg-[#D6B87D] text-[#1E1B2E] font-bold text-sm shadow-[0_4px_14px_rgba(201,169,110,0.3)] flex items-center gap-2 transition-all cursor-pointer"
-                  >
-                    <Download size={16} /> Download Certificate
-                  </motion.button>
-                </Link>
-              </div>
-            ) : localCompletedIds.includes(activeLesson.id) ? (
-              <div className="flex items-center gap-3">
-                <div className="px-4 h-11 rounded-xl bg-[#22C55E]/10 text-[#22C55E] font-bold text-sm flex items-center gap-2">
-                  <CheckCircle2 size={16} /> Lesson Completed
-                </div>
-                {!isLastLesson && (
-                  <motion.button
-                    whileHover={shouldReduceMotion ? {} : { scale: 1.02 }}
-                    whileTap={shouldReduceMotion ? {} : { scale: 0.98 }}
-                    className="h-11 px-6 rounded-xl bg-[#C9A96E] hover:bg-[#D6B87D] text-[#1E1B2E] font-bold text-sm cursor-pointer shadow-[0_4px_14px_rgba(201,169,110,0.3)] flex items-center gap-2 transition-all"
-                    onClick={() => {
-                      const nextIndex = allLessons.findIndex((l: any) => l.id === activeLesson.id) + 1;
-                      if (nextIndex < allLessons.length) setActiveLesson(allLessons[nextIndex]);
-                    }}
-                  >
-                    Next Lesson <ChevronRight size={16} />
-                  </motion.button>
-                )}
-              </div>
-            ) : (
-              <motion.button
-                whileHover={shouldReduceMotion ? {} : { scale: 1.02 }}
-                whileTap={shouldReduceMotion ? {} : { scale: 0.98 }}
-                className="h-11 px-6 rounded-xl bg-[#22C55E] hover:bg-[#1DB954] text-white font-bold text-sm cursor-pointer shadow-[0_4px_14px_rgba(34,197,94,0.3)] flex items-center gap-2 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
-                onClick={handleComplete}
-                disabled={loading}
-              >
-                {loading ? (
-                  <>
-                    <motion.div animate={{ rotate: 360 }} transition={{ repeat: Infinity, duration: 1 }} className="w-4 h-4 border-2 border-white border-t-transparent rounded-full" />
-                    Completing...
-                  </>
+                {earnedCertificate ? (
+                  <div className="flex items-center gap-3">
+                    <div className="px-4 h-11 rounded-xl bg-[#22C55E]/10 text-[#22C55E] font-bold text-sm flex items-center gap-2 border border-[#22C55E]/20">
+                      <CheckCircle2 size={16} /> Completed
+                    </div>
+                    <Link href={`/certificates/${earnedCertificate.id}`} target="_blank">
+                      <motion.button
+                        whileHover={shouldReduceMotion ? {} : { scale: 1.02 }}
+                        whileTap={shouldReduceMotion ? {} : { scale: 0.98 }}
+                        className="h-11 px-5 rounded-xl bg-[#C9A96E] hover:bg-[#D6B87D] text-[#1E1B2E] font-bold text-sm shadow-[0_4px_14px_rgba(201,169,110,0.3)] flex items-center gap-2 transition-all cursor-pointer"
+                      >
+                        <Download size={16} /> Download Certificate
+                      </motion.button>
+                    </Link>
+                  </div>
+                ) : localCompletedIds.includes(activeLesson.id) ? (
+                  <div className="flex items-center gap-3">
+                    <div className="px-4 h-11 rounded-xl bg-[#22C55E]/10 text-[#22C55E] font-bold text-sm flex items-center gap-2">
+                      <CheckCircle2 size={16} /> Lesson Completed
+                    </div>
+                    {!isLastLesson && (
+                      <motion.button
+                        whileHover={shouldReduceMotion ? {} : { scale: 1.02 }}
+                        whileTap={shouldReduceMotion ? {} : { scale: 0.98 }}
+                        className="h-11 px-6 rounded-xl bg-[#C9A96E] hover:bg-[#D6B87D] text-[#1E1B2E] font-bold text-sm cursor-pointer shadow-[0_4px_14px_rgba(201,169,110,0.3)] flex items-center gap-2 transition-all"
+                        onClick={() => {
+                          const nextIndex = allLessons.findIndex((l: any) => l.id === activeLesson.id) + 1;
+                          if (nextIndex < allLessons.length) setActiveLesson(allLessons[nextIndex]);
+                        }}
+                      >
+                        Next Lesson <ChevronRight size={16} />
+                      </motion.button>
+                    )}
+                  </div>
                 ) : (
-                  <>{isLastLesson ? "Finish Course" : "Complete & Next"}</>
+                  <motion.button
+                    whileHover={shouldReduceMotion ? {} : { scale: 1.02 }}
+                    whileTap={shouldReduceMotion ? {} : { scale: 0.98 }}
+                    onClick={handleComplete}
+                    disabled={loading}
+                    className="h-11 px-8 rounded-xl bg-[#1E1B2E] hover:bg-[#2D2844] text-white font-bold text-sm cursor-pointer shadow-[0_4px_14px_rgba(30,27,46,0.25)] flex items-center gap-2 transition-all disabled:opacity-70 disabled:cursor-not-allowed"
+                  >
+                    {loading ? (
+                      <motion.div animate={{ rotate: 360 }} transition={{ repeat: Infinity, duration: 1 }} className="w-4 h-4 border-2 border-white border-t-transparent rounded-full" />
+                    ) : (
+                      <CheckCircle2 size={18} />
+                    )}
+                    Mark as Complete
+                  </motion.button>
                 )}
-              </motion.button>
-            )}
+              </div>
+            </div>
+          </>
+        ) : (
+          <div className="rounded-2xl bg-white/70 backdrop-blur-xl border border-white/60 shadow-[0_8px_30px_rgba(30,27,46,0.05)] p-12 text-center">
+             <BookText size={48} className="text-[#C9A96E] mx-auto mb-4 opacity-50" />
+             <h3 className="text-xl font-extrabold text-[#1E1B2E] mb-2" style={{ fontFamily: "var(--font-heading, serif)" }}>No Lessons Yet</h3>
+             <p className="text-sm font-medium text-[#8E8E93]">The teacher hasn't uploaded any video or reading lessons yet. Please check out the assignments below.</p>
           </div>
-        </div>
+        )}
 
         {/* Assignments Section */}
         {course.assignments && course.assignments.length > 0 && (
@@ -653,9 +661,24 @@ export default function CoursePlayerClient({
                       <p className="text-xs font-bold text-red-500 mb-1.5 flex items-center gap-1">
                         Due: {new Date(assignment.dueDate).toLocaleString()}
                       </p>
-                      <p className="text-sm font-medium text-[#8E8E93]">
-                        {assignment.description}
-                      </p>
+                      {(() => {
+                        const match = assignment.description.match(/\*\*Attached Document:\*\* \[Download File\]\((.*?)\)/);
+                        const fileUrl = match ? match[1] : null;
+                        const cleanDescription = match ? assignment.description.replace(match[0], '').trim() : assignment.description;
+                        
+                        return (
+                          <div className="space-y-3 mt-2">
+                            <p className="text-sm font-medium text-[#8E8E93]">
+                              {cleanDescription}
+                            </p>
+                            {fileUrl && (
+                              <a href={fileUrl} download className="inline-flex items-center gap-2 px-3 py-1.5 rounded-lg bg-[#C9A96E]/10 hover:bg-[#C9A96E]/20 text-[#C9A96E] text-xs font-bold transition-colors w-fit border border-[#C9A96E]/20">
+                                <Download size={14} /> Download Attached Document
+                              </a>
+                            )}
+                          </div>
+                        );
+                      })()}
                       {/* Show grade & feedback if graded */}
                       {submission?.grade != null && (
                         <div className="mt-3 p-3 bg-[rgba(201,169,110,0.08)] border border-[rgba(201,169,110,0.2)] rounded-xl">

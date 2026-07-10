@@ -37,8 +37,7 @@ export default async function StudentCourses() {
   const enrolledIds = enrollments.map((e) => e.courseId);
   const pendingLeaveCourseIds = leaveRequests.map((r) => r.courseId);
 
-  // Calculate progress for each course
-  const enrolledCourses = allCourses.filter(c => enrolledIds.includes(c.id)).map(course => {
+  const enrolledAll = allCourses.filter(c => enrolledIds.includes(c.id)).map(course => {
     const totalLessons = course.modules.reduce((sum, mod) => sum + mod._count.lessons, 0);
     const courseModuleIds = course.modules.map(m => m.id);
     const completedLessons = lessonCompletions.filter(lc => courseModuleIds.includes(lc.lesson.moduleId)).length;
@@ -53,10 +52,14 @@ export default async function StudentCourses() {
     };
   });
 
+  const enrolledCourses = enrolledAll.filter(c => c.isPublic);
+  const enrolledClasses = enrolledAll.filter(c => !c.isPublic);
+
   return (
     <div className="space-y-8 max-w-7xl mx-auto pb-12 font-sans">
       <CoursesClient
         courses={enrolledCourses}
+        classes={enrolledClasses}
         enrolledIds={enrolledIds}
         pendingLeaveCourseIds={pendingLeaveCourseIds}
       />

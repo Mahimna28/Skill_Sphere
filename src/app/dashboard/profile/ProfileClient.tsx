@@ -26,26 +26,19 @@ export default function ProfileClient({ user, roleData }: { user: any, roleData:
       icon: CheckCircle2,
       color: "bg-[#22C55E]/15 border-[#22C55E]/30 text-[#22C55E]",
     },
-    ...(user.enrollments && user.enrollments.length > 0
-      ? [
-          {
-            id: "enrolled",
-            type: "learning",
-            title: "Enrolled in Course",
-            desc: user.enrollments[0].course?.title || "Active Learning Path",
-            icon: BookOpen,
-            color: "bg-[#1E1B2E] text-[#C9A96E]",
-          },
-        ]
-      : []),
+
     ...(roleData?.recentActivity
-      ? roleData.recentActivity.slice(0, 3).map((act: any, i: number) => ({
-          id: `role-act-${i}`,
-          type: "learning",
-          title: act.course?.title ? `Studying: ${act.course.title}` : "Course Activity",
-          desc: `Progress: ${act.progress || 0}%`,
-          icon: TrendingUp,
-          color: "bg-[#C9A96E]/20 text-[#1E1B2E]",
+      ? roleData.recentActivity.map((act: any) => ({
+          id: act.id,
+          type: act.type,
+          title: act.title,
+          desc: act.desc,
+          icon: act.iconType === "certificate" ? Award : act.iconType === "score" ? Star : BookOpen,
+          color: act.iconType === "certificate" 
+            ? "bg-[#C9A96E]/20 text-[#C9A96E]" 
+            : act.iconType === "score"
+            ? "bg-[#22C55E]/15 text-[#22C55E]"
+            : "bg-[#1E1B2E] text-[#C9A96E]",
         }))
       : []),
     {

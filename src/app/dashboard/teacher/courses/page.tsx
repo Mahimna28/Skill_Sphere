@@ -13,13 +13,21 @@ export default async function TeacherCoursesPage() {
     redirect("/login");
   }
 
-  const courses = decoded?.id
+  const allCourses = decoded?.id
     ? await prisma.course.findMany({
-        where: { teacherId: decoded.id },
+        where: {
+          OR: [
+            { teacherId: decoded.id },
+            { coTeachers: { some: { id: decoded.id } } }
+          ]
+        },
         include: { _count: { select: { enrollments: true } } },
         orderBy: { createdAt: "desc" },
       })
     : [];
 
-  return <TeacherCoursesClient courses={courses} />;
+  const publicCourses = allCourses.filter(c => c.isPublic);
+  const privateClasses = allCourses.filter(c => !c.isPublic);
+
+  return <TeacherCoursesClient courses={publicCourses} classes={privateClasses} />;
 }

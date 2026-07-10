@@ -3,26 +3,38 @@
 import { useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { BookOpen, Plus, Loader2, X, Globe, Lock, Users, Sparkles, Upload } from "lucide-react";
+import { BookOpen, Plus, Loader2, X, Globe, Lock, Users, Sparkles, Upload, GraduationCap, Copy, CheckCheck } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 
 const SUBJECTS = ["AI & ML", "Python", "Web Dev", "Mathematics", "Physics", "History", "Literature", "Other"];
 
 interface Props {
   courses: any[];
+  classes: any[];
 }
 
-export default function TeacherCoursesClient({ courses: initialCourses }: Props) {
+export default function TeacherCoursesClient({ courses: initialCourses, classes: initialClasses }: Props) {
   const router = useRouter();
   const [courses, setCourses] = useState(initialCourses);
+  const [classes, setClasses] = useState(initialClasses);
+  const [activeTab, setActiveTab] = useState<"courses" | "classes">("courses");
   const [showForm, setShowForm] = useState(false);
+  const [showClassForm, setShowClassForm] = useState(false);
   const [loading, setLoading] = useState(false);
   const [toast, setToast] = useState<{ message: string; type: "success" | "error" } | null>(null);
   const [form, setForm] = useState({ title: "", description: "", subject: "Python", thumbnail: "", isPublic: true });
+  const [classForm, setClassForm] = useState({ title: "", description: "", subject: "Python", section: "", room: "" });
+  const [codeCopied, setCodeCopied] = useState<string | null>(null);
 
   const showToast = (message: string, type: "success" | "error") => {
     setToast({ message, type });
     setTimeout(() => setToast(null), 3500);
+  };
+
+  const copyCode = (code: string) => {
+    navigator.clipboard.writeText(code);
+    setCodeCopied(code);
+    setTimeout(() => setCodeCopied(null), 2000);
   };
 
   const handleCreate = async (e: React.FormEvent) => {
@@ -43,6 +55,32 @@ export default function TeacherCoursesClient({ courses: initialCourses }: Props)
         router.refresh();
       } else {
         showToast(data.message || "Failed to create course", "error");
+      }
+    } catch {
+      showToast("Network error. Please try again.", "error");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleCreateClass = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setLoading(true);
+    try {
+      const res = await fetch("/api/courses", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ ...classForm, isPublic: false }),
+      });
+      const data = await res.json();
+      if (res.ok) {
+        setClasses(prev => [data.course || data, ...prev]);
+        setClassForm({ title: "", description: "", subject: "Python", section: "", room: "" });
+        setShowClassForm(false);
+        showToast("✅ Class created! Share the code with students.", "success");
+        router.refresh();
+      } else {
+        showToast(data.message || "Failed to create class", "error");
       }
     } catch {
       showToast("Network error. Please try again.", "error");
@@ -72,21 +110,52 @@ export default function TeacherCoursesClient({ courses: initialCourses }: Props)
         <div className="pt-12 px-8 flex flex-col md:flex-row md:items-end justify-between gap-6">
           <div>
             <h1 className="font-heading text-[32px] md:text-[40px] text-[#1E1B2E] leading-tight tracking-tight mb-2">Course Studio</h1>
-            <p className="font-sans text-[15px] text-[#8E8E93] max-w-md">Design, build, and manage your premium course catalogue.</p>
+            <p className="font-sans text-[15px] text-[#8E8E93] max-w-md">Manage your public courses and private institutional classes.</p>
           </div>
-          <motion.button 
-            whileHover={{ scale: 1.02 }}
-            whileTap={{ scale: 0.98 }}
-            onClick={() => setShowForm(true)}
-            className="h-12 px-6 rounded-xl bg-gradient-to-r from-[#C9A96E] to-[#E2C48D] hover:to-[#D6B87D] text-[#1E1B2E] text-[14px] font-bold uppercase tracking-wider flex items-center justify-center gap-2 shadow-[0_8px_24px_rgba(201,169,110,0.3)] transition-all shrink-0"
-          >
-            <Plus size={18} /> New Course
-          </motion.button>
+          <div className="flex gap-3">
+            {activeTab === "courses" ? (
+              <motion.button
+                whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}
+                onClick={() => setShowForm(true)}
+                className="h-12 px-6 rounded-xl bg-gradient-to-r from-[#C9A96E] to-[#E2C48D] hover:to-[#D6B87D] text-[#1E1B2E] text-[14px] font-bold uppercase tracking-wider flex items-center justify-center gap-2 shadow-[0_8px_24px_rgba(201,169,110,0.3)] transition-all shrink-0"
+              >
+                <Plus size={18} /> New Course
+              </motion.button>
+            ) : (
+              <motion.button
+                whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}
+                onClick={() => setShowClassForm(true)}
+                className="h-12 px-6 rounded-xl bg-gradient-to-r from-[#1E1B2E] to-[#2D2844] text-white text-[14px] font-bold uppercase tracking-wider flex items-center justify-center gap-2 shadow-[0_8px_24px_rgba(30,27,46,0.3)] transition-all shrink-0"
+              >
+                <Plus size={18} /> New Class
+              </motion.button>
+            )}
+          </div>
         </div>
 
-        {/* COURSES GRID / EMPTY STATE */}
+        {/* TAB SWITCHER */}
+        <div className="mt-8 px-8 flex gap-2">
+          <button
+            onClick={() => setActiveTab("courses")}
+            className={`flex items-center gap-2 px-6 py-2.5 rounded-xl text-[13px] font-bold uppercase tracking-wider transition-all ${
+              activeTab === "courses" ? "bg-[#1E1B2E] text-white shadow-sm" : "bg-white text-[#8E8E93] hover:text-[#1E1B2E]"
+            }`}
+          >
+            <Globe size={14} /> Courses ({courses.length})
+          </button>
+          <button
+            onClick={() => setActiveTab("classes")}
+            className={`flex items-center gap-2 px-6 py-2.5 rounded-xl text-[13px] font-bold uppercase tracking-wider transition-all ${
+              activeTab === "classes" ? "bg-[#1E1B2E] text-white shadow-sm" : "bg-white text-[#8E8E93] hover:text-[#1E1B2E]"
+            }`}
+          >
+            <GraduationCap size={14} /> My Classes ({classes.length})
+          </button>
+        </div>
+
+        {/* COURSES/CLASSES GRID / EMPTY STATE */}
         <div className="mt-12 px-8">
-          {courses.length === 0 ? (
+          {(activeTab === "courses" ? courses : classes).length === 0 ? (
             <motion.div 
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
@@ -98,22 +167,26 @@ export default function TeacherCoursesClient({ courses: initialCourses }: Props)
               <div className="relative z-10 w-24 h-24 mb-8 rounded-full bg-white shadow-[0_8px_32px_rgba(0,0,0,0.06)] flex items-center justify-center">
                 <Sparkles size={40} className="text-[#C9A96E]" />
               </div>
-              <h3 className="relative z-10 font-heading text-[28px] text-[#1E1B2E] mb-4">Your Studio is Empty</h3>
+              <h3 className="relative z-10 font-heading text-[28px] text-[#1E1B2E] mb-4">
+                {activeTab === "courses" ? "Your Studio is Empty" : "No Classes Yet"}
+              </h3>
               <p className="relative z-10 font-sans text-[15px] text-[#8E8E93] max-w-[400px] mb-8 leading-relaxed">
-                Start crafting your first premium learning experience. Share your expertise with the world.
+                {activeTab === "courses" 
+                  ? "Start crafting your first premium learning experience. Share your expertise with the world."
+                  : "Create a private class to manage your students, assignments, and grades."}
               </p>
               <motion.button 
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
-                onClick={() => setShowForm(true)}
+                onClick={() => activeTab === "courses" ? setShowForm(true) : setShowClassForm(true)}
                 className="relative z-10 h-[48px] px-8 rounded-xl bg-[#1E1B2E] hover:bg-[#2A2540] text-white text-[14px] font-bold uppercase tracking-wider shadow-[0_8px_24px_rgba(30,27,46,0.2)] transition-all flex items-center gap-2"
               >
-                <Plus size={18} /> Create First Course
+                <Plus size={18} /> {activeTab === "courses" ? "Create First Course" : "Create First Class"}
               </motion.button>
             </motion.div>
           ) : (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-              {courses.map((course, i) => (
+              {(activeTab === "courses" ? courses : classes).map((course, i) => (
                 <motion.div 
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
@@ -154,6 +227,17 @@ export default function TeacherCoursesClient({ courses: initialCourses }: Props)
                     <p className="font-sans text-[14px] text-[#8E8E93] line-clamp-2 mt-4 leading-relaxed flex-1">
                       {course.description}
                     </p>
+                    {activeTab === "classes" && course.classCode && (
+                      <div className="mt-4 p-3 bg-[#F5F1EB] rounded-xl flex items-center justify-between border border-[rgba(30,27,46,0.05)]">
+                        <span className="text-[12px] font-bold uppercase tracking-wider text-[#8E8E93]">Code</span>
+                        <div className="flex items-center gap-2">
+                          <span className="font-mono text-[14px] font-bold text-[#C9A96E]">{course.classCode}</span>
+                          <button onClick={(e) => { e.preventDefault(); copyCode(course.classCode); }} className="text-[#8E8E93] hover:text-[#1E1B2E]">
+                            {codeCopied === course.classCode ? <CheckCheck size={14} className="text-green-500" /> : <Copy size={14} />}
+                          </button>
+                        </div>
+                      </div>
+                    )}
                   </div>
 
                   <div className="px-6 pb-6 pt-2 bg-white flex items-center gap-3 shrink-0">
@@ -352,6 +436,86 @@ export default function TeacherCoursesClient({ courses: initialCourses }: Props)
                       </div>
                     </form>
                   </div>
+                </div>
+            </motion.div>
+          </div>
+        )}
+      </AnimatePresence>
+
+      <AnimatePresence>
+        {showClassForm && (
+          <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 sm:p-6 bg-[#1E1B2E]/80 backdrop-blur-md">
+            <motion.div 
+              initial={{ opacity: 0, scale: 0.95, y: 20 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              exit={{ opacity: 0, scale: 0.95, y: 20 }}
+              className="bg-white w-full max-w-lg rounded-[32px] shadow-2xl overflow-hidden flex flex-col h-full max-h-[85vh]"
+            >
+                {/* Header */}
+                <div className="flex items-center justify-between p-6 border-b border-[rgba(30,27,46,0.06)] bg-white/50 backdrop-blur-sm shrink-0">
+                  <h2 className="font-heading text-[24px] text-[#1E1B2E]">Create Class</h2>
+                  <button 
+                    onClick={() => setShowClassForm(false)}
+                    className="w-10 h-10 flex items-center justify-center rounded-full bg-white hover:bg-[rgba(30,27,46,0.04)] text-[#8E8E93] hover:text-[#1E1B2E] transition-colors shadow-sm"
+                  >
+                    <X size={20} />
+                  </button>
+                </div>
+                
+                <div className="p-8 overflow-y-auto flex-1 custom-scrollbar">
+                  <form onSubmit={handleCreateClass} className="space-y-6">
+                    
+                    <div className="space-y-2">
+                      <label className="block text-[11px] uppercase tracking-[0.1em] font-bold text-[#8E8E93]">Class Name <span className="text-[#DC2626]">*</span></label>
+                      <input
+                        required
+                        placeholder="e.g. Physics 101"
+                        className="w-full h-[52px] bg-[#F5F1EB] rounded-xl px-5 text-[15px] font-medium text-[#1E1B2E] focus:outline-none focus:ring-2 focus:ring-[#C9A96E]/40"
+                        value={classForm.title}
+                        onChange={(e) => setClassForm({ ...classForm, title: e.target.value })}
+                      />
+                    </div>
+                    
+                    <div className="space-y-2">
+                      <label className="block text-[11px] uppercase tracking-[0.1em] font-bold text-[#8E8E93]">Section</label>
+                      <input
+                        placeholder="e.g. Batch A"
+                        className="w-full h-[52px] bg-[#F5F1EB] rounded-xl px-5 text-[15px] font-medium text-[#1E1B2E] focus:outline-none focus:ring-2 focus:ring-[#C9A96E]/40"
+                        value={classForm.section}
+                        onChange={(e) => setClassForm({ ...classForm, section: e.target.value })}
+                      />
+                    </div>
+                    
+                    <div className="space-y-2">
+                      <label className="block text-[11px] uppercase tracking-[0.1em] font-bold text-[#8E8E93]">Subject <span className="text-[#DC2626]">*</span></label>
+                      <select
+                        className="w-full h-[52px] bg-[#F5F1EB] rounded-xl px-5 text-[15px] font-medium text-[#1E1B2E] focus:outline-none focus:ring-2 focus:ring-[#C9A96E]/40 appearance-none cursor-pointer"
+                        value={classForm.subject}
+                        onChange={(e) => setClassForm({ ...classForm, subject: e.target.value })}
+                      >
+                        {SUBJECTS.map((s) => <option key={s} value={s}>{s}</option>)}
+                      </select>
+                    </div>
+
+                    <div className="space-y-2">
+                      <label className="block text-[11px] uppercase tracking-[0.1em] font-bold text-[#8E8E93]">Room</label>
+                      <input
+                        placeholder="e.g. Online"
+                        className="w-full h-[52px] bg-[#F5F1EB] rounded-xl px-5 text-[15px] font-medium text-[#1E1B2E] focus:outline-none focus:ring-2 focus:ring-[#C9A96E]/40"
+                        value={classForm.room}
+                        onChange={(e) => setClassForm({ ...classForm, room: e.target.value })}
+                      />
+                    </div>
+                    
+                    <div className="pt-4 flex gap-4">
+                      <button type="button" onClick={() => setShowClassForm(false)} className="flex-1 h-[56px] rounded-xl bg-white text-[#1E1B2E] text-[15px] font-bold hover:bg-[#F5F1EB] transition-colors border border-[rgba(30,27,46,0.1)]">
+                        Cancel
+                      </button>
+                      <button type="submit" disabled={loading} className="flex-[2] h-[56px] rounded-xl bg-[#1E1B2E] text-white text-[15px] font-bold uppercase tracking-widest flex items-center justify-center gap-2 hover:bg-[#C9A96E] hover:text-[#1E1B2E] transition-all disabled:opacity-50">
+                        {loading ? <Loader2 className="animate-spin" size={20} /> : "Create Class"}
+                      </button>
+                    </div>
+                  </form>
                 </div>
             </motion.div>
           </div>

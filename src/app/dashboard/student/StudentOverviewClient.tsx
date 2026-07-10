@@ -33,6 +33,8 @@ interface OverviewProps {
     points: number;
     studyHours: number;
     currentStreak: number;
+    longestStreak: number;
+    checkedInToday: boolean;
     level: number;
   };
   enrollments: Array<{
@@ -64,33 +66,26 @@ interface OverviewProps {
 function ProgressHero({
   name,
   streak,
+  longestStreak,
+  checkedInToday,
   progressPercent,
   level,
   shouldReduceMotion,
 }: {
   name: string;
   streak: number;
+  longestStreak: number;
+  checkedInToday: boolean;
   progressPercent: number;
   level: number;
   shouldReduceMotion: boolean;
 }) {
-  const [currentStreak, setCurrentStreak] = useState(streak || 0);
-  const [checkedInToday, setCheckedInToday] = useState(false);
   const [showStreakModal, setShowStreakModal] = useState(false);
   const [studyGoal, setStudyGoal] = useState("30 mins");
   const [showToast, setShowToast] = useState(false);
 
   const daysOfWeek = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
   const todayIndex = new Date().getDay() === 0 ? 6 : new Date().getDay() - 1;
-
-  const handleCheckIn = () => {
-    if (!checkedInToday) {
-      setCurrentStreak((prev) => prev + 1);
-      setCheckedInToday(true);
-      setShowToast(true);
-      setTimeout(() => setShowToast(false), 4000);
-    }
-  };
 
   return (
     <>
@@ -115,12 +110,12 @@ function ProgressHero({
               type="button"
               onClick={() => setShowStreakModal(true)}
               className="flex items-center gap-2.5 px-4 py-2 bg-[#F5F1EB] hover:bg-[rgba(201,169,110,0.2)] rounded-2xl border border-[#1E1B2E]/10 transition-all cursor-pointer shadow-sm hover:scale-105 group"
-              title="Click to view streak calendar & check in!"
+              title="Click to view streak calendar"
             >
               <Flame className="w-5 h-5 text-[#C9A96E] fill-[#C9A96E]/20 group-hover:scale-110 transition-transform animate-pulse" />
-              <span className="text-sm font-bold text-[#1E1B2E]">{currentStreak} Day Streak</span>
+              <span className="text-sm font-bold text-[#1E1B2E]">{streak} Day Streak</span>
               <span className="text-[10px] font-black bg-[#1E1B2E] text-[#C9A96E] px-2.5 py-0.5 rounded-full uppercase ml-1 shadow-xs">
-                {checkedInToday ? "✓ Checked In" : "+ Check In"}
+                {checkedInToday ? "✓ Checked In" : "Not Logged Today"}
               </span>
             </button>
             <Link href="/courses">
@@ -202,13 +197,13 @@ function ProgressHero({
                 <div className="p-4 rounded-2xl bg-[#F5F1EB] border border-[#1E1B2E]/5 text-center">
                   <p className="text-xs font-bold text-[#8E8E93] uppercase">Current Streak</p>
                   <p className="text-2xl font-black text-[#1E1B2E] mt-1 flex items-center justify-center gap-1">
-                    <Flame className="w-5 h-5 text-[#C9A96E] fill-[#C9A96E]" /> {currentStreak} <span className="text-xs font-medium text-[#8E8E93]">days</span>
+                    <Flame className="w-5 h-5 text-[#C9A96E] fill-[#C9A96E]" /> {streak} <span className="text-xs font-medium text-[#8E8E93]">days</span>
                   </p>
                 </div>
                 <div className="p-4 rounded-2xl bg-[#F5F1EB] border border-[#1E1B2E]/5 text-center">
                   <p className="text-xs font-bold text-[#8E8E93] uppercase">Longest Streak</p>
                   <p className="text-2xl font-black text-[#1E1B2E] mt-1 flex items-center justify-center gap-1">
-                    <Trophy className="w-5 h-5 text-[#C9A96E]" /> {Math.max(currentStreak, 7)} <span className="text-xs font-medium text-[#8E8E93]">days</span>
+                    <Trophy className="w-5 h-5 text-[#C9A96E]" /> {longestStreak} <span className="text-xs font-medium text-[#8E8E93]">days</span>
                   </p>
                 </div>
               </div>
@@ -271,17 +266,13 @@ function ProgressHero({
 
               {/* Check In Action Button */}
               <div className="pt-2">
-                {!checkedInToday ? (
-                  <button
-                    type="button"
-                    onClick={handleCheckIn}
-                    className="w-full py-3.5 bg-gradient-to-r from-[#C9A96E] to-[#E5C992] text-[#1E1B2E] rounded-2xl font-extrabold text-sm uppercase tracking-wider shadow-md hover:scale-[1.02] transition-transform cursor-pointer flex items-center justify-center gap-2"
-                  >
-                    <Flame className="w-5 h-5 fill-[#1E1B2E]" /> Check In For Today (+10 XP)
-                  </button>
-                ) : (
+                {checkedInToday ? (
                   <div className="w-full py-3.5 bg-[#22C55E]/15 border border-[#22C55E] text-[#1E1B2E] rounded-2xl font-bold text-sm text-center flex items-center justify-center gap-2">
                     <CheckCircle2 className="w-5 h-5 text-[#22C55E]" /> Today's Streak Checked In!
+                  </div>
+                ) : (
+                  <div className="w-full py-3.5 bg-gray-100 border border-gray-200 text-[#8E8E93] rounded-2xl font-bold text-sm text-center flex items-center justify-center gap-2">
+                    <Clock className="w-5 h-5" /> Activity recorded upon next login/action
                   </div>
                 )}
               </div>
@@ -575,25 +566,26 @@ function CertificatesGallery({
       ) : (
         <div className="flex gap-4 overflow-x-auto pb-2 snap-x snap-mandatory">
           {certificates.map((cert) => (
-            <motion.div
-              key={cert.id}
-              whileHover={{ scale: 1.02 }}
-              className="min-w-[260px] max-w-[280px] shrink-0 bg-[#F5F1EB] rounded-2xl p-5 border border-[#C9A96E]/30 snap-start flex flex-col justify-between"
-            >
-              <div className="flex items-center gap-3 mb-4">
-                <div className="w-10 h-10 rounded-xl bg-[#1E1B2E] text-[#C9A96E] flex items-center justify-center shrink-0 shadow">
-                  <Star className="w-5 h-5 fill-current" />
+            <Link key={cert.id} href={`/certificates/${cert.id}`} className="snap-start shrink-0">
+              <motion.div
+                whileHover={{ scale: 1.02 }}
+                className="min-w-[260px] max-w-[280px] h-full bg-[#F5F1EB] rounded-2xl p-5 border border-[#C9A96E]/30 flex flex-col justify-between"
+              >
+                <div className="flex items-center gap-3 mb-4">
+                  <div className="w-10 h-10 rounded-xl bg-[#1E1B2E] text-[#C9A96E] flex items-center justify-center shrink-0 shadow">
+                    <Star className="w-5 h-5 fill-current" />
+                  </div>
+                  <span className="text-xs font-bold text-[#C9A96E] uppercase tracking-wider">Certified</span>
                 </div>
-                <span className="text-xs font-bold text-[#C9A96E] uppercase tracking-wider">Certified</span>
-              </div>
-              <h4 className="font-bold text-[#1E1B2E] text-base mb-2 line-clamp-2">{cert.title}</h4>
-              <div className="flex items-center justify-between text-xs text-[#8E8E93] pt-3 border-t border-[#1E1B2E]/10">
-                <span>Issued</span>
-                <span className="font-semibold text-[#1E1B2E]">
-                  {new Date(cert.issueDate).toLocaleDateString()}
-                </span>
-              </div>
-            </motion.div>
+                <h4 className="font-bold text-[#1E1B2E] text-base mb-2 line-clamp-2">{cert.title}</h4>
+                <div className="flex items-center justify-between text-xs text-[#8E8E93] pt-3 border-t border-[#1E1B2E]/10">
+                  <span>Issued</span>
+                  <span className="font-semibold text-[#1E1B2E]">
+                    {new Date(cert.issueDate).toLocaleDateString()}
+                  </span>
+                </div>
+              </motion.div>
+            </Link>
           ))}
         </div>
       )}
@@ -908,7 +900,7 @@ function RecentActivityFeed({
 }
 
 // ── Main Overview Client Wrapper ─────────────────────────────────────────
-export default function StudentOverviewClient({ user, enrollments, marks, certificates }: OverviewProps) {
+export default function StudentOverviewClient({ user, enrollments, marks, certificates, recentActivity }: OverviewProps) {
   const shouldReduceMotion = useReducedMotion() ?? false;
 
   const progressPercent =
@@ -923,30 +915,14 @@ export default function StudentOverviewClient({ user, enrollments, marks, certif
 
   const nextCourse = enrollments.find((e) => e.progress < 100) || enrollments[0];
 
-  // Construct recent activity safe fallback
-  const recentActivity: OverviewProps["recentActivity"] = [
-    ...marks.slice(0, 3).map((m, i) => ({
-      id: `mark-${i}`,
-      type: "score" as const,
-      title: `Scored ${m.score}% in Quiz`,
-      subtitle: m.subject,
-      time: "Recently",
-    })),
-    ...certificates.slice(0, 2).map((c, i) => ({
-      id: `cert-${i}`,
-      type: "certificate" as const,
-      title: `Earned Certificate`,
-      subtitle: c.title,
-      time: new Date(c.issueDate).toLocaleDateString(),
-    })),
-  ].slice(0, 5);
-
   return (
     <div className="space-y-8 pb-12">
       {/* 1. Progress Hero */}
       <ProgressHero
         name={user.name?.split(" ")[0] || "Student"}
         streak={user.currentStreak || 0}
+        longestStreak={user.longestStreak || 0}
+        checkedInToday={user.checkedInToday}
         progressPercent={progressPercent}
         level={user.level || 1}
         shouldReduceMotion={shouldReduceMotion}

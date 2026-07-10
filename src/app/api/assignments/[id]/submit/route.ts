@@ -29,13 +29,14 @@ export async function POST(req: Request, { params }: { params: Promise<{ id: str
       return NextResponse.json({ message: "You are not enrolled in this course" }, { status: 403 });
     }
 
-    // Check if already submitted
+    // Check if already submitted — allow update (re-submit)
     const existing = await prisma.assignmentSubmission.findUnique({
       where: { assignmentId_studentId: { assignmentId, studentId: decoded.id } }
     });
 
-    if (existing) {
-      return NextResponse.json({ message: "You have already submitted this assignment" }, { status: 400 });
+    // If already graded, don't allow re-submission
+    if (existing?.status === "graded") {
+      return NextResponse.json({ message: "This assignment has already been graded and cannot be re-submitted." }, { status: 400 });
     }
 
     // Parse multipart form data
@@ -67,12 +68,32 @@ export async function POST(req: Request, { params }: { params: Promise<{ id: str
       return NextResponse.json({ message: "Please provide submission text or upload a file" }, { status: 400 });
     }
 
-    const submission = await prisma.assignmentSubmission.create({
-      data: {
+    const submission = await prisma.assignmentSubmission.upsert({
+      where: { assignmentId_studentId: { assignmentId, studentId: decoded.id } },
+      update: {
+        content: text?.trim() || null,
+        fileUrl: fileUrl || null,
+        status: "turned_in",
+        turnedInAt: new Date(),
+      },
+      create: {
         assignmentId,
         studentId: decoded.id,
         content: text?.trim() || null,
         fileUrl: fileUrl || null,
+        status: "turned_in",
+        turnedInAt: new Date(),
+      }
+    });
+
+    // Notify teacher
+    await prisma.notification.create({
+      data: {
+        userId: assignment.course.teacherId,
+        type: "assignment_submitted",
+        title: "New Submission",
+        body: `A student submitted "${assignment.title}".`,
+        linkUrl: `/dashboard/teacher/courses/${assignment.courseId}`
       }
     });
 

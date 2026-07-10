@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { Save, Trash2, ArrowLeft, Loader2, Plus, BookOpen, Video, FileText, Users, X, Upload, File, Pencil, Check, ChevronUp, Link as LinkIcon, Edit3, Globe, Lock, FileCheck, UserPlus } from "lucide-react";
+import { Save, Trash2, ArrowLeft, Loader2, Plus, BookOpen, Video, FileText, Users, X, Upload, File, Pencil, Check, ChevronUp, Link as LinkIcon, Edit3, Globe, Lock, FileCheck, UserPlus, Download } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import Link from "next/link";
 
@@ -156,6 +156,24 @@ export default function ManageCourseClient({ course, studentsProgress = [] }: { 
     }
   };
 
+  const handleDeleteAssignment = async (assignmentId: string) => {
+    if (!confirm("Are you sure you want to delete this assignment?")) return;
+    setLoading(true);
+    try {
+      const res = await fetch(`/api/assignments/${assignmentId}`, {
+        method: "DELETE",
+      });
+      if (res.ok) {
+        router.refresh();
+      } else {
+        const data = await res.json();
+        alert(`Failed to delete assignment: ${data.message || "Unknown error"}`);
+      }
+    } finally {
+      setLoading(false);
+    }
+  };
+
   const handleAddModule = async () => {
     if (!newModuleTitle) return;
     setLoading(true);
@@ -274,7 +292,7 @@ export default function ManageCourseClient({ course, studentsProgress = [] }: { 
 
   return (
     <div className="flex flex-col min-h-screen bg-[#F5F1EB] font-sans text-[#1E1B2E]">
-      <div className="w-full max-w-[1000px] mx-auto pb-20">
+      <div className="w-full pb-20">
         
         {/* Page Header */}
         <div className="pt-10 px-8 flex items-center gap-4 mb-4">
@@ -707,9 +725,9 @@ export default function ManageCourseClient({ course, studentsProgress = [] }: { 
                       <table className="w-full text-left border-collapse">
                         <thead className="bg-[#F5F1EB]/50">
                           <tr>
-                            <th className="p-4 px-6 text-[11px] font-bold uppercase tracking-wider text-[#8E8E93] border-b border-[rgba(30,27,46,0.05)]">Student</th>
-                            <th className="p-4 px-6 text-[11px] font-bold uppercase tracking-wider text-[#8E8E93] border-b border-[rgba(30,27,46,0.05)] w-48">Final Score (0-100)</th>
-                            <th className="p-4 px-6 text-[11px] font-bold uppercase tracking-wider text-[#8E8E93] border-b border-[rgba(30,27,46,0.05)] w-32 text-right">Action</th>
+                            <th className="p-4 px-6 text-[11px] font-bold uppercase tracking-wider text-[#8E8E93] border-b border-[rgba(30,27,46,0.05)] w-full">Student</th>
+                            <th className="p-4 px-6 text-[11px] font-bold uppercase tracking-wider text-[#8E8E93] border-b border-[rgba(30,27,46,0.05)] w-[200px]">Final Score (0-100)</th>
+                            <th className="p-4 px-6 text-[11px] font-bold uppercase tracking-wider text-[#8E8E93] border-b border-[rgba(30,27,46,0.05)] w-[150px] text-right">Action</th>
                           </tr>
                         </thead>
                         <tbody className="divide-y divide-[rgba(30,27,46,0.04)]">
@@ -764,7 +782,7 @@ export default function ManageCourseClient({ course, studentsProgress = [] }: { 
 
             {activeTab === "assignments" && (
               <motion.div key="assignments" initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -10 }} className="px-8 space-y-8">
-                <div className="bg-white p-8 rounded-[24px] shadow-[0_4px_20px_rgba(30,27,46,0.04)] border border-white">
+                <div className="bg-white p-8 rounded-[24px] shadow-[0_4px_20px_rgba(30,27,46,0.04)] border border-white max-w-3xl">
                   <h3 className="font-heading text-[24px] text-[#1E1B2E] mb-6 flex items-center gap-3">
                     <div className="w-10 h-10 rounded-full bg-[#1E1B2E] flex items-center justify-center"><Plus size={18} className="text-[#C9A96E]"/></div>
                     New Global Assignment
@@ -849,11 +867,36 @@ export default function ManageCourseClient({ course, studentsProgress = [] }: { 
                       <div key={assignment.id} className="bg-white rounded-[20px] shadow-[0_4px_16px_rgba(30,27,46,0.03)] border border-[rgba(30,27,46,0.04)] p-6 hover:shadow-[0_8px_24px_rgba(30,27,46,0.06)] transition-shadow">
                          <div className="flex flex-col md:flex-row justify-between md:items-start gap-6">
                             <div className="flex-1">
-                               <h4 className="font-heading text-[20px] text-[#1E1B2E]">{assignment.title}</h4>
+                               <div className="flex items-center gap-3">
+                                 <h4 className="font-heading text-[20px] text-[#1E1B2E]">{assignment.title}</h4>
+                                 <button 
+                                   onClick={() => handleDeleteAssignment(assignment.id)}
+                                   disabled={loading}
+                                   className="p-1.5 text-[#8E8E93] hover:text-[#DC2626] hover:bg-[#DC2626]/10 rounded-lg transition-colors"
+                                   title="Delete Assignment"
+                                 >
+                                   <Trash2 size={16} />
+                                 </button>
+                               </div>
                                <div className="inline-flex items-center gap-1.5 px-3 py-1 bg-[#DC2626]/10 text-[#DC2626] rounded-md text-[11px] font-bold uppercase tracking-wider mt-2 mb-4">
                                  <FileText size={12}/> Due: {new Date(assignment.dueDate).toLocaleString()}
                                </div>
-                               <p className="text-[14px] text-[#8E8E93] leading-relaxed max-w-3xl">{assignment.description}</p>
+                               {(() => {
+                                 const match = assignment.description.match(/\*\*Attached Document:\*\* \[Download File\]\((.*?)\)/);
+                                 const fileUrl = match ? match[1] : null;
+                                 const cleanDescription = match ? assignment.description.replace(match[0], '').trim() : assignment.description;
+                                 
+                                 return (
+                                   <div className="space-y-3">
+                                     <p className="text-[14px] text-[#8E8E93] leading-relaxed max-w-3xl">{cleanDescription}</p>
+                                     {fileUrl && (
+                                       <a href={fileUrl} download className="inline-flex items-center gap-2 px-3 py-1.5 rounded-lg bg-[#C9A96E]/10 hover:bg-[#C9A96E]/20 text-[#C9A96E] text-xs font-bold transition-colors w-fit border border-[#C9A96E]/20 mt-2">
+                                         <Download size={14} /> Download Attached Document
+                                       </a>
+                                     )}
+                                   </div>
+                                 );
+                               })()}
                             </div>
                             <div className="shrink-0 flex flex-col items-end gap-3">
                                <div className="flex flex-col items-center justify-center w-24 h-24 rounded-2xl bg-[rgba(201,169,110,0.05)] border border-[#C9A96E]/20">

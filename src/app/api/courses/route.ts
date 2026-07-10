@@ -13,7 +13,22 @@ export async function POST(req: Request) {
       return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
     }
 
-    const { title, description, details, subject, thumbnail, isPublic } = await req.json();
+    const { title, description, details, subject, thumbnail, isPublic, section, room } = await req.json();
+
+    const user = await prisma.user.findUnique({
+      where: { id: decoded.id },
+      select: { departmentId: true }
+    });
+
+    const isPublicBool = isPublic ?? true;
+    let classCode = null;
+    if (!isPublicBool) {
+      classCode = Math.random().toString(36).substring(2, 8).toUpperCase();
+      // Ensure unique by re-generating if exists (simplified for now)
+      while (await prisma.course.findUnique({ where: { classCode } })) {
+        classCode = Math.random().toString(36).substring(2, 8).toUpperCase();
+      }
+    }
 
     const course = await prisma.course.create({
       data: {
@@ -22,8 +37,12 @@ export async function POST(req: Request) {
         details: details || null,
         subject,
         thumbnail: thumbnail || null,
-        isPublic: isPublic ?? true,
+        isPublic: isPublicBool,
+        classCode,
+        section: section || null,
+        room: room || null,
         teacherId: decoded.id,
+        departmentId: user?.departmentId || null,
       },
     });
 

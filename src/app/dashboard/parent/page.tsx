@@ -21,7 +21,14 @@ export default async function ParentDashboard() {
             include: { 
               course: { 
                 include: { 
-                  modules: { include: { _count: { select: { lessons: true } } } } 
+                  modules: { include: { _count: { select: { lessons: true } } } },
+                  assignments: {
+                    include: {
+                      submissions: {
+                        include: { assignment: true }
+                      }
+                    }
+                  }
                 } 
               } 
             } 
@@ -35,40 +42,41 @@ export default async function ParentDashboard() {
 
   if (!parent) redirect("/login");
 
-  const child = parent.children[0]; // Currently handling one child as per registration logic
+  const processedChildren = parent.children.map((child: any) => {
+    const avgScore = child.marks && child.marks.length > 0
+      ? Math.round(child.marks.reduce((s: any, m: any) => s + m.score, 0) / child.marks.length)
+      : null;
 
-  const avgScore = child && child.marks && child.marks.length > 0
-    ? Math.round(child.marks.reduce((s: any, m: any) => s + m.score, 0) / child.marks.length)
-    : null;
+    let totalLessonsAcc = 0;
+    let totalCompletionsAcc = 0;
+    
+    const coursesWithProgress = child.enrollments.map((enr: any) => {
+      const totalLessons = enr.course.modules.reduce((sum: number, mod: any) => sum + mod._count.lessons, 0);
+      const courseModuleIds = enr.course.modules.map((m: any) => m.id);
+      const completedLessons = child.completedLessons ? child.completedLessons.filter((lc: any) => courseModuleIds.includes(lc.lesson.moduleId)).length : 0;
+      
+      totalLessonsAcc += totalLessons;
+      totalCompletionsAcc += completedLessons;
+      
+      return {
+        ...enr.course,
+        totalLessons,
+        completedLessons,
+        progress: totalLessons === 0 ? 0 : Math.round((completedLessons / totalLessons) * 100)
+      };
+    });
 
-  // Calculate real attendance/progress
-  let totalLessonsAcc = 0;
-  let totalCompletionsAcc = 0;
-  
-  const coursesWithProgress = child ? child.enrollments.map((enr: any) => {
-    const totalLessons = enr.course.modules.reduce((sum: number, mod: any) => sum + mod._count.lessons, 0);
-    const courseModuleIds = enr.course.modules.map((m: any) => m.id);
-    const completedLessons = child.completedLessons ? child.completedLessons.filter((lc: any) => courseModuleIds.includes(lc.lesson.moduleId)).length : 0;
-    
-    totalLessonsAcc += totalLessons;
-    totalCompletionsAcc += completedLessons;
-    
+    const overallAttendance = totalLessonsAcc === 0 ? 0 : Math.round((totalCompletionsAcc / totalLessonsAcc) * 100);
+
     return {
-      ...enr.course,
-      totalLessons,
-      completedLessons,
-      progress: totalLessons === 0 ? 0 : Math.round((completedLessons / totalLessons) * 100)
+      ...child,
+      avgScore,
+      coursesWithProgress,
+      overallAttendance
     };
-  }) : [];
-
-  const overallAttendance = totalLessonsAcc === 0 ? 0 : Math.round((totalCompletionsAcc / totalLessonsAcc) * 100);
+  });
 
   return (
-    <ParentOverviewClient 
-      child={child} 
-      avgScore={avgScore} 
-      coursesWithProgress={coursesWithProgress} 
-      overallAttendance={overallAttendance} 
-    />
+    <ParentOverviewClient childrenData={processedChildren} />
   );
 }

@@ -2,7 +2,7 @@
 
 import React, { useState, useCallback } from "react";
 import { useRouter } from "next/navigation";
-import { motion, useReducedMotion } from "framer-motion";
+import { motion, useReducedMotion, AnimatePresence } from "framer-motion";
 import {
   BookOpen,
   Play,
@@ -15,6 +15,7 @@ import {
   ShieldAlert,
   Compass,
   Download,
+  X,
 } from "lucide-react";
 
 // Shimmer skeleton component for image loading
@@ -59,16 +60,21 @@ interface Course {
 
 interface Props {
   courses: Course[];
+  classes?: Course[];
   enrolledIds: string[];
   pendingLeaveCourseIds?: string[];
 }
 
 export default function CoursesClient({
   courses,
+  classes = [],
   enrolledIds: initialEnrolledIds,
   pendingLeaveCourseIds = [],
 }: Props) {
   const router = useRouter();
+  const [activeTab, setActiveTab] = useState<"courses" | "classes">("courses");
+  const [showJoinClass, setShowJoinClass] = useState(false);
+  const [classCodeInput, setClassCodeInput] = useState("");
   const [enrolledIds, setEnrolledIds] = useState<Set<string>>(new Set(initialEnrolledIds));
   const [pendingLeave, setPendingLeave] = useState<Set<string>>(new Set(pendingLeaveCourseIds));
   const [loadingId, setLoadingId] = useState<string | null>(null);
@@ -138,6 +144,33 @@ export default function CoursesClient({
     }
   };
 
+  const handleJoinClass = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!classCodeInput) return;
+    setLoadingId("join");
+    try {
+      const res = await fetch("/api/classes/join", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ classCode: classCodeInput })
+      });
+      const data = await res.json();
+      if (res.ok) {
+        setEnrolledIds(prev => new Set([...prev, data.courseId]));
+        showToast("Successfully joined class!", "success");
+        setShowJoinClass(false);
+        setClassCodeInput("");
+        router.refresh();
+      } else {
+        showToast(data.message || "Failed to join class", "error");
+      }
+    } catch {
+      showToast("Network error. Please try again.", "error");
+    } finally {
+      setLoadingId(null);
+    }
+  };
+
   // Framer Motion Variants for Staggered Grid Entrance
   const gridVariants = {
     hidden: { opacity: 0 },
@@ -198,27 +231,51 @@ export default function CoursesClient({
 
         {/* Top-Right Header Actions: Enrolled Badge + Explore Courses CTA */}
         <div className="flex flex-wrap items-center gap-3 shrink-0 self-start sm:self-center">
-          <div className="flex items-center gap-2 px-4 py-2.5 bg-[#FFFFFF]/80 backdrop-blur-md rounded-xl border border-[#1E1B2E]/10 shadow-sm shrink-0">
-            <BookOpen className="w-4.5 h-4.5 text-[#C9A96E]" />
-            <span className="text-sm font-bold text-[#1E1B2E]">{courses.length} Enrolled</span>
+          <div className="flex bg-[#F5F1EB] rounded-xl p-1">
+            <button
+              onClick={() => setActiveTab("courses")}
+              className={`px-4 py-2 rounded-lg text-sm font-bold transition-all ${
+                activeTab === "courses" ? "bg-white text-[#1E1B2E] shadow-sm" : "text-[#8E8E93]"
+              }`}
+            >
+              Courses
+            </button>
+            <button
+              onClick={() => setActiveTab("classes")}
+              className={`px-4 py-2 rounded-lg text-sm font-bold transition-all ${
+                activeTab === "classes" ? "bg-white text-[#1E1B2E] shadow-sm" : "text-[#8E8E93]"
+              }`}
+            >
+              Classes
+            </button>
           </div>
-
-          {/* Explore Courses Button */}
-          <motion.button
-            whileHover={shouldReduceMotion ? {} : { scale: 1.03 }}
-            whileTap={shouldReduceMotion ? {} : { scale: 0.98 }}
-            onClick={() => router.push("/courses")}
-            aria-label="Explore Courses"
-            className="h-[44px] px-6 rounded-xl bg-[#C9A96E] text-[#1E1B2E] font-bold text-sm tracking-wide transition-all shadow-[0_4px_12px_rgba(201,169,110,0.25)] hover:shadow-[0_8px_24px_rgba(201,169,110,0.45)] flex items-center justify-center gap-2 cursor-pointer"
-          >
-            <Compass className="w-4.5 h-4.5 shrink-0" />
-            <span>Explore Courses</span>
-          </motion.button>
+          {activeTab === "courses" ? (
+            <motion.button
+              whileHover={shouldReduceMotion ? {} : { scale: 1.03 }}
+              whileTap={shouldReduceMotion ? {} : { scale: 0.98 }}
+              onClick={() => router.push("/courses")}
+              aria-label="Explore Courses"
+              className="h-[44px] px-6 rounded-xl bg-[#C9A96E] text-[#1E1B2E] font-bold text-sm tracking-wide transition-all shadow-[0_4px_12px_rgba(201,169,110,0.25)] hover:shadow-[0_8px_24px_rgba(201,169,110,0.45)] flex items-center justify-center gap-2 cursor-pointer"
+            >
+              <Compass className="w-4.5 h-4.5 shrink-0" />
+              <span>Explore Courses</span>
+            </motion.button>
+          ) : (
+            <motion.button
+              whileHover={shouldReduceMotion ? {} : { scale: 1.03 }}
+              whileTap={shouldReduceMotion ? {} : { scale: 0.98 }}
+              onClick={() => setShowJoinClass(true)}
+              className="h-[44px] px-6 rounded-xl bg-[#1E1B2E] text-white font-bold text-sm tracking-wide transition-all flex items-center justify-center gap-2 cursor-pointer"
+            >
+              <Users className="w-4.5 h-4.5 shrink-0" />
+              <span>Join Class</span>
+            </motion.button>
+          )}
         </div>
       </div>
 
       {/* Empty State */}
-      {courses.length === 0 ? (
+      {(activeTab === "courses" ? courses : classes).length === 0 ? (
         <motion.div
           initial={shouldReduceMotion ? { opacity: 0 } : { opacity: 0, scale: 0.95 }}
           animate={{ opacity: 1, scale: 1 }}
@@ -240,20 +297,22 @@ export default function CoursesClient({
             className="text-2xl sm:text-3xl font-extrabold text-[#1E1B2E] mb-3 tracking-tight"
             style={{ fontFamily: "var(--font-heading, serif)" }}
           >
-            No Courses Enrolled
+            {activeTab === "courses" ? "No Courses Enrolled" : "No Classes Joined"}
           </h3>
           <p className="text-[#8E8E93] font-medium max-w-md mx-auto mb-8 leading-relaxed text-sm sm:text-base">
-            Your active learning space is ready. Discover industry-leading courses and begin building real-world mastery today.
+            {activeTab === "courses"
+              ? "Your active learning space is ready. Discover industry-leading courses and begin building real-world mastery today."
+              : "Ask your teacher for the class code, then enter it here."}
           </p>
 
           <motion.button
             whileHover={shouldReduceMotion ? {} : { scale: 1.03 }}
             whileTap={shouldReduceMotion ? {} : { scale: 0.98 }}
-            onClick={() => router.push("/courses")}
+            onClick={() => activeTab === "courses" ? router.push("/courses") : setShowJoinClass(true)}
             aria-label="Explore Courses"
             className="h-[44px] px-6 rounded-xl bg-[#C9A96E] text-[#1E1B2E] font-bold text-sm uppercase tracking-wider shadow-[0_8px_24px_rgba(201,169,110,0.4)] flex items-center justify-center gap-2 mx-auto"
           >
-            <span>Explore Course Catalog</span>
+            <span>{activeTab === "courses" ? "Explore Course Catalog" : "Join Class"}</span>
             <ArrowRight className="w-4 h-4" />
           </motion.button>
         </motion.div>
@@ -265,10 +324,58 @@ export default function CoursesClient({
           variants={gridVariants}
           className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8"
         >
-          {courses.map((course) => {
+          {(activeTab === "courses" ? courses : classes).map((course) => {
             const isEnrolled = enrolledIds.has(course.id);
             const isLoading = loadingId === course.id;
             const progress = course.progress || 0;
+
+            if (!course.isPublic) {
+              return (
+                <motion.div
+                  key={course.id}
+                  variants={cardVariants}
+                  whileHover={shouldReduceMotion ? {} : { scale: 1.02 }}
+                  transition={{ duration: 0.3, ease: easing }}
+                  onClick={() => router.push(`/dashboard/student/courses/${course.id}`)}
+                  className="group relative flex flex-col rounded-[24px] bg-white border border-[#1E1B2E]/10 shadow-[0_8px_30px_rgba(30,27,46,0.04)] hover:shadow-[0_12px_40px_rgba(30,27,46,0.08)] transition-all duration-300 overflow-hidden cursor-pointer"
+                >
+                  {/* Top Banner Area */}
+                  <div className="relative h-[120px] w-full bg-gradient-to-br from-[#1E1B2E] to-[#2D2844] p-6 flex flex-col justify-end shrink-0">
+                    {/* Background Pattern / Shimmer */}
+                    <div className="absolute inset-0 opacity-10 bg-[radial-gradient(circle_at_top_right,_var(--tw-gradient-stops))] from-white via-transparent to-transparent pointer-events-none" />
+                    
+                    <h3
+                      className="text-2xl font-bold text-white leading-tight truncate relative z-10"
+                      style={{ fontFamily: "var(--font-heading, serif)" }}
+                    >
+                      {course.title}
+                    </h3>
+                    <p className="text-white/80 text-sm font-medium truncate relative z-10">
+                      {course.subject}
+                    </p>
+                  </div>
+                  
+                  {/* Class Info */}
+                  <div className="p-6 pt-5 bg-white flex flex-col justify-between flex-1">
+                    <div className="flex items-center gap-3">
+                      <div className="w-10 h-10 rounded-full bg-[#F5F1EB] flex items-center justify-center text-lg shadow-sm border border-[#1E1B2E]/5">
+                        👨‍🏫
+                      </div>
+                      <div className="flex flex-col">
+                        <span className="text-[#1E1B2E] font-bold text-sm">{course.teacher.name}</span>
+                        <span className="text-[#8E8E93] text-xs font-semibold">{course._count.enrollments} Students</span>
+                      </div>
+                    </div>
+                    
+                    <div className="mt-6 pt-5 border-t border-[#1E1B2E]/5 flex justify-end">
+                      <button className="px-5 py-2.5 rounded-xl bg-[#F5F1EB] text-[#1E1B2E] group-hover:bg-[#C9A96E] transition-colors font-bold text-xs uppercase tracking-wider">
+                        Open Class
+                      </button>
+                    </div>
+                  </div>
+                </motion.div>
+              );
+            }
 
             return (
               <motion.div
@@ -480,6 +587,56 @@ export default function CoursesClient({
           })}
         </motion.div>
       )}
+
+      {/* Join Class Modal */}
+      <AnimatePresence>
+        {showJoinClass && (
+          <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 sm:p-6 bg-[#1E1B2E]/80 backdrop-blur-md">
+            <motion.div 
+              initial={{ opacity: 0, scale: 0.95, y: 20 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              exit={{ opacity: 0, scale: 0.95, y: 20 }}
+              className="bg-white w-full max-w-md rounded-[32px] shadow-2xl overflow-hidden flex flex-col h-full max-h-[85vh]"
+            >
+              <div className="flex items-center justify-between p-6 border-b border-[rgba(30,27,46,0.06)] bg-white/50 backdrop-blur-sm shrink-0">
+                <h2 className="font-heading text-[24px] text-[#1E1B2E]">Join Class</h2>
+                <button 
+                  onClick={() => setShowJoinClass(false)}
+                  className="w-10 h-10 flex items-center justify-center rounded-full bg-white hover:bg-[rgba(30,27,46,0.04)] text-[#8E8E93] hover:text-[#1E1B2E] transition-colors shadow-sm"
+                >
+                  <X size={20} />
+                </button>
+              </div>
+              
+              <div className="p-8 flex-1 custom-scrollbar">
+                <form onSubmit={handleJoinClass} className="space-y-6">
+                  <div className="space-y-2">
+                    <label className="block text-[11px] uppercase tracking-[0.1em] font-bold text-[#8E8E93]">Class Code <span className="text-[#DC2626]">*</span></label>
+                    <input
+                      required
+                      placeholder="e.g. ABCDEF"
+                      className="w-full h-[52px] bg-[#F5F1EB] rounded-xl px-5 text-[15px] font-mono font-medium text-[#1E1B2E] focus:outline-none focus:ring-2 focus:ring-[#C9A96E]/40 tracking-widest uppercase"
+                      value={classCodeInput}
+                      onChange={(e) => setClassCodeInput(e.target.value.toUpperCase())}
+                      maxLength={6}
+                    />
+                    <p className="text-[12px] text-[#8E8E93] mt-2">Ask your teacher for the class code, then enter it here.</p>
+                  </div>
+                  
+                  <div className="pt-4 flex gap-4">
+                    <button type="button" onClick={() => setShowJoinClass(false)} className="flex-1 h-[56px] rounded-xl bg-white text-[#1E1B2E] text-[15px] font-bold hover:bg-[#F5F1EB] transition-colors border border-[rgba(30,27,46,0.1)]">
+                      Cancel
+                    </button>
+                    <button type="submit" disabled={loadingId === "join" || classCodeInput.length < 5} className="flex-[2] h-[56px] rounded-xl bg-[#1E1B2E] text-white text-[15px] font-bold uppercase tracking-widest flex items-center justify-center gap-2 hover:bg-[#C9A96E] hover:text-[#1E1B2E] transition-all disabled:opacity-50">
+                      {loadingId === "join" ? <Loader2 className="animate-spin" size={20} /> : "Join Class"}
+                    </button>
+                  </div>
+                </form>
+              </div>
+            </motion.div>
+          </div>
+        )}
+      </AnimatePresence>
     </div>
   );
 }

@@ -1,10 +1,10 @@
 "use client";
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, Suspense } from "react";
 import { useSearchParams } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
 import { MessageSquare, Send, Search, Loader2, ArrowLeft, Trash2, Lock, UserPlus, CheckCheck, X, Clock, AtSign, Users, Plus, MoreHorizontal } from "lucide-react";
 
-export default function MessagesPage() {
+function MessagesContent() {
   const [myUsername, setMyUsername] = useState<string|null>(undefined as any);
   const [newUsername, setNewUsername] = useState("");
   const [usernameError, setUsernameError] = useState("");
@@ -633,5 +633,13 @@ export default function MessagesPage() {
         </div>
       </div>
     </div>
+  );
+}
+
+export default function MessagesPage() {
+  return (
+    <Suspense fallback={<div className="flex h-screen items-center justify-center bg-[#F5F1EB]"><Loader2 className="animate-spin text-[#C9A96E]" size={40} /></div>}>
+      <MessagesContent />
+    </Suspense>
   );
 }

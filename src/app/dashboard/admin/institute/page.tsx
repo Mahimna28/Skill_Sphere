@@ -15,11 +15,23 @@ export default async function AdminInstitute() {
     redirect("/dashboard/admin/system");
   }
 
+  // Fetch the user to get their institutionId
+  const user = await prisma.user.findUnique({
+    where: { id: decoded.id },
+    select: { institutionId: true, role: true }
+  });
+
+  // If the user belongs to an institution and is an institute_admin, let them manage it.
+  // Otherwise, fallback to checking if they own one (for first time creation).
+  const queryWhere = (user?.role === "institute_admin" && user?.institutionId)
+    ? { id: user.institutionId }
+    : { adminId: decoded.id };
+
   // Fetch the institution along with departments, members, and requests
   const institutions = await prisma.institution.findMany({
-    where: { adminId: decoded.id },
+    where: queryWhere,
     include: {
-      departments: { include: { _count: { select: { courses: true } } } },
+      departments: { include: { _count: { select: { courses: { where: { isPublic: false } } } } } },
       members: { select: { id: true, name: true, email: true, role: true, department: { select: { name: true } } } },
       joinRequests: { include: { user: { select: { id: true, name: true, email: true, role: true } } } },
       leaveRequests: { include: { user: { select: { id: true, name: true, email: true, role: true } } } },

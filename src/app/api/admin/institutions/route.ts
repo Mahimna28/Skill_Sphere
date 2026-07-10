@@ -14,7 +14,7 @@ export async function GET() {
 
   const institutions = await prisma.institution.findMany({
     include: {
-      departments: { include: { _count: { select: { courses: true } } } },
+      departments: { include: { _count: { select: { courses: { where: { isPublic: false } } } } } },
       _count: { select: { members: true, joinRequests: true } },
     },
   });

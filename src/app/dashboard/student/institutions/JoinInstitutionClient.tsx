@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { motion, useReducedMotion } from "framer-motion";
 import { School, CheckCircle2, Lock, BookOpen, Users, Building2, Sparkles, Clock, Check } from "lucide-react";
+import { useRouter } from "next/navigation";
 
 // Global motion easing
 const easing = [0.25, 0.1, 0.25, 1.0] as const;
@@ -41,6 +42,7 @@ export default function JoinInstitutionClient({
   const [pendingSet, setPendingSet] = useState<Set<string>>(new Set(pendingIds));
   const [loadingId, setLoadingId] = useState<string | null>(null);
   const shouldReduceMotion = useReducedMotion() ?? false;
+  const router = useRouter();
 
   const handleEnrollRequest = async (institutionId: string) => {
     if (loadingId || pendingSet.has(institutionId) || userInstitutionId === institutionId) return;
@@ -172,8 +174,9 @@ export default function JoinInstitutionClient({
       )}
 
       {/* Available Institutions Grid */}
-      <div className="space-y-4">
-        <div className="flex items-center justify-between">
+      {!userInstitutionId && (
+        <div className="space-y-4">
+          <div className="flex items-center justify-between">
           <h2
             className="text-xl font-bold text-[#1E1B2E] flex items-center gap-2"
             style={{ fontFamily: "var(--font-heading, serif)" }}
@@ -305,6 +308,7 @@ export default function JoinInstitutionClient({
           </motion.div>
         )}
       </div>
+      )}
 
       {/* Private Classes Section */}
       {privateClasses.length > 0 && (
@@ -331,9 +335,10 @@ export default function JoinInstitutionClient({
             {privateClasses.map((cls) => (
               <motion.div
                 key={cls.id}
+                onClick={() => router.push(`/dashboard/student/courses/${cls.id}`)}
                 variants={cardVariants}
                 whileHover={shouldReduceMotion ? {} : { scale: 1.02 }}
-                className="rounded-2xl bg-white/70 backdrop-blur-xl border border-white/80 p-5 shadow-[0_8px_30px_rgba(30,27,46,0.05)] hover:shadow-[0_12px_32px_rgba(30,27,46,0.1)] flex flex-col justify-between transition-shadow relative overflow-hidden group"
+                className="rounded-2xl bg-white/70 backdrop-blur-xl border border-white/80 p-5 shadow-[0_8px_30px_rgba(30,27,46,0.05)] hover:shadow-[0_12px_32px_rgba(30,27,46,0.1)] flex flex-col justify-between transition-shadow relative overflow-hidden group cursor-pointer"
               >
                 <motion.div
                   className="absolute inset-0 bg-gradient-to-r from-transparent via-white/15 to-transparent -translate-x-full pointer-events-none"

@@ -9,18 +9,22 @@ export async function GET(req: Request) {
     return NextResponse.json({ message: "Email is required" }, { status:400 });
   }
 
-  const child = await prisma.user.findUnique({
-    where: { email },
-    select: { id: true, role: true, name: true }
+  const emails = email.split(",").map(e => e.trim()).filter(e => e);
+
+  const children = await prisma.user.findMany({
+    where: { email: { in: emails } },
+    select: { id: true, role: true, name: true, email: true }
   });
 
-  if (!child) {
-    return NextResponse.json({ message: "No student found with this Gmail. Please check the spelling." }, { status: 404 });
+  const missingEmails = emails.filter(e => !children.some(c => c.email.toLowerCase() === e.toLowerCase()));
+  if (missingEmails.length > 0) {
+    return NextResponse.json({ message: `No student found for: ${missingEmails.join(', ')}. Please check spelling.` }, { status: 404 });
   }
 
-  if (child.role !== "student") {
-    return NextResponse.json({ message: "The provided Gmail belongs to a " + child.role + ", not a student." }, { status: 400 });
+  const invalidRoleChildren = children.filter(c => c.role !== "student");
+  if (invalidRoleChildren.length > 0) {
+    return NextResponse.json({ message: `The following are not students: ${invalidRoleChildren.map(c => c.email).join(', ')}` }, { status: 400 });
   }
 
-  return NextResponse.json({ message: "Student found: " + child.name, childId: child.id });
+  return NextResponse.json({ message: "Students found: " + children.map(c => c.name).join(', ') });
 }
