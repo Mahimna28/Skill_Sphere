@@ -2,8 +2,6 @@
 
 import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
-import { Header } from "@/components/layout/Header";
-import { Footer } from "@/components/layout/Footer";
 import Link from "next/link";
 import { ArrowLeft, Clock } from "lucide-react";
 import { useParams } from "next/navigation";
@@ -71,7 +69,6 @@ export default function BlogPostPage() {
   if (loading) {
     return (
       <div className="min-h-screen bg-[#F5F1EB] flex flex-col">
-        <Header />
         <main className="flex-1 pt-32 pb-24">
           <div className="max-w-3xl mx-auto px-6 animate-pulse">
             <div className="h-6 w-32 bg-gray-200 rounded mb-8" />
@@ -91,7 +88,6 @@ export default function BlogPostPage() {
             </div>
           </div>
         </main>
-        <Footer />
       </div>
     );
   }
@@ -99,7 +95,6 @@ export default function BlogPostPage() {
   if (!post) {
     return (
       <div className="min-h-screen bg-[#F5F1EB] flex flex-col">
-        <Header />
         <main className="flex-1 flex flex-col items-center justify-center">
           <h1 className="font-heading text-4xl text-[#1E1B2E] mb-4">Post not found</h1>
           <Link href="/blog">
@@ -108,15 +103,12 @@ export default function BlogPostPage() {
             </button>
           </Link>
         </main>
-        <Footer />
       </div>
     );
   }
 
   return (
     <div className="min-h-screen bg-[#F5F1EB] flex flex-col">
-      <Header />
-      
       <main className="flex-1 pt-32 pb-24">
         <article className="max-w-3xl mx-auto px-6">
           <Link href="/blog" className="inline-flex items-center gap-2 text-[#8E8E93] hover:text-[#C9A96E] transition-colors mb-8 font-medium text-sm">
@@ -197,8 +189,6 @@ export default function BlogPostPage() {
           </motion.div>
         </article>
       </main>
-      
-      <Footer />
     </div>
   );
 }

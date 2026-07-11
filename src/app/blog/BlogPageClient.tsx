@@ -127,13 +127,11 @@ export default function BlogPageClient() {
               transition={{ duration: 0.8, ease: appleEase }}
               className="w-full lg:w-[55%] relative rounded-[16px] overflow-hidden shadow-[0_8px_32px_rgba(30,27,46,0.08)] aspect-[16/9] lg:aspect-auto lg:h-[500px]"
             >
-                <motion.div style={{ y: yParallax }} className="absolute inset-0 -top-[100px] -bottom-[100px]">
-                  <img 
-                    src={getCoverImage(featuredArticle)} 
-                    alt={featuredArticle.title} 
-                    className="w-full h-full object-cover transition-transform duration-700 ease-out group-hover:scale-[1.03]"
-                  />
-              </motion.div>
+              <img 
+                src={getCoverImage(featuredArticle)} 
+                alt={featuredArticle.title} 
+                className="w-full h-full absolute inset-0 object-cover transition-transform duration-700 ease-out group-hover:scale-[1.03]"
+              />
             </motion.div>
 
             {/* Right Content */}
