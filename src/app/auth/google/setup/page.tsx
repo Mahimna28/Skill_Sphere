@@ -206,7 +206,7 @@ export default function GoogleSetupPage() {
       >
         <Stepper />
 
-        <AnimatePresence mode="wait">
+        <>
           {step === "role" && (
             <div 
               key="role"
@@ -252,10 +252,8 @@ export default function GoogleSetupPage() {
               <button 
                 type="button" onClick={() => setStep("details")}
                 disabled={!role}
-                whileHover={role ? { scale: 1.01 } : {}}
-                whileTap={role ? { scale: 0.98 } : {}}
                 className={`w-full h-[48px] rounded-xl font-sans text-[16px] font-medium transition-colors ${
-                  role ? "bg-[#C9A96E] text-[#1E1B2E]" : "bg-[#F5F1EB] text-[#8E8E93] cursor-not-allowed"
+                  role ? "bg-[#C9A96E] text-[#1E1B2E] hover:bg-[#b89b65] active:scale-[0.98]" : "bg-[#F5F1EB] text-[#8E8E93] cursor-not-allowed"
                 }`}
               >
                 Continue
@@ -335,7 +333,7 @@ export default function GoogleSetupPage() {
               </form>
             </div>
           )}
-        </AnimatePresence>
+        </>
       </div>
     </div>
   );

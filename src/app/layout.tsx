@@ -17,6 +17,9 @@ export const metadata: Metadata = {
   title: "Skill Sphere Academy",
   description: "Next Generation Learning Platform",
   manifest: "/manifest.json",
+};
+
+export const viewport = {
   themeColor: "#4F7DF3",
 };
 
