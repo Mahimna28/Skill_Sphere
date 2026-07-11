@@ -7,7 +7,8 @@ const SUPER_ADMIN_EMAIL = "mahimnamistry281005@gmail.com";
 export async function GET(req: Request) {
   const { searchParams } = new URL(req.url);
   const code = searchParams.get("code");
-  const baseUrl = process.env.NEXT_PUBLIC_BASE_URL!;
+  const origin = req.headers.get("origin") || new URL(req.url).origin;
+  const baseUrl = (process.env.NEXT_PUBLIC_BASE_URL || origin).replace(/\/$/, "");
 
   // If Google returned an error
   if (!code) {

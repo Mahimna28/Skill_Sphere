@@ -74,17 +74,7 @@ export async function POST(req: Request) {
       });
     }
 
-    // ── Create "Set Password" notification ───────────────────────────────────
-    await prisma.notification.create({
-      data: {
-        userId: updatedUser.id,
-        type: "set_password",
-        title: "⚠️ Set Your Password",
-        body: "You signed in with Google. Set a password so you can also log in with your email.",
-        linkUrl: "/dashboard/profile",
-        read: false,
-      },
-    });
+    // Removed: "Set Password" notification creation
 
     // ── Re-issue JWT with correct role ────────────────────────────────────────
     const newToken = generateToken({ id: updatedUser.id, email: updatedUser.email, role: updatedUser.role });

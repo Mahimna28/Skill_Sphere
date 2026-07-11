@@ -16,11 +16,22 @@ export async function POST(req: Request) {
 
     const course = await prisma.course.findUnique({
       where: { classCode: classCode.toUpperCase() },
-      select: { id: true, isPublic: true }
+      select: { id: true, isPublic: true, departmentId: true, department: { select: { institutionId: true } } }
     });
 
     if (!course || course.isPublic) {
       return NextResponse.json({ message: "Invalid class code" }, { status: 404 });
+    }
+
+    // Check institution logic
+    if (course.departmentId && course.department?.institutionId) {
+      const user = await prisma.user.findUnique({ where: { id: decoded.id }, select: { institutionId: true } });
+      if (!user?.institutionId) {
+        return NextResponse.json({ message: "You cannot join an institute class because you are not in any institute" }, { status: 403 });
+      }
+      if (user.institutionId !== course.department.institutionId) {
+        return NextResponse.json({ message: "This class is not in this institute" }, { status: 403 });
+      }
     }
 
     // Check if already enrolled
