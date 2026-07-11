@@ -6,10 +6,10 @@ import { useRouter } from "next/navigation";
 import {
   BookOpen, Users, BarChart3, Rss, Plus, Trash2, FileText,
   MessageSquare, Send, Check, Loader2, Download, Copy, CheckCheck,
-  ChevronDown, ChevronRight, Upload, Star, Clock, X, AlertCircle, Award
+  ChevronDown, ChevronRight, Upload, Star, Clock, X, AlertCircle, Award, Settings
 } from "lucide-react";
 
-type Tab = "stream" | "classwork" | "people" | "grades" | "calendar";
+type Tab = "stream" | "classwork" | "people" | "grades" | "calendar" | "settings";
 
 const STATUS_CONFIG: Record<string, { label: string; color: string; bg: string }> = {
   assigned: { label: "Assigned", color: "#8E8E93", bg: "rgba(142,142,147,0.1)" },
@@ -59,6 +59,15 @@ export default function ClassroomClient({ course, isPrimaryTeacher, currentUserI
   // Calendar state
   const [showEventForm, setShowEventForm] = useState(false);
   const [eventForm, setEventForm] = useState({ title: "", description: "", startTime: "", endTime: "", location: "" });
+
+  // Settings state
+  const [classSettingsForm, setClassSettingsForm] = useState({ 
+    title: course.title || "", 
+    description: course.description || "",
+    details: course.details || "",
+    section: course.section || "", 
+    room: course.room || "" 
+  });
 
   // Grades state
   const [selectedSubmission, setSelectedSubmission] = useState<any>(null);
@@ -121,6 +130,38 @@ export default function ClassroomClient({ course, isPrimaryTeacher, currentUserI
     if (!confirm("Delete this topic and all its content?")) return;
     await fetch(`/api/classes/${course.id}/topics/${topicId}`, { method: "DELETE" });
     router.refresh();
+  };
+
+  const generateClassCode = async () => {
+    if (!confirm("Generate a new class code for this course?")) return;
+    setLoading(true);
+    try {
+      await fetch(`/api/courses/${course.id}/generate-code`, { method: "POST" });
+      router.refresh();
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const saveClassSettings = async () => {
+    if (!classSettingsForm.title) {
+      alert("Class name is required");
+      return;
+    }
+    setLoading(true);
+    try {
+      await fetch(`/api/courses/${course.id}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(classSettingsForm)
+      });
+      alert("Settings saved successfully!");
+      router.refresh();
+    } catch (e) {
+      alert("Failed to save settings");
+    } finally {
+      setLoading(false);
+    }
   };
 
   const createAssignment = async (topicId?: string) => {
@@ -325,6 +366,7 @@ export default function ClassroomClient({ course, isPrimaryTeacher, currentUserI
     { id: "calendar", label: "Calendar", icon: Clock },
     { id: "people", label: "People", icon: Users },
     { id: "grades", label: "Grades", icon: BarChart3 },
+    ...(isPrimaryTeacher ? [{ id: "settings", label: "Settings", icon: Settings }] : []),
   ];
 
   return (
@@ -333,14 +375,24 @@ export default function ClassroomClient({ course, isPrimaryTeacher, currentUserI
       <div className="bg-gradient-to-br from-[#1E1B2E] to-[#2D2844] text-white px-8 py-6 mx-4 mt-4 rounded-[24px]">
         <div className="flex items-center justify-between">
           <div>
-            <p className="text-[12px] font-bold uppercase tracking-widest text-[#C9A96E] mb-1">{course.subject}</p>
             <h1 className="font-heading text-[32px] leading-tight">{course.title}</h1>
             {course.section && <p className="text-white/60 text-sm mt-1">Section: {course.section}</p>}
           </div>
           <div className="text-right">
             <p className="text-[11px] text-white/50 mb-1">Class Code</p>
-            <div className="flex items-center gap-2 bg-white/10 border border-white/20 px-4 py-2 rounded-xl" title={course.classCode ? "Select to copy" : ""}>
-              <span className="font-mono text-[20px] font-bold text-[#C9A96E] tracking-widest select-all cursor-text">{course.classCode || "NO CODE"}</span>
+            <div className="flex items-center gap-2">
+              <div className="flex items-center gap-2 bg-white/10 border border-white/20 px-4 py-2 rounded-xl" title={course.classCode ? "Select to copy" : ""}>
+                <span className="font-mono text-[20px] font-bold text-[#C9A96E] tracking-widest select-all cursor-text">{course.classCode || "NO CODE"}</span>
+              </div>
+              {!course.classCode && (
+                <button
+                  onClick={generateClassCode}
+                  disabled={loading}
+                  className="bg-[#C9A96E] hover:bg-[#b0925c] text-[#1E1B2E] px-3 py-2 rounded-lg text-sm font-bold transition-all disabled:opacity-50"
+                >
+                  Generate Code
+                </button>
+              )}
             </div>
           </div>
         </div>
@@ -365,7 +417,7 @@ export default function ClassroomClient({ course, isPrimaryTeacher, currentUserI
           })}
         </div>
         {/* Subjects Filter Bar */}
-        {(course.subjects?.length > 0) && (
+        {(course.subjects?.length > 0 || course.subject) && (
           <div className="flex items-center gap-2 mt-4 flex-wrap">
             <button
               onClick={() => setSelectedSubjectId(null)}
@@ -377,20 +429,35 @@ export default function ClassroomClient({ course, isPrimaryTeacher, currentUserI
             >
               All Subjects
             </button>
+            {course.subject && (
+              <span className="px-4 py-1.5 rounded-full text-[12px] font-bold text-white border border-white/20 bg-white/5 cursor-default">
+                {course.subject}
+              </span>
+            )}
             {(course.subjects || []).map((sub: any) => (
-              <button
-                key={sub.id}
-                onClick={() => setSelectedSubjectId(sub.id)}
-                className={`px-4 py-1.5 rounded-full text-[12px] font-bold transition-all border ${
-                  selectedSubjectId === sub.id
-                    ? "bg-white text-[#1E1B2E] border-white shadow-sm"
-                    : "bg-transparent text-white/60 border-white/20 hover:border-white/40"
-                }`}
-                style={selectedSubjectId === sub.id ? { borderColor: sub.color, color: sub.color, background: `${sub.color}22` } : {}}
-              >
-                <span className="w-2 h-2 rounded-full inline-block mr-1.5" style={{ background: sub.color }} />
-                {sub.name}
-              </button>
+              <div key={sub.id} className="relative group">
+                <button
+                  onClick={() => setSelectedSubjectId(sub.id)}
+                  className={`px-4 py-1.5 rounded-full text-[12px] font-bold transition-all border ${
+                    selectedSubjectId === sub.id
+                      ? "bg-white text-[#1E1B2E] border-white shadow-sm"
+                      : "bg-transparent text-white/60 border-white/20 hover:border-white/40"
+                  }`}
+                  style={selectedSubjectId === sub.id ? { borderColor: sub.color, color: sub.color, background: `${sub.color}22` } : {}}
+                >
+                  <span className="w-2 h-2 rounded-full inline-block mr-1.5" style={{ background: sub.color }} />
+                  {sub.name}
+                </button>
+                {isPrimaryTeacher && (
+                  <button
+                    onClick={() => deleteSubject(sub.id)}
+                    className="absolute -top-1 -right-1 w-4 h-4 bg-red-500 text-white rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity shadow-sm"
+                    title="Delete subject"
+                  >
+                    <X size={10} />
+                  </button>
+                )}
+              </div>
             ))}
             <button
               onClick={() => setShowNewSubjectForm(true)}
@@ -682,8 +749,19 @@ export default function ClassroomClient({ course, isPrimaryTeacher, currentUserI
                 <div className="absolute top-0 right-0 w-32 h-32 bg-[#C9A96E]/10 rounded-full blur-2xl pointer-events-none" />
                 <div>
                   <p className="text-[11px] font-bold uppercase tracking-widest text-white/50 mb-1">Class Join Code</p>
-                  <div className="mt-1" title={course.classCode ? "Select to copy" : ""}>
-                    <span className="font-mono text-[28px] font-bold text-[#C9A96E] tracking-widest select-all cursor-text">{course.classCode || "NO CODE"}</span>
+                  <div className="mt-1 flex items-center gap-3">
+                    <div className="bg-[#F5F1EB] px-4 py-2 rounded-lg border border-[rgba(30,27,46,0.1)] inline-block" title={course.classCode ? "Select to copy" : ""}>
+                      <span className="font-mono text-[28px] font-bold text-[#C9A96E] tracking-widest select-all cursor-text">{course.classCode || "NO CODE"}</span>
+                    </div>
+                    {!course.classCode && (
+                      <button
+                        onClick={generateClassCode}
+                        disabled={loading}
+                        className="bg-[#1E1B2E] hover:bg-[#2D2844] text-white px-4 py-2 rounded-lg text-sm font-bold transition-all disabled:opacity-50 h-full flex items-center"
+                      >
+                        Generate Code
+                      </button>
+                    )}
                   </div>
                   <p className="text-[12px] text-white/40 mt-1">Students enter this code to join instantly</p>
                 </div>
@@ -915,6 +993,109 @@ export default function ClassroomClient({ course, isPrimaryTeacher, currentUserI
                   </div>
                 )}
               </div>
+            </motion.div>
+          )}
+
+          {/* ═══════════════════════════════ SETTINGS TAB ═══════════════════════════════ */}
+          {activeTab === "settings" && isPrimaryTeacher && (
+            <motion.div key="settings" initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }}>
+              <div className="bg-white rounded-[20px] shadow-[0_4px_20px_rgba(30,27,46,0.04)] overflow-hidden">
+                <div className="px-6 py-4 border-b border-[rgba(30,27,46,0.05)] bg-[#F5F1EB]/50">
+                  <h3 className="font-bold text-[18px] text-[#1E1B2E]">Class Settings</h3>
+                  <p className="text-[13px] text-[#8E8E93] mt-0.5">Manage class details and preferences</p>
+                </div>
+                <div className="p-8 max-w-2xl space-y-6">
+                  <div>
+                    <label className="block text-[11px] font-bold uppercase tracking-widest text-[#8E8E93] mb-2">Class Name</label>
+                    <input 
+                      type="text" 
+                      value={classSettingsForm.title} 
+                      onChange={e => setClassSettingsForm({ ...classSettingsForm, title: e.target.value })} 
+                      className="w-full h-12 bg-[#F5F1EB] rounded-xl px-4 text-[14px] text-[#1E1B2E] font-medium focus:outline-none focus:ring-2 focus:ring-[#C9A96E]/40"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-[11px] font-bold uppercase tracking-widest text-[#8E8E93] mb-2">Description</label>
+                    <textarea 
+                      value={classSettingsForm.description} 
+                      onChange={e => setClassSettingsForm({ ...classSettingsForm, description: e.target.value })} 
+                      className="w-full h-24 bg-[#F5F1EB] rounded-xl p-4 text-[14px] text-[#1E1B2E] font-medium focus:outline-none focus:ring-2 focus:ring-[#C9A96E]/40 resize-none"
+                      placeholder="Brief description of the class"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-[11px] font-bold uppercase tracking-widest text-[#8E8E93] mb-2">Details / Guidelines</label>
+                    <textarea 
+                      value={classSettingsForm.details} 
+                      onChange={e => setClassSettingsForm({ ...classSettingsForm, details: e.target.value })} 
+                      className="w-full h-32 bg-[#F5F1EB] rounded-xl p-4 text-[14px] text-[#1E1B2E] font-medium focus:outline-none focus:ring-2 focus:ring-[#C9A96E]/40 resize-none"
+                      placeholder="Additional details, syllabus info, or classroom rules"
+                    />
+                  </div>
+                  <div className="grid grid-cols-2 gap-4">
+                    <div>
+                      <label className="block text-[11px] font-bold uppercase tracking-widest text-[#8E8E93] mb-2">Section</label>
+                      <input 
+                        type="text" 
+                        value={classSettingsForm.section} 
+                        onChange={e => setClassSettingsForm({ ...classSettingsForm, section: e.target.value })} 
+                        className="w-full h-12 bg-[#F5F1EB] rounded-xl px-4 text-[14px] text-[#1E1B2E] font-medium focus:outline-none focus:ring-2 focus:ring-[#C9A96E]/40"
+                        placeholder="e.g. A, B, Morning"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-[11px] font-bold uppercase tracking-widest text-[#8E8E93] mb-2">Room</label>
+                      <input 
+                        type="text" 
+                        value={classSettingsForm.room} 
+                        onChange={e => setClassSettingsForm({ ...classSettingsForm, room: e.target.value })} 
+                        className="w-full h-12 bg-[#F5F1EB] rounded-xl px-4 text-[14px] text-[#1E1B2E] font-medium focus:outline-none focus:ring-2 focus:ring-[#C9A96E]/40"
+                        placeholder="e.g. Room 101"
+                      />
+                    </div>
+                  </div>
+                  <div className="pt-4 border-t border-[rgba(30,27,46,0.05)]">
+                    <button
+                      onClick={saveClassSettings}
+                      disabled={loading || !classSettingsForm.title}
+                      className="bg-[#1E1B2E] hover:bg-[#2D2844] text-white px-6 py-3 rounded-xl text-[13px] font-bold uppercase tracking-wider transition-all disabled:opacity-50 flex items-center gap-2"
+                    >
+                      {loading ? <Loader2 size={16} className="animate-spin" /> : <Settings size={16} />}
+                      Save Changes
+                    </button>
+                  </div>
+                </div>
+              </div>
+
+              {/* Manage Subjects section */}
+              {course.subjects && course.subjects.length > 0 && (
+                <div className="bg-white rounded-[20px] shadow-[0_4px_20px_rgba(30,27,46,0.04)] overflow-hidden mt-6">
+                  <div className="px-6 py-4 border-b border-[rgba(30,27,46,0.05)] bg-[#F5F1EB]/50">
+                    <h3 className="font-bold text-[18px] text-[#1E1B2E]">Manage Class Subjects</h3>
+                    <p className="text-[13px] text-[#8E8E93] mt-0.5">Delete unused or incorrectly created subjects</p>
+                  </div>
+                  <div className="p-8 max-w-2xl">
+                    <div className="space-y-3">
+                      {course.subjects.map((sub: any) => (
+                        <div key={sub.id} className="flex items-center justify-between bg-[#F5F1EB] rounded-xl p-4">
+                          <div className="flex items-center gap-3">
+                            <span className="w-3 h-3 rounded-full" style={{ background: sub.color }} />
+                            <span className="font-bold text-[14px] text-[#1E1B2E]">{sub.name}</span>
+                          </div>
+                          <button
+                            onClick={() => deleteSubject(sub.id)}
+                            disabled={loading}
+                            className="w-8 h-8 rounded-lg flex items-center justify-center bg-white border border-[rgba(30,27,46,0.1)] text-[#8E8E93] hover:text-red-500 hover:border-red-200 transition-all disabled:opacity-50"
+                            title="Delete subject"
+                          >
+                            <Trash2 size={14} />
+                          </button>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+              )}
             </motion.div>
           )}
         </AnimatePresence>

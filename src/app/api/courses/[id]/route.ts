@@ -14,7 +14,7 @@ export async function PATCH(req: Request, { params }: { params: Promise<{ id: st
       return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
     }
 
-    const { title, description, subject, thumbnail, isPublic } = await req.json();
+    const { title, description, details, subject, thumbnail, isPublic, section, room } = await req.json();
 
     // Verify ownership
     const existing = await prisma.course.findUnique({ where: { id } });
@@ -24,7 +24,7 @@ export async function PATCH(req: Request, { params }: { params: Promise<{ id: st
 
     const course = await prisma.course.update({
       where: { id },
-      data: { title, description, subject, thumbnail, isPublic },
+      data: { title, description, details, subject, thumbnail, isPublic, section, room },
     });
 
     return NextResponse.json({ message: "Course updated!", course });
