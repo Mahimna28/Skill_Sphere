@@ -231,7 +231,7 @@ export default function BlogPostClient() {
             </ul>
 
             <div className="w-full relative aspect-[16/9] mt-[32px] mb-[8px] rounded-xl overflow-hidden bg-[#1E1B2E]">
-              <Image src="https://images.unsplash.com/photo-1522202176988-66273c2fd55f?w=800&h=450&fit=crop" alt="Students learning together" fill className="object-cover" />
+              <Image src="https://images.unsplash.com/photo-1524178232363-1fb2b075b655?w=800&h=450&fit=crop" alt="Students learning together" fill className="object-cover" />
             </div>
             <p className="font-sans text-[13px] text-[#8E8E93] italic text-center mt-[8px] mb-[32px]">
               Students collaborating in a modern, AI-enhanced learning environment.

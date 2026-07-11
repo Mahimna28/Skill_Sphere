@@ -5,18 +5,6 @@ import { Code, MessageCircle, Briefcase, Camera, Mail, ArrowUp } from "lucide-re
 import { useState } from "react";
 
 export function Footer() {
-  const [email, setEmail] = useState("");
-  const [subscribed, setSubscribed] = useState(false);
-
-  const handleSubscribe = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (email && email.includes("@")) {
-      setSubscribed(true);
-      setEmail("");
-      // Real app: submit to API
-    }
-  };
-
   const scrollToTop = () => {
     window.scrollTo({ top: 0, behavior: "smooth" });
   };
@@ -25,44 +13,14 @@ export function Footer() {
     <footer className="bg-[#1E1B2E] pt-[80px] pb-[40px]">
       <div className="max-w-[1200px] mx-auto px-[32px]">
 
-        {/* ROW 1: NEWSLETTER + BRAND */}
-        <div className="flex flex-col md:flex-row justify-between pb-[48px] border-b border-[rgba(255,255,255,0.08)] gap-10 md:gap-0">
-          {/* Brand */}
-          <div className="w-full md:w-[40%] flex flex-col justify-center">
-            <span className="font-heading font-black text-[24px] text-white tracking-tight">
-              Skill Sphere.
-            </span>
-            <p className="font-sans text-[14px] text-[rgba(255,255,255,0.5)] mt-[8px] max-w-[280px] leading-[1.5]">
-              Education, crafted for how you think.
-            </p>
-          </div>
-
-          {/* Newsletter */}
-          <div className="w-full md:w-[60%]">
-            <h3 className="font-heading text-[20px] text-white">Stay in the loop.</h3>
-            <p className="font-sans text-[14px] text-[rgba(255,255,255,0.6)] mt-[6px]">
-              Get updates on new courses, features, and learning tips — no spam, ever.
-            </p>
-            <form onSubmit={handleSubscribe} className="mt-[16px] flex flex-row gap-[12px]">
-              <input
-                type="email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                placeholder="Enter your email"
-                className="flex-1 h-[48px] bg-[rgba(255,255,255,0.05)] border border-[rgba(255,255,255,0.15)] rounded-xl px-[16px] text-white placeholder-[rgba(255,255,255,0.6)] font-sans text-[14px] focus:outline-none focus:border-[#C9A96E] focus:shadow-[0_0_0_3px_rgba(201,169,110,0.15)] transition-all"
-                required
-              />
-              <button
-                type="submit"
-                className="h-[48px] px-[24px] bg-[#C9A96E] text-[#1E1B2E] font-sans font-semibold text-[14px] rounded-xl hover:bg-[#B8956A] hover:scale-[1.02] active:scale-[0.98] transition-all whitespace-nowrap"
-              >
-                Subscribe
-              </button>
-            </form>
-            {subscribed && (
-              <p className="text-[#C9A96E] font-sans text-[13px] mt-2">Thanks for subscribing!</p>
-            )}
-          </div>
+        {/* ROW 1: BRAND */}
+        <div className="flex flex-col items-center text-center pb-[48px] border-b border-[rgba(255,255,255,0.08)]">
+          <span className="font-heading font-black text-[24px] text-white tracking-tight">
+            Skill Sphere.
+          </span>
+          <p className="font-sans text-[14px] text-[rgba(255,255,255,0.5)] mt-[8px] max-w-[280px] leading-[1.5]">
+            Education, crafted for how you think.
+          </p>
         </div>
 
         {/* ROW 2: LINK COLUMNS */}

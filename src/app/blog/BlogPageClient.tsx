@@ -58,8 +58,8 @@ export default function BlogPageClient() {
     "Web Development guides": "https://images.unsplash.com/photo-1633356122544-f134324a6cee?auto=format&fit=crop&q=80&w=1000",
     "Career and internship tips": "https://images.unsplash.com/photo-1521737604893-d14cc237f11d?auto=format&fit=crop&q=80&w=1000",
     "Interview preparation articles": "https://images.unsplash.com/photo-1573164713988-8665fc963095?auto=format&fit=crop&q=80&w=1000",
-    "Programming roadmaps": "https://images.unsplash.com/photo-1473341304170-971dccb5ac1e?auto=format&fit=crop&q=80&w=1000",
-    "College admission and scholarship guides": "https://images.unsplash.com/photo-1523050854058-8df90110c9f1?auto=format&fit=crop&q=80&w=1000",
+    "Programming roadmaps": "https://images.unsplash.com/photo-1587620962725-abab7fe55159?auto=format&fit=crop&q=80&w=1000",
+    "College admission and scholarship guides": "https://images.unsplash.com/photo-1523240795612-9a054b0db644?auto=format&fit=crop&q=80&w=1000",
     "Industry news and technology updates": "https://images.unsplash.com/photo-1504384308090-c894fdcc538d?auto=format&fit=crop&q=80&w=1000",
     "Default": "https://images.unsplash.com/photo-1456406644174-8ddd4cd52a06?auto=format&fit=crop&q=80&w=1000"
   };
@@ -324,40 +324,6 @@ export default function BlogPageClient() {
               </button>
             </div>
           )}
-        </div>
-      </section>
-
-      {/* 5. NEWSLETTER CTA */}
-      <section className="py-[120px] bg-[#1E1B2E] text-center">
-        <div className="max-w-2xl mx-auto px-4">
-          <motion.div
-            initial={{ opacity: 0, y: 30 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.8, ease: appleEase }}
-          >
-            <h2 className="font-heading font-black text-[36px] text-white mb-4">
-              Stay curious.
-            </h2>
-            <p className="font-sans text-[16px] text-[#F5F1EB] mb-10 font-light opacity-90">
-              Join 40,000+ educators and learners receiving our weekly insights.
-            </p>
-            <div className="flex flex-col sm:flex-row gap-4 justify-center relative">
-              <input 
-                type="email" 
-                placeholder="Enter your email" 
-                className="w-full h-[56px] bg-transparent border-0 border-b border-white/20 px-4 font-sans text-[16px] text-white placeholder-white/50 focus:border-[#C9A96E] focus:ring-0 focus:outline-none transition-colors"
-              />
-              <motion.button 
-                whileHover={{ scale: 1.02 }}
-                whileTap={{ scale: 0.98 }}
-                transition={{ type: "spring", stiffness: 400, damping: 25 }}
-                className="w-full sm:w-auto shrink-0 bg-[#C9A96E] text-[#1E1B2E] font-sans font-medium text-[16px] rounded-full px-8 h-[56px]"
-              >
-                Subscribe
-              </motion.button>
-            </div>
-          </motion.div>
         </div>
       </section>
 

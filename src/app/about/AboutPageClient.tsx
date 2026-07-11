@@ -98,11 +98,11 @@ export default function AboutPageClient() {
           <div className="flex-1 w-full relative aspect-[4/3]">
             {isMobile ? (
               <div className="w-full h-full relative rounded-2xl overflow-hidden shadow-[0_12px_40px_rgba(0,0,0,0.15)]">
-                <Image src="https://images.unsplash.com/photo-1522202176988-66273c2fd55f?w=800&h=600&fit=crop" alt="Students learning" fill className="object-cover" />
+                <Image src="https://images.unsplash.com/photo-1515162816999-a0c47dc192f7?auto=format&fit=crop&q=80&w=1000" alt="Students learning" fill className="object-cover" />
               </div>
             ) : (
               <ParallaxWrapper speed={0.5} className="w-full h-full relative rounded-2xl overflow-hidden shadow-[0_12px_40px_rgba(0,0,0,0.15)]">
-                <Image src="https://images.unsplash.com/photo-1522202176988-66273c2fd55f?w=800&h=600&fit=crop" alt="Students learning" fill className="object-cover" />
+                <Image src="https://images.unsplash.com/photo-1515162816999-a0c47dc192f7?auto=format&fit=crop&q=80&w=1000" alt="Students learning" fill className="object-cover" />
               </ParallaxWrapper>
             )}
           </div>

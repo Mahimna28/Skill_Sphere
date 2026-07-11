@@ -60,7 +60,7 @@ export default function FeaturesPageClient() {
       <section className="relative min-h-screen flex flex-col items-center justify-center pt-32 pb-32 px-4 overflow-hidden bg-[#1E1B2E]">
         <div className="absolute inset-0 z-0">
           <div className="absolute inset-0 bg-[rgba(30,27,46,0.8)] z-10" />
-          <Image src="https://images.unsplash.com/photo-1522202176988-66273c2fd55f?auto=format&fit=crop&q=80&w=2000" alt="Features Hero" fill className="object-cover" priority />
+          <Image src="https://images.unsplash.com/photo-1517245386807-bb43f82c33c4?auto=format&fit=crop&q=80&w=2000" alt="Features Hero" fill className="object-cover" priority />
         </div>
 
         <div className="relative z-20 w-full max-w-7xl mx-auto flex flex-col items-center text-center">
