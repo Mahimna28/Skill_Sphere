@@ -2,17 +2,17 @@ import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { verifyToken } from "@/lib/auth";
 
-export async function POST(req: Request, { params }: { params: { id: string } }) {
+export async function POST(req: Request, { params }: { params: Promise<{ id: string }> }) {
   try {
     const token = req.headers.get("cookie")?.split("token=")[1]?.split(";")[0];
     if (!token) return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
 
     const decoded = verifyToken(token);
-    if (!decoded || (decoded.role !== "teacher" && decoded.role !== "admin" && decoded.role !== "superadmin")) {
+    if (!decoded || !["teacher", "admin", "superadmin", "institute_admin"].includes(decoded.role)) {
       return NextResponse.json({ message: "Unauthorized" }, { status: 403 });
     }
 
-    const { id: courseId } = params;
+    const { id: courseId } = await params;
 
     // Verify course belongs to teacher or is admin
     const course = await prisma.course.findUnique({ where: { id: courseId } });
