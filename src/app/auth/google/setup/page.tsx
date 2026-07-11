@@ -22,6 +22,7 @@ export default function GoogleSetupPage() {
   const [user, setUser] = useState<{ name: string; image?: string } | null>(null);
   const [role, setRole] = useState("student");
   const [username, setUsername] = useState("");
+  const [password, setPassword] = useState("");
   const [childEmail, setChildEmail] = useState("");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
@@ -95,6 +96,12 @@ export default function GoogleSetupPage() {
       return;
     }
 
+    if (!password || password.length < 6) {
+      setError("Password must be at least 6 characters long.");
+      setLoading(false);
+      return;
+    }
+
     if (usernameStatus !== "available") {
       setError("Please choose a valid and available username.");
       setLoading(false);
@@ -105,7 +112,7 @@ export default function GoogleSetupPage() {
       const res = await fetch("/api/auth/google/setup", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ role, username, childEmail: role === "parent" ? childEmail : undefined }),
+        body: JSON.stringify({ role, username, password, childEmail: role === "parent" ? childEmail : undefined }),
       });
 
       const data = await res.json();
@@ -301,6 +308,21 @@ export default function GoogleSetupPage() {
                     <p className={`text-[10px] uppercase tracking-[0.05em] font-bold ${/^[a-z0-9_]*$/.test(username) && username ? "text-[#C9A96E]" : "text-[#8E8E93] opacity-50"}`}>• a-z, 0-9, _</p>
                     {usernameStatus === "taken" && <p className="text-[10px] uppercase tracking-[0.05em] font-bold text-red-500">• Taken!</p>}
                   </div>
+                </div>
+
+                <div className="space-y-1">
+                  <Label className="font-sans text-[12px] uppercase tracking-[0.1em] text-[#8E8E93] flex items-center gap-1.5">
+                    Set a Password <span className="normal-case tracking-normal text-[#C9A96E] ml-1">(for email login)</span>
+                  </Label>
+                  <Input
+                    type="password"
+                    placeholder="Min. 6 characters"
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    className="h-[48px] bg-white border border-[rgba(30,27,46,0.08)] rounded-xl font-sans text-[15px] text-[#1E1B2E] placeholder:text-[#8E8E93] focus-visible:ring-0 focus-visible:border-[#C9A96E] focus-visible:shadow-[0_0_0_3px_rgba(201,169,110,0.15)] transition-all px-4"
+                    required
+                    minLength={6}
+                  />
                 </div>
 
                 {role === "parent" && (

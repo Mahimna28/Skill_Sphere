@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { cookies } from "next/headers";
 import { verifyToken, generateToken } from "@/lib/auth";
+import bcrypt from "bcryptjs";
 
 export async function POST(req: Request) {
   try {
@@ -18,7 +19,7 @@ export async function POST(req: Request) {
       return NextResponse.json({ message: "Setup already completed" }, { status: 400 });
     }
 
-    const { role, username, childEmail } = await req.json();
+    const { role, username, password, childEmail } = await req.json();
 
     // ── Validate role ────────────────────────────────────────────────────────
     const allowedRoles = ["student", "teacher", "parent"];
@@ -41,6 +42,12 @@ export async function POST(req: Request) {
       return NextResponse.json({ message: "Username already taken. Try another." }, { status: 409 });
     }
 
+    // ── Validate password ────────────────────────────────────────────────────
+    if (!password || password.length < 6) {
+      return NextResponse.json({ message: "Password must be at least 6 characters." }, { status: 400 });
+    }
+    const hashedPassword = await bcrypt.hash(password, 10);
+
     // ── Parent: validate child email ─────────────────────────────────────────
     let childUser = null;
     if (role === "parent") {
@@ -62,6 +69,7 @@ export async function POST(req: Request) {
       data: {
         role,
         username,
+        password: hashedPassword,
         isProfilePublic,
       },
     });
