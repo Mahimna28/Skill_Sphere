@@ -1,6 +1,6 @@
 "use client";
 
-import { motion } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
 import { 
   Sparkles, AlertCircle, Frown, MessageSquareOff, TrendingDown, TrendingUp,
   Check, CheckCircle, XCircle, Minus, Compass, Brain, Rocket,
@@ -11,6 +11,7 @@ import { Footer } from "@/components/layout/Footer";
 import { CommunityFeedbackSection } from "@/components/home/CommunityFeedback";
 import Link from "next/link";
 import { useState, useEffect } from "react";
+import { TiltMockup } from "@/components/animations/TiltMockup";
 
 
 function SolutionSection() {
@@ -81,10 +82,9 @@ function SolutionSection() {
           transition={{ duration: 0.8, delay: 0.2 }}
           className="relative"
         >
-          <div className="relative rounded-2xl overflow-hidden shadow-[0_32px_64px_rgba(0,0,0,0.15)] bg-white aspect-[4/3] border border-[rgba(30,27,46,0.04)] flex items-center justify-center">
-            <img src="/images/solution-dashboard.jpg" alt="Skill Sphere Dashboard" className="w-full h-full object-cover" onError={(e) => (e.currentTarget.style.display = 'none')} />
-            <span className="absolute text-[#8E8E93] font-medium">Dashboard Preview</span>
-          </div>
+          <TiltMockup>
+            <img src="/images/Dashboards/Student/overview.png" alt="Skill Sphere Student Dashboard" className="w-full h-full object-cover object-top" />
+          </TiltMockup>
           {/* Floating stat card */}
           <motion.div
             animate={{ y: [0, -10, 0] }}
@@ -102,6 +102,67 @@ function SolutionSection() {
             </div>
           </motion.div>
         </motion.div>
+      </div>
+    </motion.section>
+  );
+}
+
+function RoleShowcaseSection() {
+  const [activeTab, setActiveTab] = useState<"student" | "teacher" | "parent">("student");
+
+  const tabs = [
+    { id: "student", label: "For Students", img: "/images/Dashboards/Student/overview.png" },
+    { id: "teacher", label: "For Teachers", img: "/images/Dashboards/Teacher_InstituteAdmin/Overview.png" },
+    { id: "parent", label: "For Parents", img: "/images/Dashboards/Parents/OverView.png" }
+  ];
+
+  return (
+    <motion.section 
+      initial={{ opacity: 0, y: 24 }}
+      whileInView={{ opacity: 1, y: 0 }}
+      viewport={{ once: true, margin: "-100px" }}
+      transition={{ duration: 0.5 }}
+      className="py-32 bg-[#1E1B2E] text-white overflow-hidden relative"
+    >
+      <div className="max-w-7xl mx-auto px-6 flex flex-col items-center">
+        <span className="text-[#C9A96E] text-sm font-medium uppercase tracking-wider mb-3">Designed for Everyone</span>
+        <h2 className="font-heading text-4xl text-white mb-6 text-center">A tailored experience for every role</h2>
+        
+        {/* Tab Switcher */}
+        <div className="flex bg-[rgba(255,255,255,0.05)] p-1 rounded-full mb-12 border border-[rgba(255,255,255,0.1)]">
+          {tabs.map((tab) => (
+            <button
+              key={tab.id}
+              onClick={() => setActiveTab(tab.id as any)}
+              className={`relative px-6 py-2.5 rounded-full text-sm font-medium transition-colors ${activeTab === tab.id ? "text-[#1E1B2E]" : "text-white hover:text-white/80"}`}
+            >
+              {activeTab === tab.id && (
+                <motion.div
+                  layoutId="activeTabRole"
+                  className="absolute inset-0 bg-[#C9A96E] rounded-full z-0"
+                  transition={{ type: "spring", bounce: 0.2, duration: 0.6 }}
+                />
+              )}
+              <span className="relative z-10">{tab.label}</span>
+            </button>
+          ))}
+        </div>
+
+        {/* Dashboard Preview */}
+        <div className="w-full max-w-5xl aspect-video relative rounded-2xl overflow-hidden shadow-[0_32px_64px_rgba(0,0,0,0.4)] border border-[rgba(255,255,255,0.1)]">
+          <AnimatePresence mode="wait">
+            <motion.img
+              key={activeTab}
+              initial={{ opacity: 0, scale: 0.98 }}
+              animate={{ opacity: 1, scale: 1 }}
+              exit={{ opacity: 0, scale: 1.02 }}
+              transition={{ duration: 0.4 }}
+              src={tabs.find(t => t.id === activeTab)?.img}
+              alt="Dashboard Preview"
+              className="w-full h-full object-cover object-top absolute inset-0"
+            />
+          </AnimatePresence>
+        </div>
       </div>
     </motion.section>
   );
@@ -728,9 +789,11 @@ function HeroSection() {
 export default function Homepage() {
   return (
     <div className="min-h-screen bg-[#F5F1EB]">
-      <main>
+      <main className="flex-1 flex flex-col">
         <HeroSection />
+
         <SolutionSection />
+        <RoleShowcaseSection />
         <FeaturesBentoSection />
         <HowItWorksSection />
         <BenefitsSection />

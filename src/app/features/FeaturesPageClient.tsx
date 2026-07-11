@@ -2,7 +2,8 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { motion } from "framer-motion";
+import React, { useRef, useState, useEffect } from "react";
+import { motion, AnimatePresence, useScroll, useTransform, useInView } from "framer-motion";
 import { ChevronDown, Sparkles, BookOpen, Users, Trophy, MessageSquare, BarChart, UserPlus, Search, PlayCircle, Award, Quote } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -12,12 +13,10 @@ import { SlideUp } from "@/components/animations/SlideUp";
 import { StaggerContainer, StaggerItem } from "@/components/animations/StaggerContainer";
 
 const FEATURES = [
-  { icon: Sparkles, title: "AI Study Tutor", desc: "Get instant, personalized help from our AI tutor. Available 24/7 for any subject, any question." },
-  { icon: BookOpen, title: "Expert-Led Courses", desc: "Learn from industry professionals with curated courses designed for real-world application." },
-  { icon: Users, title: "Community Learning", desc: "Join discussions, ask questions, and collaborate with peers in course-specific chat rooms." },
-  { icon: Trophy, title: "Gamified Progress", desc: "Earn points, climb the leaderboard, and stay motivated with achievement tracking." },
-  { icon: MessageSquare, title: "Direct Messaging", desc: "Connect with teachers and students directly for personalized support and networking." },
-  { icon: BarChart, title: "Progress Analytics", desc: "Track your learning with detailed analytics, streaks, and performance insights." }
+  { icon: Sparkles, title: "AI Study Tutor", desc: "Get instant, personalized help from our AI tutor. Available 24/7 for any subject, any question.", img: "/images/Dashboards/Student/AI_Study_Tutor.png" },
+  { icon: BookOpen, title: "Expert-Led Course Studio", desc: "Learn from industry professionals with curated courses designed for real-world application.", img: "/images/Dashboards/Teacher_InstituteAdmin/CourseStudio.png" },
+  { icon: Users, title: "Community Learning", desc: "Join discussions, ask questions, and collaborate with peers in course-specific chat rooms.", img: "/images/Dashboards/Student/Course_Chat.png" },
+  { icon: Trophy, title: "Gamified Progress", desc: "Earn points, climb the leaderboard, and stay motivated with achievement tracking.", img: "/images/Dashboards/Student/Leaderboard.png" },
 ];
 
 const STEPS = [
@@ -95,36 +94,8 @@ export default function FeaturesPageClient() {
         </div>
       </section>
 
-      {/* 2. FEATURE GRID */}
-      <section className="py-[80px] px-[32px] bg-[#F5F1EB]">
-        <div className="max-w-[1200px] mx-auto w-full">
-          <div className="text-center mb-[48px]">
-            <FadeIn>
-              <h2 className="font-heading text-[32px] text-[#1E1B2E]">Why Skill Sphere Stands Out</h2>
-              <p className="font-sans text-[16px] text-[#8E8E93] mt-[12px]">Powerful tools designed to accelerate your learning journey.</p>
-            </FadeIn>
-          </div>
-
-          <StaggerContainer staggerDelay={getStaggerDelay(0.15)} className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-[24px]">
-            {FEATURES.map((feature, idx) => (
-              <StaggerItem key={idx}>
-                <div className="bg-white rounded-2xl p-[32px] shadow-[0_4px_20px_rgba(0,0,0,0.06)] hover:-translate-y-[6px] hover:shadow-[0_12px_32px_rgba(0,0,0,0.1)] transition-all duration-300 h-full flex flex-col">
-                  <div className="w-[56px] h-[56px] rounded-full bg-[rgba(201,169,110,0.1)] flex items-center justify-center mb-[20px]">
-                    <feature.icon size={28} className="text-[#C9A96E]" />
-                  </div>
-                  <h3 className="font-heading text-[20px] text-[#1E1B2E]">{feature.title}</h3>
-                  <p className="font-sans text-[14px] text-[#8E8E93] leading-[1.7] mt-[10px] flex-1">
-                    {feature.desc}
-                  </p>
-                  <Link href="/courses" className="font-sans text-[13px] text-[#C9A96E] hover:underline mt-[16px] inline-block font-medium">
-                    Learn more &rarr;
-                  </Link>
-                </div>
-              </StaggerItem>
-            ))}
-          </StaggerContainer>
-        </div>
-      </section>
+      {/* 2. STICKY SCROLL PARALLAX FEATURES */}
+      <StickyScrollSection />
 
       {/* 3. HOW IT WORKS */}
       <section className="py-[80px] px-[32px] bg-white">
@@ -316,3 +287,81 @@ export default function FeaturesPageClient() {
     </div>
   );
 }
+
+function StickyScrollSection() {
+  const [activeIndex, setActiveIndex] = useState(0);
+
+  return (
+    <section className="py-[120px] px-[32px] bg-[#F5F1EB] relative">
+      <div className="max-w-[1200px] mx-auto w-full">
+        <div className="text-center mb-[80px]">
+          <FadeIn>
+            <h2 className="font-heading text-[32px] md:text-[48px] text-[#1E1B2E]">Why Skill Sphere Stands Out</h2>
+            <p className="font-sans text-[16px] md:text-[18px] text-[#8E8E93] mt-[12px]">Powerful tools designed to accelerate your learning journey.</p>
+          </FadeIn>
+        </div>
+
+        <div className="flex flex-col md:flex-row gap-12 relative items-start">
+          {/* Left side: Scrolling Text */}
+          <div className="w-full md:w-1/2 flex flex-col pb-[30vh]">
+            {FEATURES.map((feature, idx) => (
+              <FeatureTextBlock 
+                key={idx} 
+                feature={feature} 
+                index={idx} 
+                setActiveIndex={setActiveIndex}
+                isActive={activeIndex === idx} 
+              />
+            ))}
+          </div>
+
+          {/* Right side: Sticky Image */}
+          <div className="hidden md:block w-1/2 sticky top-[30vh]">
+            <div className="w-full aspect-video relative rounded-2xl overflow-hidden shadow-[0_32px_64px_rgba(0,0,0,0.15)] bg-white border border-[rgba(30,27,46,0.04)] flex items-center justify-center">
+              <AnimatePresence mode="wait">
+                <motion.img
+                  key={activeIndex}
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: -20 }}
+                  transition={{ duration: 0.5 }}
+                  src={FEATURES[activeIndex].img}
+                  alt={FEATURES[activeIndex].title}
+                  className="w-full h-full object-cover object-top absolute inset-0"
+                />
+              </AnimatePresence>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  );
+}
+
+function FeatureTextBlock({ feature, index, setActiveIndex, isActive }: { feature: any, index: number, setActiveIndex: (idx: number) => void, isActive: boolean }) {
+  const ref = useRef(null);
+  const isInView = useInView(ref, { margin: "-40% 0px -40% 0px" });
+
+  useEffect(() => {
+    if (isInView) {
+      setActiveIndex(index);
+    }
+  }, [isInView, index, setActiveIndex]);
+
+  return (
+    <div ref={ref} className={`transition-all duration-500 ${isActive ? "opacity-100 scale-100" : "opacity-30 scale-95"} flex flex-col justify-center min-h-[60vh]`}>
+      <div className="w-[64px] h-[64px] rounded-2xl bg-[rgba(201,169,110,0.1)] flex items-center justify-center mb-[24px]">
+        <feature.icon size={32} className="text-[#C9A96E]" />
+      </div>
+      <h3 className="font-heading text-[32px] text-[#1E1B2E] mb-4">{feature.title}</h3>
+      <p className="font-sans text-[18px] text-[#8E8E93] leading-[1.7] mb-6">
+        {feature.desc}
+      </p>
+      {/* Mobile-only image */}
+      <div className="md:hidden w-full aspect-video rounded-xl overflow-hidden shadow-lg mt-6 relative">
+        <img src={feature.img} alt={feature.title} className="w-full h-full object-cover object-top" />
+      </div>
+    </div>
+  );
+}
+

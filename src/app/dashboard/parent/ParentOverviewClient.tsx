@@ -7,6 +7,34 @@ import { motion } from "framer-motion";
 
 export default function ParentOverviewClient({ childrenData }: { childrenData: any[] }) {
   const [activeChildId, setActiveChildId] = useState<string>(childrenData[0]?.id || "");
+  const [showLinkModal, setShowLinkModal] = useState(false);
+  const [childEmail, setChildEmail] = useState("");
+  const [loadingLink, setLoadingLink] = useState(false);
+  const [linkMessage, setLinkMessage] = useState("");
+
+  const handleLinkChild = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setLoadingLink(true);
+    setLinkMessage("");
+    try {
+      const res = await fetch("/api/parent/link-child", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ childEmail })
+      });
+      const data = await res.json();
+      if (res.ok) {
+        setLinkMessage("Success! Reloading...");
+        setTimeout(() => window.location.reload(), 1500);
+      } else {
+        setLinkMessage(data.message || "Failed to link child.");
+      }
+    } catch (err) {
+      setLinkMessage("An error occurred.");
+    } finally {
+      setLoadingLink(false);
+    }
+  };
 
   if (!childrenData || childrenData.length === 0) {
     return (
@@ -16,11 +44,41 @@ export default function ParentOverviewClient({ childrenData }: { childrenData: a
         </div>
         <h2 className="text-3xl font-heading text-[#1E1B2E]">No Child Linked</h2>
         <p className="max-w-md font-sans text-[14px] text-[#8E8E93]">
-          It seems your account isn't linked to a student. Go to Settings to link your child using their email.
+          It seems your account isn't linked to a student. Link your child using their email address.
         </p>
-        <Link href="/dashboard/parent/settings" className="px-6 py-3 bg-[#1E1B2E] text-white rounded-xl font-medium mt-4 hover:bg-[#2D2844] transition">
-          Go to Settings
-        </Link>
+        <button onClick={() => setShowLinkModal(true)} className="px-6 py-3 bg-[#1E1B2E] text-white rounded-xl font-medium mt-4 hover:bg-[#2D2844] transition">
+          Link Child
+        </button>
+
+        {showLinkModal && (
+          <div className="fixed inset-0 bg-black/60 z-50 flex items-center justify-center p-4">
+            <div className="bg-white rounded-2xl w-full max-w-md p-6 relative">
+              <button onClick={() => setShowLinkModal(false)} className="absolute top-4 right-4 text-gray-500 hover:text-gray-900">
+                ×
+              </button>
+              <h3 className="font-heading text-xl mb-2 text-left">Link a Child</h3>
+              <p className="text-gray-500 text-[13px] mb-4 text-left">Enter the email address your child used to register as a student.</p>
+              <form onSubmit={handleLinkChild} className="flex flex-col gap-4">
+                <input 
+                  type="email" 
+                  placeholder="student@example.com" 
+                  className="w-full border rounded-lg px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-[#C9A96E]" 
+                  value={childEmail}
+                  onChange={(e) => setChildEmail(e.target.value)}
+                  required
+                />
+                {linkMessage && (
+                  <p className={`text-[13px] font-medium text-left ${linkMessage.includes("Success") ? "text-green-600" : "text-red-500"}`}>
+                    {linkMessage}
+                  </p>
+                )}
+                <button type="submit" disabled={loadingLink} className="w-full bg-[#C9A96E] text-[#1E1B2E] font-medium py-3 rounded-lg hover:bg-[#b8985d] transition-all disabled:opacity-50">
+                  {loadingLink ? "Linking..." : "Link Child Account"}
+                </button>
+              </form>
+            </div>
+          </div>
+        )}
       </div>
     );
   }
@@ -85,9 +143,9 @@ export default function ParentOverviewClient({ childrenData }: { childrenData: a
               <span className={`font-semibold text-[14px] ${activeChildId === c.id ? 'text-[#1E1B2E]' : 'text-[#8E8E93]'}`}>{c.name}</span>
             </button>
           ))}
-          <Link href="/dashboard/parent/settings" className="flex items-center gap-2 px-4 py-2 rounded-full border-2 border-dashed border-gray-300 text-gray-500 hover:text-gray-800 hover:border-gray-400 transition-all text-sm font-medium whitespace-nowrap">
+          <button onClick={() => setShowLinkModal(true)} className="flex items-center gap-2 px-4 py-2 rounded-full border-2 border-dashed border-gray-300 text-gray-500 hover:text-gray-800 hover:border-gray-400 transition-all text-sm font-medium whitespace-nowrap">
             + Link Child
-          </Link>
+          </button>
         </div>
 
         {/* QUICK ACTIONS */}
@@ -320,6 +378,37 @@ export default function ParentOverviewClient({ childrenData }: { childrenData: a
         </div>
 
       </div>
+
+      {showLinkModal && (
+        <div className="fixed inset-0 bg-black/60 z-50 flex items-center justify-center p-4">
+          <div className="bg-white rounded-2xl w-full max-w-md p-6 relative">
+            <button onClick={() => setShowLinkModal(false)} className="absolute top-4 right-4 text-gray-500 hover:text-gray-900 text-xl font-bold">
+              ×
+            </button>
+            <h3 className="font-heading text-xl mb-2 text-[#1E1B2E]">Link a Child</h3>
+            <p className="text-gray-500 text-[13px] mb-4">Enter the email address your child used to register as a student on Skill Sphere.</p>
+            <form onSubmit={handleLinkChild} className="flex flex-col gap-4">
+              <input 
+                type="email" 
+                placeholder="student@example.com" 
+                className="w-full border border-gray-200 rounded-lg px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-[#C9A96E]" 
+                value={childEmail}
+                onChange={(e) => setChildEmail(e.target.value)}
+                required
+              />
+              {linkMessage && (
+                <p className={`text-[13px] font-medium ${linkMessage.includes("Success") ? "text-green-600" : "text-red-500"}`}>
+                  {linkMessage}
+                </p>
+              )}
+              <button type="submit" disabled={loadingLink} className="w-full bg-[#C9A96E] text-[#1E1B2E] font-medium py-3 rounded-lg hover:bg-[#b8985d] transition-all disabled:opacity-50">
+                {loadingLink ? "Linking..." : "Link Child Account"}
+              </button>
+            </form>
+          </div>
+        </div>
+      )}
+
     </div>
   );
 }
