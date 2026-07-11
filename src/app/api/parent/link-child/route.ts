@@ -1,13 +1,13 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
-import { verifyAuth } from "@/lib/auth";
+import { verifyToken } from "@/lib/auth";
 
 export async function POST(req: Request) {
   try {
     const token = req.headers.get("cookie")?.split("token=")[1]?.split(";")[0];
     if (!token) return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
 
-    const decoded = verifyAuth(token);
+    const decoded = await verifyToken(token);
     if (!decoded || decoded.role !== "parent") {
       return NextResponse.json({ message: "Unauthorized or not a parent" }, { status: 403 });
     }
