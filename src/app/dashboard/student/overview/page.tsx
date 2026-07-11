@@ -17,7 +17,10 @@ export default async function StudentOverviewPage() {
   if (decoded?.id) {
     user = await prisma.user.findUnique({ where: { id: decoded.id } });
     const rawEnrollments = await prisma.enrollment.findMany({
-      where: { userId: decoded.id },
+      where: { 
+        userId: decoded.id,
+        course: { classCode: null } // Explicitly filter out classes
+      },
       include: { course: { include: { teacher: { select: { name: true } } } } },
     });
     enrollments = rawEnrollments.map((e) => ({

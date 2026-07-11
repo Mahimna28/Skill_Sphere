@@ -301,14 +301,14 @@ export default function StudentSidebar({
               exit={{ opacity: 0 }}
               transition={{ duration: 0.2 }}
               onClick={() => setMobileOpen(false)}
-              className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 md:hidden"
+              className="fixed inset-0 bg-black/50 backdrop-blur-sm z-[100] md:hidden"
             />
             <motion.aside
               initial="hidden"
               animate="visible"
               exit="exit"
               variants={sidebarVariants as any}
-              className="fixed inset-y-0 left-0 w-72 z-50 md:hidden p-3"
+              className="fixed inset-y-0 left-0 w-72 z-[100] md:hidden p-3"
             >
               {sidebarContent}
             </motion.aside>

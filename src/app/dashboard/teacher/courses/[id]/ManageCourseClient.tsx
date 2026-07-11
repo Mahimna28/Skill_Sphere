@@ -237,6 +237,13 @@ export default function ManageCourseClient({ course, studentsProgress = [], user
     if (!file) return;
 
     setUploading(true);
+    
+    // Auto-fill title from filename if empty
+    if (!newLesson.title) {
+      const titleFromName = file.name.replace(/\.[^/.]+$/, "").replace(/[-_]/g, " ");
+      setNewLesson(prev => ({ ...prev, title: titleFromName }));
+    }
+
     const formData = new FormData();
     formData.append("file", file);
 

@@ -43,6 +43,13 @@ export default function CertificateClient({ certificate, course }: { certificate
         useCORS: true,
         backgroundColor: "#1E1B2E",
         logging: false,
+        windowWidth: 1200,
+        windowHeight: 900,
+        onclone: (clonedDoc, clonedElement) => {
+          if (clonedElement && clonedElement.parentElement) {
+            clonedElement.parentElement.style.transform = "none";
+          }
+        },
       });
 
       const imgData = canvas.toDataURL("image/png");
