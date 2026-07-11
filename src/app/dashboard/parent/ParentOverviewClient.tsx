@@ -150,10 +150,10 @@ export default function ParentOverviewClient({ childrenData }: { childrenData: a
 
         {/* QUICK ACTIONS */}
         <div className="flex items-center gap-3 shrink-0">
-          <Link href="/dashboard/parent/community" className="flex items-center gap-2 bg-[#1E1B2E] text-white px-4 py-2 rounded-lg text-[13px] font-medium hover:bg-[#2D2844] transition-all">
+          <Link href="/dashboard/community" className="flex items-center gap-2 bg-[#1E1B2E] text-white px-4 py-2 rounded-lg text-[13px] font-medium hover:bg-[#2D2844] transition-all">
             <MessageCircle size={16} /> Community Hub
           </Link>
-          <button className="flex items-center gap-2 bg-white border border-gray-200 text-gray-700 px-4 py-2 rounded-lg text-[13px] font-medium hover:bg-gray-50 transition-all">
+          <button onClick={() => window.print()} className="flex items-center gap-2 bg-white border border-gray-200 text-gray-700 px-4 py-2 rounded-lg text-[13px] font-medium hover:bg-gray-50 transition-all">
             <Download size={16} /> Report
           </button>
         </div>

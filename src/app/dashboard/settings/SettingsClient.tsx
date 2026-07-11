@@ -461,30 +461,34 @@ export default function SettingsClient({ initialUser }: SettingsClientProps) {
                   />
                 </div>
 
-                <div className="md:col-span-2">
-                  <label className="block text-xs font-sans text-[#8E8E93] mb-2 font-medium">
-                    Bio / Intro
-                  </label>
-                  <textarea
-                    value={bio}
-                    onChange={(e) => setBio(e.target.value)}
-                    className="w-full bg-white border border-[rgba(30,27,46,0.15)] rounded-xl p-3.5 text-sm font-sans text-[#1E1B2E] placeholder-[#8E8E93] focus:outline-none focus:border-[#C9A96E] focus:ring-2 focus:ring-[rgba(201,169,110,0.15)] transition-all min-h-[90px] resize-none"
-                    placeholder="Tell the community about yourself..."
-                  />
-                </div>
+                {user.role !== "parent" && (
+                  <>
+                    <div className="md:col-span-2">
+                      <label className="block text-xs font-sans text-[#8E8E93] mb-2 font-medium">
+                        Bio / Intro
+                      </label>
+                      <textarea
+                        value={bio}
+                        onChange={(e) => setBio(e.target.value)}
+                        className="w-full bg-white border border-[rgba(30,27,46,0.15)] rounded-xl p-3.5 text-sm font-sans text-[#1E1B2E] placeholder-[#8E8E93] focus:outline-none focus:border-[#C9A96E] focus:ring-2 focus:ring-[rgba(201,169,110,0.15)] transition-all min-h-[90px] resize-none"
+                        placeholder="Tell the community about yourself..."
+                      />
+                    </div>
 
-                <div className="md:col-span-2">
-                  <label className="block text-xs font-sans text-[#8E8E93] mb-2 font-medium">
-                    Skills (Comma separated)
-                  </label>
-                  <input
-                    type="text"
-                    value={skills}
-                    onChange={(e) => setSkills(e.target.value)}
-                    className="w-full bg-white border border-[rgba(30,27,46,0.15)] rounded-xl h-11 px-4 text-sm font-sans text-[#1E1B2E] placeholder-[#8E8E93] focus:outline-none focus:border-[#C9A96E] focus:ring-2 focus:ring-[rgba(201,169,110,0.15)] transition-all"
-                    placeholder="Python, React, Machine Learning"
-                  />
-                </div>
+                    <div className="md:col-span-2">
+                      <label className="block text-xs font-sans text-[#8E8E93] mb-2 font-medium">
+                        Skills (Comma separated)
+                      </label>
+                      <input
+                        type="text"
+                        value={skills}
+                        onChange={(e) => setSkills(e.target.value)}
+                        className="w-full bg-white border border-[rgba(30,27,46,0.15)] rounded-xl h-11 px-4 text-sm font-sans text-[#1E1B2E] placeholder-[#8E8E93] focus:outline-none focus:border-[#C9A96E] focus:ring-2 focus:ring-[rgba(201,169,110,0.15)] transition-all"
+                        placeholder="Python, React, Machine Learning"
+                      />
+                    </div>
+                  </>
+                )}
               </div>
 
               {/* Role Specific Fields */}
