@@ -253,6 +253,8 @@ export default function JoinInstitutionClient({ institutions, userInstitutionId,
                           : 'bg-[#1E1B2E] text-white hover:bg-[#C9A96E]'
                         } disabled:opacity-60`}
                     >
+                      {loading && requestedId === inst.id ? <Loader2 className="animate-spin w-[14px] h-[14px]" /> : null}
+                      {requestedId === inst.id ? "Request Pending" : "Request to Join"}
                     </button>
                   </div>
                 </motion.div>

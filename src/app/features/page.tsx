@@ -3,8 +3,6 @@
 import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Sparkles, Check, CheckCircle, XCircle, Play, Trophy } from "lucide-react";
-import { Header } from "@/components/layout/Header";
-import { Footer } from "@/components/layout/Footer";
 import Link from "next/link";
 
 // Reusable Feature Section component
@@ -553,8 +551,6 @@ export default function FeaturesPage() {
 
   return (
     <div className="min-h-screen bg-[#F5F1EB]">
-      <Header />
-      
       <main>
         <HeroSection />
         <FeatureSection {...aiTutorData} />
@@ -567,8 +563,6 @@ export default function FeaturesPage() {
         <TechStackSection />
         <CTASection />
       </main>
-      
-      <Footer />
     </div>
   );
 }
