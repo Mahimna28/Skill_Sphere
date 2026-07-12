@@ -27,9 +27,9 @@ const INCIDENTS = [
 
 export default function StatusPage() {
   return (
-    <div className="min-h-screen bg-[#F5F1EB] font-sans">
+    <div className="font-sans">
       
-      <main className="pt-32 pb-24 px-6 relative">
+      <main className="py-4 relative">
         <div className="max-w-[800px] mx-auto">
           
           {/* Header Status */}

@@ -165,10 +165,10 @@ export default function FeaturesPageClient() {
 
                   <div className="flex flex-col gap-[16px] mt-[24px] flex-1 justify-end">
                     <div className="self-end bg-[#1E1B2E] text-white rounded-2xl rounded-tr-sm px-[16px] py-[12px] max-w-[85%] font-sans text-[14px]">
-                      Can you explain how React hooks work? I'm having trouble with useEffect.
+                      Can you explain how React hooks work? I&apos;m having trouble with useEffect.
                     </div>
                     <div className="self-start bg-white border border-[rgba(30,27,46,0.08)] text-[#1E1B2E] rounded-2xl rounded-tl-sm px-[16px] py-[12px] max-w-[85%] font-sans text-[14px] shadow-sm">
-                      Of course! Think of <code>useEffect</code> as a way to synchronize your component with an external system. Let's break down the dependency array first...
+                      Of course! Think of <code>useEffect</code> as a way to synchronize your component with an external system. Let&apos;s break down the dependency array first...
                     </div>
                     <div className="self-start bg-white border border-[rgba(30,27,46,0.08)] rounded-2xl rounded-tl-sm px-[16px] py-[12px] shadow-sm flex gap-1">
                       <div className="w-1.5 h-1.5 bg-[#C9A96E] rounded-full animate-pulse delay-75" />

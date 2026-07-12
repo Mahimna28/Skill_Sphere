@@ -21,6 +21,7 @@ import {
   ShieldAlert,
   Shield,
   PenTool,
+  Activity,
 } from "lucide-react";
 import { isCommunityHubEnabled } from "@/lib/features";
 import { SidebarItem, CommunityHubSidebarGroup } from "@/components/ui/SidebarItem";
@@ -97,6 +98,7 @@ export default function StudentSidebar({
           { href: "/dashboard/admin/feedback", label: "Review Feedback", icon: Heart },
           { href: "/dashboard/admin/promote", label: "Promote Admins", icon: ShieldAlert },
           { href: "/dashboard/admin/blog", label: "Upload Blog", icon: PenTool },
+          { href: "/dashboard/admin/status", label: "System Status", icon: Activity },
         ] as NavItem[],
         bottom: [
           { href: "/dashboard/feedback", label: "Give Feedback", icon: Heart },

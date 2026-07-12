@@ -199,9 +199,9 @@ function FeaturesBentoSection() {
             viewport={{ once: true }}
             transition={{ duration: 0.5 }}
             whileHover={{ y: -4 }}
-            className="col-span-1 md:col-span-2 row-span-1 md:row-span-2 bg-[#1E1B2E] rounded-2xl p-8 relative overflow-hidden group cursor-pointer min-h-[300px]"
+            className="col-span-1 md:col-span-2 row-span-1 md:row-span-2 bg-[#1E1B2E] rounded-2xl p-8 relative overflow-hidden group cursor-pointer min-h-[350px] md:min-h-[300px]"
           >
-            <div className="relative z-10">
+            <div className="relative z-20">
               <div className="w-12 h-12 rounded-xl bg-[rgba(201,169,110,0.15)] flex items-center justify-center mb-6">
                 <Sparkles className="w-6 h-6 text-[#C9A96E]" />
               </div>
@@ -209,16 +209,19 @@ function FeaturesBentoSection() {
               <p className="text-white/60 mb-6 max-w-sm">
                 Ask anything, get instant explanations. Available 24/7 for every course and topic.
               </p>
-              <Link href="/features" className="flex items-center gap-2 text-[#C9A96E] text-sm font-medium group-hover:gap-3 transition-all">
+              <Link href="/features" className="flex items-center gap-2 text-[#C9A96E] text-sm font-medium group-hover:gap-3 transition-all w-fit">
                 Learn more <ArrowRight className="w-4 h-4" />
               </Link>
             </div>
-            <img 
-              src="/images/ai-tutor-preview.jpg" 
-              alt="AI Tutor"
-              className="absolute bottom-0 right-0 w-3/4 opacity-60 group-hover:scale-105 group-hover:opacity-80 transition-all duration-500"
-              onError={(e) => (e.currentTarget.style.display = 'none')}
-            />
+            <div className="absolute right-0 bottom-0 w-[85%] md:w-[75%] h-[55%] md:h-[65%] translate-y-6 translate-x-6 md:translate-y-8 md:translate-x-8 rounded-tl-xl border border-white/10 overflow-hidden shadow-2xl transition-transform duration-500 group-hover:-translate-y-2 group-hover:-translate-x-2 z-10">
+              <img 
+                src="/images/Dashboards/Student/AI_Study_Tutor.png" 
+                alt="AI Tutor Dashboard"
+                className="w-full h-full object-cover object-left-top"
+                onError={(e) => (e.currentTarget.style.display = 'none')}
+              />
+            </div>
+            <div className="absolute inset-0 bg-gradient-to-t from-[#1E1B2E] via-transparent to-transparent opacity-30 z-10 pointer-events-none" />
           </motion.div>
 
           {/* Medium Feature: Interactive Courses */}
@@ -230,17 +233,15 @@ function FeaturesBentoSection() {
             whileHover={{ y: -4 }}
             className="col-span-1 md:col-span-2 bg-[#F5F1EB] rounded-2xl p-6 relative overflow-hidden group cursor-pointer min-h-[250px]"
           >
-            <div className="flex flex-col sm:flex-row items-start justify-between gap-4">
-              <div>
-                <div className="w-10 h-10 rounded-xl bg-[rgba(201,169,110,0.15)] flex items-center justify-center mb-4">
-                  <BookOpen className="w-5 h-5 text-[#C9A96E]" />
-                </div>
-                <h3 className="font-heading text-xl text-[#1E1B2E] mb-2">Interactive Courses</h3>
-                <p className="text-[#8E8E93] text-sm">Video, code, quizzes — all in one place.</p>
+            <div className="relative z-20 flex flex-col items-start h-full">
+              <div className="w-10 h-10 rounded-xl bg-white shadow-sm flex items-center justify-center mb-4">
+                <BookOpen className="w-5 h-5 text-[#C9A96E]" />
               </div>
-              <div className="w-full sm:w-32 aspect-video sm:aspect-square bg-[rgba(30,27,46,0.05)] rounded-lg flex items-center justify-center shadow-sm group-hover:scale-105 transition-transform overflow-hidden relative">
-                <img src="/images/course-mini.jpg" alt="Courses" className="w-full h-full object-cover" onError={(e) => (e.currentTarget.style.display = 'none')} />
-              </div>
+              <h3 className="font-heading text-xl text-[#1E1B2E] mb-2">Interactive Courses</h3>
+              <p className="text-[#8E8E93] text-sm max-w-[200px]">Video, code, quizzes — all in one place.</p>
+            </div>
+            <div className="absolute right-0 bottom-0 w-[60%] h-[75%] translate-y-4 translate-x-4 rounded-tl-xl border border-black/5 overflow-hidden shadow-xl transition-transform duration-500 group-hover:-translate-y-2 group-hover:-translate-x-2 z-10">
+              <img src="/images/Dashboards/Student/My_Courses.png" alt="Courses Dashboard" className="w-full h-full object-cover object-left-top" onError={(e) => (e.currentTarget.style.display = 'none')} />
             </div>
           </motion.div>
 
@@ -251,11 +252,16 @@ function FeaturesBentoSection() {
             viewport={{ once: true }}
             transition={{ duration: 0.5, delay: 0.2 }}
             whileHover={{ y: -4 }}
-            className="bg-white border border-[rgba(30,27,46,0.08)] rounded-2xl p-6 hover:border-[#C9A96E]/30 transition-colors cursor-pointer min-h-[200px]"
+            className="bg-white border border-[rgba(30,27,46,0.08)] rounded-2xl relative overflow-hidden group cursor-pointer min-h-[200px]"
           >
-            <Users className="w-6 h-6 text-[#C9A96E] mb-4" />
-            <h3 className="font-medium text-[#1E1B2E] mb-1">Community</h3>
-            <p className="text-[#8E8E93] text-sm">Learn together, never alone.</p>
+            <div className="p-6 relative z-20">
+              <Users className="w-6 h-6 text-[#C9A96E] mb-4" />
+              <h3 className="font-medium text-[#1E1B2E] mb-1">Community</h3>
+              <p className="text-[#8E8E93] text-sm">Learn together, never alone.</p>
+            </div>
+            <div className="absolute right-0 bottom-0 w-[70%] h-[45%] translate-y-2 translate-x-2 rounded-tl-lg border border-black/5 overflow-hidden shadow-lg transition-transform duration-500 group-hover:-translate-y-1 group-hover:-translate-x-1 z-10">
+               <img src="/images/Dashboards/Student/Course_Chat.png" alt="Community Chat" className="w-full h-full object-cover object-top" onError={(e) => (e.currentTarget.style.display = 'none')} />
+            </div>
           </motion.div>
 
           {/* Small Feature: Gamification */}
@@ -265,11 +271,16 @@ function FeaturesBentoSection() {
             viewport={{ once: true }}
             transition={{ duration: 0.5, delay: 0.3 }}
             whileHover={{ y: -4 }}
-            className="bg-white border border-[rgba(30,27,46,0.08)] rounded-2xl p-6 hover:border-[#C9A96E]/30 transition-colors cursor-pointer min-h-[200px]"
+            className="bg-white border border-[rgba(30,27,46,0.08)] rounded-2xl relative overflow-hidden group cursor-pointer min-h-[200px]"
           >
-            <Trophy className="w-6 h-6 text-[#C9A96E] mb-4" />
-            <h3 className="font-medium text-[#1E1B2E] mb-1">Gamification</h3>
-            <p className="text-[#8E8E93] text-sm">Points, streaks, leaderboards.</p>
+            <div className="p-6 relative z-20">
+              <Trophy className="w-6 h-6 text-[#C9A96E] mb-4" />
+              <h3 className="font-medium text-[#1E1B2E] mb-1">Gamification</h3>
+              <p className="text-[#8E8E93] text-sm">Points, streaks, leaderboards.</p>
+            </div>
+            <div className="absolute right-0 bottom-0 w-[70%] h-[45%] translate-y-2 translate-x-2 rounded-tl-lg border border-black/5 overflow-hidden shadow-lg transition-transform duration-500 group-hover:-translate-y-1 group-hover:-translate-x-1 z-10">
+               <img src="/images/Dashboards/Student/Leaderboard.png" alt="Leaderboard" className="w-full h-full object-cover object-top" onError={(e) => (e.currentTarget.style.display = 'none')} />
+            </div>
           </motion.div>
         </div>
       </div>

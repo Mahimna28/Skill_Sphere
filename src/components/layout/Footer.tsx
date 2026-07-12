@@ -48,8 +48,7 @@ export function Footer() {
               links: [
                 { name: "Help Center / FAQs", url: "/faq" },
                 { name: "Contact Us", url: "/contact" },
-                { name: "Feedback", url: "/feedback" },
-                { name: "System Status", url: "/status" }
+                { name: "Feedback", url: "/feedback" }
               ]
             },
             {

@@ -497,7 +497,7 @@ export default function FeaturesPage() {
     subtitle: "AI-Powered",
     title: "Your Personal AI Tutor, 24/7",
     description: "Stuck on a concept at 2 AM? Our AI Study Tutor explains anything in simple terms, gives examples, quizzes you, and adapts to your learning style.",
-    image: "/images/ai-tutor-preview.jpg",
+    image: "https://images.unsplash.com/photo-1677442136019-21780ecad995?auto=format&fit=crop&q=80&w=800",
     imagePosition: "right" as const,
     features: [
       "Ask anything — from basic definitions to advanced problem solving",
@@ -511,7 +511,7 @@ export default function FeaturesPage() {
     subtitle: "Immersive Learning",
     title: "Video, Code & Quizzes in One Place",
     description: "No more switching between YouTube, IDEs, and quiz apps. Watch lessons, write code, and test your knowledge — all inside Skill Sphere.",
-    image: "/images/course-preview.jpg",
+    image: "https://images.unsplash.com/photo-1516321318423-f06f85e504b3?auto=format&fit=crop&q=80&w=800",
     imagePosition: "left" as const,
     features: [
       "HD video lessons with interactive transcripts",
@@ -522,24 +522,24 @@ export default function FeaturesPage() {
   };
 
   const communityData = {
-    subtitle: "Learn Together",
-    title: "A Community That Actually Helps",
-    description: "Join course-specific chats, ask questions in the forum, or message peers directly. Learning alone is hard — do it together.",
-    image: "/images/community-preview.jpg",
+    subtitle: "Collaborative",
+    title: "Learn Together, Grow Together",
+    description: "Join a vibrant community of learners. Form study groups, participate in course discussions, and get peer feedback on your assignments.",
+    image: "https://images.unsplash.com/photo-1522202176988-66273c2fd55f?auto=format&fit=crop&q=80&w=800",
     imagePosition: "right" as const,
     features: [
-      "Course chat rooms with real-time messaging",
-      "Q&A forum with upvoting and verified answers",
-      "Direct messaging with instructors and peers",
-      "Study groups for collaborative learning"
+      "Real-time course chat and discussion forums",
+      "Join public or private study groups",
+      "Peer review system for coding assignments",
+      "Direct messaging with mentors and peers"
     ]
   };
 
   const gamificationData = {
-    subtitle: "Stay Motivated",
-    title: "Points, Streaks & Leaderboards",
-    description: "Turn learning into a game. Earn points for completing lessons, maintain daily streaks, and compete on global leaderboards.",
-    image: "/images/gamification-preview.jpg",
+    subtitle: "Engaging",
+    title: "Level Up Your Skills",
+    description: "Stay motivated with our gamified learning system. Earn experience points, unlock achievements, and showcase your verified skills to employers.",
+    image: "https://images.unsplash.com/photo-1552820728-8b83bb6b773f?auto=format&fit=crop&q=80&w=800",
     imagePosition: "left" as const,
     features: [
       "Daily streaks with push notifications",
