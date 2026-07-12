@@ -8,6 +8,8 @@ import {
 } from "lucide-react";
 import { Header } from "@/components/layout/Header";
 import { Footer } from "@/components/layout/Footer";
+import FeaturesStickyScroll from "@/components/landing/FeaturesStickyScroll";
+import { RoleInteractiveDemo } from "@/components/landing/RoleInteractiveDemo";
 import { CommunityFeedbackSection } from "@/components/home/CommunityFeedback";
 import Link from "next/link";
 import { useState, useEffect } from "react";
@@ -107,66 +109,6 @@ function SolutionSection() {
   );
 }
 
-function RoleShowcaseSection() {
-  const [activeTab, setActiveTab] = useState<"student" | "teacher" | "parent">("student");
-
-  const tabs = [
-    { id: "student", label: "For Students", img: "/images/Dashboards/Student/overview.png" },
-    { id: "teacher", label: "For Teachers", img: "/images/Dashboards/Teacher_InstituteAdmin/Overview.png" },
-    { id: "parent", label: "For Parents", img: "/images/Dashboards/Parents/OverView.png" }
-  ];
-
-  return (
-    <motion.section 
-      initial={{ opacity: 0, y: 24 }}
-      whileInView={{ opacity: 1, y: 0 }}
-      viewport={{ once: true, margin: "-100px" }}
-      transition={{ duration: 0.5 }}
-      className="py-32 bg-[#1E1B2E] text-white overflow-hidden relative"
-    >
-      <div className="max-w-7xl mx-auto px-6 flex flex-col items-center">
-        <span className="text-[#C9A96E] text-sm font-medium uppercase tracking-wider mb-3">Designed for Everyone</span>
-        <h2 className="font-heading text-4xl text-white mb-6 text-center">A tailored experience for every role</h2>
-        
-        {/* Tab Switcher */}
-        <div className="flex bg-[rgba(255,255,255,0.05)] p-1 rounded-full mb-12 border border-[rgba(255,255,255,0.1)]">
-          {tabs.map((tab) => (
-            <button
-              key={tab.id}
-              onClick={() => setActiveTab(tab.id as any)}
-              className={`relative px-6 py-2.5 rounded-full text-sm font-medium transition-colors ${activeTab === tab.id ? "text-[#1E1B2E]" : "text-white hover:text-white/80"}`}
-            >
-              {activeTab === tab.id && (
-                <motion.div
-                  layoutId="activeTabRole"
-                  className="absolute inset-0 bg-[#C9A96E] rounded-full z-0"
-                  transition={{ type: "spring", bounce: 0.2, duration: 0.6 }}
-                />
-              )}
-              <span className="relative z-10">{tab.label}</span>
-            </button>
-          ))}
-        </div>
-
-        {/* Dashboard Preview */}
-        <div className="w-full max-w-5xl aspect-video relative rounded-2xl overflow-hidden shadow-[0_32px_64px_rgba(0,0,0,0.4)] border border-[rgba(255,255,255,0.1)]">
-          <AnimatePresence mode="wait">
-            <motion.img
-              key={activeTab}
-              initial={{ opacity: 0, scale: 0.98 }}
-              animate={{ opacity: 1, scale: 1 }}
-              exit={{ opacity: 0, scale: 1.02 }}
-              transition={{ duration: 0.4 }}
-              src={tabs.find(t => t.id === activeTab)?.img}
-              alt="Dashboard Preview"
-              className="w-full h-full object-cover object-top absolute inset-0"
-            />
-          </AnimatePresence>
-        </div>
-      </div>
-    </motion.section>
-  );
-}
 
 function FeaturesBentoSection() {
   return (
@@ -191,98 +133,7 @@ function FeaturesBentoSection() {
           </p>
         </motion.div>
 
-        <div className="grid grid-cols-1 md:grid-cols-4 grid-rows-none md:grid-rows-2 gap-4 h-auto md:h-[600px]">
-          {/* Large Feature: AI Tutor */}
-          <motion.div
-            initial={{ opacity: 0, scale: 0.95 }}
-            whileInView={{ opacity: 1, scale: 1 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.5 }}
-            whileHover={{ y: -4 }}
-            className="col-span-1 md:col-span-2 row-span-1 md:row-span-2 bg-[#1E1B2E] rounded-2xl p-8 relative overflow-hidden group cursor-pointer min-h-[350px] md:min-h-[300px]"
-          >
-            <div className="relative z-20">
-              <div className="w-12 h-12 rounded-xl bg-[rgba(201,169,110,0.15)] flex items-center justify-center mb-6">
-                <Sparkles className="w-6 h-6 text-[#C9A96E]" />
-              </div>
-              <h3 className="font-heading text-2xl text-white mb-3">AI Study Tutor</h3>
-              <p className="text-white/60 mb-6 max-w-sm">
-                Ask anything, get instant explanations. Available 24/7 for every course and topic.
-              </p>
-              <Link href="/features" className="flex items-center gap-2 text-[#C9A96E] text-sm font-medium group-hover:gap-3 transition-all w-fit">
-                Learn more <ArrowRight className="w-4 h-4" />
-              </Link>
-            </div>
-            <div className="absolute right-0 bottom-0 w-[85%] md:w-[75%] h-[55%] md:h-[65%] translate-y-6 translate-x-6 md:translate-y-8 md:translate-x-8 rounded-tl-xl border border-white/10 overflow-hidden shadow-2xl transition-transform duration-500 group-hover:-translate-y-2 group-hover:-translate-x-2 z-10">
-              <img 
-                src="/images/Dashboards/Student/AI_Study_Tutor.png" 
-                alt="AI Tutor Dashboard"
-                className="w-full h-full object-cover object-left-top"
-                onError={(e) => (e.currentTarget.style.display = 'none')}
-              />
-            </div>
-            <div className="absolute inset-0 bg-gradient-to-t from-[#1E1B2E] via-transparent to-transparent opacity-30 z-10 pointer-events-none" />
-          </motion.div>
-
-          {/* Medium Feature: Interactive Courses */}
-          <motion.div
-            initial={{ opacity: 0, scale: 0.95 }}
-            whileInView={{ opacity: 1, scale: 1 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.5, delay: 0.1 }}
-            whileHover={{ y: -4 }}
-            className="col-span-1 md:col-span-2 bg-[#F5F1EB] rounded-2xl p-6 relative overflow-hidden group cursor-pointer min-h-[250px]"
-          >
-            <div className="relative z-20 flex flex-col items-start h-full">
-              <div className="w-10 h-10 rounded-xl bg-white shadow-sm flex items-center justify-center mb-4">
-                <BookOpen className="w-5 h-5 text-[#C9A96E]" />
-              </div>
-              <h3 className="font-heading text-xl text-[#1E1B2E] mb-2">Interactive Courses</h3>
-              <p className="text-[#8E8E93] text-sm max-w-[200px]">Video, code, quizzes — all in one place.</p>
-            </div>
-            <div className="absolute right-0 bottom-0 w-[60%] h-[75%] translate-y-4 translate-x-4 rounded-tl-xl border border-black/5 overflow-hidden shadow-xl transition-transform duration-500 group-hover:-translate-y-2 group-hover:-translate-x-2 z-10">
-              <img src="/images/Dashboards/Student/My_Courses.png" alt="Courses Dashboard" className="w-full h-full object-cover object-left-top" onError={(e) => (e.currentTarget.style.display = 'none')} />
-            </div>
-          </motion.div>
-
-          {/* Small Feature: Community */}
-          <motion.div
-            initial={{ opacity: 0, scale: 0.95 }}
-            whileInView={{ opacity: 1, scale: 1 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.5, delay: 0.2 }}
-            whileHover={{ y: -4 }}
-            className="bg-white border border-[rgba(30,27,46,0.08)] rounded-2xl relative overflow-hidden group cursor-pointer min-h-[200px]"
-          >
-            <div className="p-6 relative z-20">
-              <Users className="w-6 h-6 text-[#C9A96E] mb-4" />
-              <h3 className="font-medium text-[#1E1B2E] mb-1">Community</h3>
-              <p className="text-[#8E8E93] text-sm">Learn together, never alone.</p>
-            </div>
-            <div className="absolute right-0 bottom-0 w-[70%] h-[45%] translate-y-2 translate-x-2 rounded-tl-lg border border-black/5 overflow-hidden shadow-lg transition-transform duration-500 group-hover:-translate-y-1 group-hover:-translate-x-1 z-10">
-               <img src="/images/Dashboards/Student/Course_Chat.png" alt="Community Chat" className="w-full h-full object-cover object-top" onError={(e) => (e.currentTarget.style.display = 'none')} />
-            </div>
-          </motion.div>
-
-          {/* Small Feature: Gamification */}
-          <motion.div
-            initial={{ opacity: 0, scale: 0.95 }}
-            whileInView={{ opacity: 1, scale: 1 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.5, delay: 0.3 }}
-            whileHover={{ y: -4 }}
-            className="bg-white border border-[rgba(30,27,46,0.08)] rounded-2xl relative overflow-hidden group cursor-pointer min-h-[200px]"
-          >
-            <div className="p-6 relative z-20">
-              <Trophy className="w-6 h-6 text-[#C9A96E] mb-4" />
-              <h3 className="font-medium text-[#1E1B2E] mb-1">Gamification</h3>
-              <p className="text-[#8E8E93] text-sm">Points, streaks, leaderboards.</p>
-            </div>
-            <div className="absolute right-0 bottom-0 w-[70%] h-[45%] translate-y-2 translate-x-2 rounded-tl-lg border border-black/5 overflow-hidden shadow-lg transition-transform duration-500 group-hover:-translate-y-1 group-hover:-translate-x-1 z-10">
-               <img src="/images/Dashboards/Student/Leaderboard.png" alt="Leaderboard" className="w-full h-full object-cover object-top" onError={(e) => (e.currentTarget.style.display = 'none')} />
-            </div>
-          </motion.div>
-        </div>
+        <FeaturesStickyScroll />
       </div>
     </motion.section>
   );
@@ -804,7 +655,7 @@ export default function Homepage() {
         <HeroSection />
 
         <SolutionSection />
-        <RoleShowcaseSection />
+        <RoleInteractiveDemo />
         <FeaturesBentoSection />
         <HowItWorksSection />
         <BenefitsSection />
