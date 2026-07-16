@@ -11,6 +11,7 @@ const nextConfig: NextConfig = {
     cpus: 1,
     workerThreads: false,
   },
+  devIndicators: false,
   /* config options here */
   reactCompiler: true,
   images: {

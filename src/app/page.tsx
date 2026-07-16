@@ -1,54 +1,65 @@
 "use client";
 
-import { motion, AnimatePresence } from "framer-motion";
+import { motion } from "framer-motion";
 import { 
-  Sparkles, AlertCircle, Frown, MessageSquareOff, TrendingDown, TrendingUp,
-  Check, CheckCircle, XCircle, Minus, Compass, Brain, Rocket,
-  Star, ArrowRight, BookOpen, Users, Trophy, ChevronDown, Play
+  Sparkles, TrendingUp, Check, CheckCircle, XCircle, Minus, Rocket, ArrowRight, ChevronDown
 } from "lucide-react";
-import { Header } from "@/components/layout/Header";
-import { Footer } from "@/components/layout/Footer";
-import FeaturesStickyScroll from "@/components/landing/FeaturesStickyScroll";
 import { RoleInteractiveDemo } from "@/components/landing/RoleInteractiveDemo";
 import { CommunityFeedbackSection } from "@/components/home/CommunityFeedback";
-import Link from "next/link";
-import { useState, useEffect } from "react";
+import { FeatureCardsAsymmetric } from "@/components/landing/FeaturesStickyScroll";
+import { MarqueeBanner } from "@/components/landing/MarqueeBanner";
+import { StickyWords } from "@/components/landing/StickyWords";
+import { ProcessSteps } from "@/components/landing/ProcessSteps";
+import { WordReveal } from "@/components/animations/WordReveal";
 import { TiltMockup } from "@/components/animations/TiltMockup";
+import Link from "next/link";
+import { useState, useEffect, useRef } from "react";
+import gsap from "gsap";
+import { ScrollTrigger } from "gsap/ScrollTrigger";
+import { useGSAP } from "@gsap/react";
 
+if (typeof window !== "undefined") {
+  gsap.registerPlugin(ScrollTrigger, useGSAP);
+}
 
 function SolutionSection() {
-  return (
-    <motion.section 
-      initial={{ opacity: 0, y: 24 }}
-      whileInView={{ opacity: 1, y: 0 }}
-      viewport={{ once: true, margin: "-100px" }}
-      transition={{ duration: 0.5, ease: [0.25, 0.1, 0.25, 1.0] }}
-      className="py-32 bg-[#F5F1EB] relative overflow-hidden"
-    >
-      {/* Decorative element */}
-      <motion.div
-        animate={{ rotate: 360 }}
-        transition={{ duration: 60, repeat: Infinity, ease: "linear" }}
-        className="absolute top-20 right-20 w-64 h-64 border border-[#C9A96E]/20 rounded-full hidden lg:block"
-      />
+  const containerRef = useRef<HTMLElement>(null);
+  const mockupRef = useRef<HTMLDivElement>(null);
 
+  useGSAP(() => {
+    if (!containerRef.current || !mockupRef.current) return;
+    const prefersReduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    if (prefersReduced) return;
+
+    gsap.fromTo(mockupRef.current, 
+      { y: 50 }, 
+      {
+        y: -30,
+        ease: "none",
+        scrollTrigger: {
+          trigger: containerRef.current,
+          start: "top bottom",
+          end: "bottom top",
+          scrub: true,
+        }
+      }
+    );
+  }, { scope: containerRef });
+
+  return (
+    <section ref={containerRef} className="py-24 md:py-32 bg-[#F5F1EB] relative overflow-hidden">
       <div className="max-w-7xl mx-auto px-6 grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
-        <motion.div
-          initial={{ opacity: 0, x: -50 }}
-          whileInView={{ opacity: 1, x: 0 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.8 }}
-        >
+        <div>
           <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-[rgba(201,169,110,0.12)] text-[#C9A96E] text-sm font-medium mb-6">
             <Sparkles className="w-4 h-4" />
             The Solution
           </div>
 
-          <h2 className="font-heading text-5xl text-[#1E1B2E] leading-tight mb-6">
-            An AI tutor, a<br className="hidden md:block" />
-            community, and a<br className="hidden md:block" />
-            <span className="text-[#C9A96E]">path that adapts to you</span>
-          </h2>
+          <WordReveal 
+            text="An AI tutor, a community, and a path that adapts to you" 
+            className="font-heading text-4xl md:text-5xl text-[#1E1B2E] leading-tight mb-6"
+            tag="h2"
+          />
 
           <p className="text-[#8E8E93] text-lg leading-relaxed mb-8">
             Skill Sphere combines structured courses, an AI tutor that explains anything 24/7, and a community of learners and mentors — so you never feel stuck or alone again.
@@ -60,39 +71,21 @@ function SolutionSection() {
               "Community keeps you accountable and motivated",
               "Structured paths eliminate 'what do I learn next?'",
             ].map((item, i) => (
-              <motion.div
-                key={i}
-                initial={{ opacity: 0, x: -20 }}
-                whileInView={{ opacity: 1, x: 0 }}
-                viewport={{ once: true }}
-                transition={{ delay: 0.4 + i * 0.1 }}
-                className="flex items-center gap-3"
-              >
+              <div key={i} className="flex items-center gap-3">
                 <div className="w-6 h-6 rounded-full bg-[rgba(201,169,110,0.15)] flex items-center justify-center flex-shrink-0">
                   <Check className="w-3.5 h-3.5 text-[#C9A96E]" />
                 </div>
                 <p className="text-[#1E1B2E]">{item}</p>
-              </motion.div>
+              </div>
             ))}
           </div>
-        </motion.div>
+        </div>
 
-        <motion.div
-          initial={{ opacity: 0, x: 50, scale: 0.95 }}
-          whileInView={{ opacity: 1, x: 0, scale: 1 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.8, delay: 0.2 }}
-          className="relative"
-        >
+        <div ref={mockupRef} className="relative">
           <TiltMockup>
             <img src="/images/Dashboards/Student/overview.png" alt="Skill Sphere Student Dashboard" className="w-full h-full object-cover object-top" />
           </TiltMockup>
-          {/* Floating stat card */}
-          <motion.div
-            animate={{ y: [0, -10, 0] }}
-            transition={{ duration: 4, repeat: Infinity }}
-            className="absolute -bottom-6 -left-6 bg-white rounded-xl p-4 shadow-lg border border-[rgba(30,27,46,0.06)] z-10"
-          >
+          <div className="absolute -bottom-6 -left-6 bg-white rounded-xl p-4 shadow-lg border border-[rgba(30,27,46,0.06)] z-10 animate-pulse">
             <div className="flex items-center gap-3">
               <div className="w-10 h-10 rounded-full bg-green-100 flex items-center justify-center">
                 <TrendingUp className="w-5 h-5 text-green-600" />
@@ -102,155 +95,47 @@ function SolutionSection() {
                 <p className="text-xs text-[#8E8E93]">Completion Rate</p>
               </div>
             </div>
-          </motion.div>
-        </motion.div>
-      </div>
-    </motion.section>
-  );
-}
-
-
-function FeaturesBentoSection() {
-  return (
-    <motion.section 
-      initial={{ opacity: 0, y: 24 }}
-      whileInView={{ opacity: 1, y: 0 }}
-      viewport={{ once: true, margin: "-100px" }}
-      transition={{ duration: 0.5, ease: [0.25, 0.1, 0.25, 1.0] }}
-      className="py-32 bg-white"
-    >
-      <div className="max-w-7xl mx-auto px-6">
-        <motion.div
-          initial={{ opacity: 0, y: 30 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          className="text-center mb-16"
-        >
-          <span className="text-[#C9A96E] text-sm font-medium uppercase tracking-wider">Features</span>
-          <h2 className="font-heading text-4xl text-[#1E1B2E] mt-3 mb-4">One platform, infinite possibilities</h2>
-          <p className="text-[#8E8E93] text-lg max-w-2xl mx-auto">
-            From AI tutoring to gamified progress tracking, every tool you need is here.
-          </p>
-        </motion.div>
-
-        <FeaturesStickyScroll />
-      </div>
-    </motion.section>
-  );
-}
-
-function HowItWorksSection() {
-  return (
-    <motion.section 
-      initial={{ opacity: 0, y: 24 }}
-      whileInView={{ opacity: 1, y: 0 }}
-      viewport={{ once: true, margin: "-100px" }}
-      transition={{ duration: 0.5, ease: [0.25, 0.1, 0.25, 1.0] }}
-      className="py-32 bg-[#F5F1EB]"
-    >
-      <div className="max-w-7xl mx-auto px-6">
-        <motion.div
-          initial={{ opacity: 0, y: 30 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          className="text-center mb-20"
-        >
-          <span className="text-[#C9A96E] text-sm font-medium uppercase tracking-wider">How It Works</span>
-          <h2 className="font-heading text-4xl text-[#1E1B2E] mt-3">Three steps to mastery</h2>
-        </motion.div>
-
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8 relative">
-          {/* Connecting line */}
-          <div className="absolute top-16 left-[20%] right-[20%] h-0.5 bg-[rgba(201,169,110,0.2)] hidden md:block" />
-
-          {[
-            {
-              step: "01",
-              title: "Choose Your Path",
-              desc: "Pick from curated learning paths or create your own. AI suggests what to learn next based on your goals.",
-              icon: Compass,
-              color: "bg-blue-50 text-blue-600"
-            },
-            {
-              step: "02",
-              title: "Learn With AI",
-              desc: "Watch lessons, write code, take quizzes. Stuck? Ask the AI tutor anytime — it knows every course inside out.",
-              icon: Brain,
-              color: "bg-[rgba(201,169,110,0.12)] text-[#C9A96E]"
-            },
-            {
-              step: "03",
-              title: "Build & Share",
-              desc: "Complete projects, earn certificates, and showcase your skills. Join the community to collaborate and grow.",
-              icon: Rocket,
-              color: "bg-green-50 text-green-600"
-            }
-          ].map((item, i) => (
-            <motion.div
-              key={i}
-              initial={{ opacity: 0, y: 40 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ delay: i * 0.2 }}
-              className="relative text-center"
-            >
-              <motion.div
-                initial={{ scale: 0 }}
-                whileInView={{ scale: 1 }}
-                viewport={{ once: true }}
-                transition={{ delay: 0.3 + i * 0.2, type: "spring" }}
-                className={`w-16 h-16 rounded-2xl ${item.color} flex items-center justify-center mx-auto mb-6 relative z-10`}
-              >
-                <item.icon className="w-8 h-8" />
-              </motion.div>
-              
-              <span className="font-heading text-6xl text-[#1E1B2E]/5 absolute top-0 left-1/2 -translate-x-1/2">
-                {item.step}
-              </span>
-              
-              <h3 className="font-heading text-2xl text-[#1E1B2E] mb-3">{item.title}</h3>
-              <p className="text-[#8E8E93] leading-relaxed max-w-sm mx-auto">{item.desc}</p>
-            </motion.div>
-          ))}
+          </div>
         </div>
       </div>
-    </motion.section>
+    </section>
   );
 }
 
 function BenefitsSection() {
+  const containerRef = useRef<HTMLElement>(null);
+  
+  useGSAP(() => {
+    if (!containerRef.current) return;
+    const prefersReduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    if (prefersReduced) return;
+
+    gsap.fromTo(".benefit-card-left", 
+      { opacity: 0, x: -60 }, 
+      { opacity: 1, x: 0, duration: 1, ease: "power3.out", scrollTrigger: { trigger: containerRef.current, start: "top 75%" } }
+    );
+    gsap.fromTo(".benefit-card-right", 
+      { opacity: 0, x: 60 }, 
+      { opacity: 1, x: 0, duration: 1, ease: "power3.out", scrollTrigger: { trigger: containerRef.current, start: "top 75%" } }
+    );
+  }, { scope: containerRef });
+
   return (
-    <motion.section 
-      initial={{ opacity: 0, y: 24 }}
-      whileInView={{ opacity: 1, y: 0 }}
-      viewport={{ once: true, margin: "-100px" }}
-      transition={{ duration: 0.5, ease: [0.25, 0.1, 0.25, 1.0] }}
-      className="py-32 bg-[#1E1B2E]"
-    >
+    <section ref={containerRef} className="py-24 md:py-32 bg-[#1E1B2E] overflow-hidden">
       <div className="max-w-7xl mx-auto px-6">
-        <motion.div
-          initial={{ opacity: 0, y: 30 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          className="text-center mb-16"
-        >
+        <div className="text-center mb-16">
           <span className="text-[#C9A96E] text-sm font-medium uppercase tracking-wider">Benefits</span>
-          <h2 className="font-heading text-4xl text-white mt-3">The Skill Sphere difference</h2>
-        </motion.div>
+          <WordReveal text="The Skill Sphere difference" className="font-heading text-4xl md:text-5xl text-white mt-3" tag="h2" />
+        </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
           {/* Before */}
-          <motion.div
-            initial={{ opacity: 0, x: -30 }}
-            whileInView={{ opacity: 1, x: 0 }}
-            viewport={{ once: true }}
-            className="bg-white/5 border border-white/10 rounded-2xl p-8"
-          >
+          <div className="benefit-card-left bg-white/5 border border-white/10 rounded-2xl p-8">
             <div className="flex items-center gap-2 mb-6">
               <XCircle className="w-5 h-5 text-red-400" />
-              <h3 className="text-white/60 font-medium">Without Skill Sphere</h3>
+              <h3 className="text-white/60 font-medium text-lg">Without Skill Sphere</h3>
             </div>
-            <div className="space-y-4">
+            <div className="space-y-5">
               {[
                 "Bouncing between 10 different websites",
                 "Questions unanswered for days",
@@ -258,34 +143,21 @@ function BenefitsSection() {
                 "Learning feels like a chore",
                 "Giving up after 2 weeks"
               ].map((item, i) => (
-                <motion.div
-                  key={i}
-                  initial={{ opacity: 0, x: -20 }}
-                  whileInView={{ opacity: 1, x: 0 }}
-                  viewport={{ once: true }}
-                  transition={{ delay: 0.2 + i * 0.1 }}
-                  className="flex items-center gap-3 text-white/40"
-                >
-                  <Minus className="w-4 h-4 flex-shrink-0" />
-                  <span>{item}</span>
-                </motion.div>
+                <div key={i} className="flex items-center gap-3 text-white/40">
+                  <Minus className="w-5 h-5 flex-shrink-0" />
+                  <span className="text-lg">{item}</span>
+                </div>
               ))}
             </div>
-          </motion.div>
+          </div>
 
           {/* After */}
-          <motion.div
-            initial={{ opacity: 0, x: 30 }}
-            whileInView={{ opacity: 1, x: 0 }}
-            viewport={{ once: true }}
-            transition={{ delay: 0.2 }}
-            className="bg-[rgba(201,169,110,0.08)] border border-[#C9A96E]/20 rounded-2xl p-8"
-          >
+          <div className="benefit-card-right bg-[rgba(201,169,110,0.08)] border border-[#C9A96E]/20 rounded-2xl p-8">
             <div className="flex items-center gap-2 mb-6">
               <CheckCircle className="w-5 h-5 text-[#C9A96E]" />
-              <h3 className="text-[#C9A96E] font-medium">With Skill Sphere</h3>
+              <h3 className="text-[#C9A96E] font-medium text-lg">With Skill Sphere</h3>
             </div>
-            <div className="space-y-4">
+            <div className="space-y-5">
               {[
                 "Everything in one beautiful dashboard",
                 "AI answers in seconds, 24/7",
@@ -293,31 +165,23 @@ function BenefitsSection() {
                 "Gamified — learning feels like leveling up",
                 "Community keeps you accountable"
               ].map((item, i) => (
-                <motion.div
-                  key={i}
-                  initial={{ opacity: 0, x: 20 }}
-                  whileInView={{ opacity: 1, x: 0 }}
-                  viewport={{ once: true }}
-                  transition={{ delay: 0.4 + i * 0.1 }}
-                  className="flex items-center gap-3 text-white"
-                >
-                  <Check className="w-4 h-4 text-[#C9A96E] flex-shrink-0" />
-                  <span>{item}</span>
-                </motion.div>
+                <div key={i} className="flex items-center gap-3 text-white">
+                  <Check className="w-5 h-5 text-[#C9A96E] flex-shrink-0" />
+                  <span className="text-lg">{item}</span>
+                </div>
               ))}
             </div>
-          </motion.div>
+          </div>
         </div>
       </div>
-    </motion.section>
+    </section>
   );
 }
-
-
 
 function PopularLearningPathsSection() {
   const [courses, setCourses] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
+  const containerRef = useRef<HTMLElement>(null);
 
   useEffect(() => {
     const fetchCourses = async () => {
@@ -336,35 +200,41 @@ function PopularLearningPathsSection() {
     fetchCourses();
   }, []);
 
+  useGSAP(() => {
+    if (loading || !containerRef.current) return;
+    const cards = containerRef.current.querySelectorAll(".course-card");
+    if (!cards.length) return;
+    
+    gsap.fromTo(cards, 
+      { opacity: 0, y: 50 },
+      { 
+        opacity: 1, 
+        y: 0, 
+        duration: 0.8, 
+        stagger: 0.1, 
+        ease: "power3.out",
+        scrollTrigger: {
+          trigger: containerRef.current,
+          start: "top 80%",
+        }
+      }
+    );
+  }, [loading]);
+
   return (
-    <motion.section 
-      initial={{ opacity: 0, y: 24 }}
-      whileInView={{ opacity: 1, y: 0 }}
-      viewport={{ once: true, margin: "-100px" }}
-      transition={{ duration: 0.5, ease: [0.25, 0.1, 0.25, 1.0] }}
-      className="py-32 bg-white"
-    >
+    <section ref={containerRef} className="py-24 md:py-32 bg-white">
       <div className="max-w-7xl mx-auto px-6">
-        <motion.div
-          initial={{ opacity: 0, y: 30 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          className="flex flex-col md:flex-row items-start md:items-end justify-between mb-12 gap-6"
-        >
+        <div className="flex flex-col md:flex-row items-start md:items-end justify-between mb-12 gap-6">
           <div>
             <span className="text-[#C9A96E] text-sm font-medium uppercase tracking-wider">Courses</span>
-            <h2 className="font-heading text-4xl text-[#1E1B2E] mt-3">Popular learning paths</h2>
+            <WordReveal text="Popular learning paths" className="font-heading text-4xl md:text-5xl text-[#1E1B2E] mt-3" tag="h2" />
           </div>
           <Link href="/courses">
-            <motion.button
-              whileHover={{ scale: 1.02 }}
-              whileTap={{ scale: 0.98 }}
-              className="px-6 py-3 rounded-xl border border-[rgba(30,27,46,0.1)] text-[#1E1B2E] font-medium hover:border-[#C9A96E] hover:bg-[rgba(201,169,110,0.06)] transition-all"
-            >
+            <button className="px-6 py-3 rounded-xl border border-[rgba(30,27,46,0.1)] text-[#1E1B2E] font-medium hover:border-[#C9A96E] hover:bg-[rgba(201,169,110,0.06)] transition-all">
               View All Courses
-            </motion.button>
+            </button>
           </Link>
-        </motion.div>
+        </div>
 
         {loading ? (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
@@ -378,16 +248,8 @@ function PopularLearningPathsSection() {
           </div>
         ) : courses.length > 0 ? (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-            {courses.map((course, i) => (
-              <motion.div
-                key={course.id}
-                initial={{ opacity: 0, y: 30 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ delay: i * 0.1 }}
-                whileHover={{ y: -8 }}
-                className="group cursor-pointer"
-              >
+            {courses.map((course) => (
+              <div key={course.id} className="course-card group cursor-pointer">
                 <Link href={`/courses/${course.id}`}>
                   <div className="relative rounded-2xl overflow-hidden mb-4 aspect-[4/3] bg-[#F5F1EB] border border-[rgba(30,27,46,0.04)] flex flex-col items-center justify-center">
                     {course.thumbnail ? (
@@ -407,7 +269,7 @@ function PopularLearningPathsSection() {
                     {course._count?.enrollments || 0} students enrolled
                   </p>
                 </Link>
-              </motion.div>
+              </div>
             ))}
           </div>
         ) : (
@@ -420,39 +282,45 @@ function PopularLearningPathsSection() {
           </div>
         )}
       </div>
-    </motion.section>
+    </section>
   );
 }
 
-
-
-
-
 function FAQSection() {
+  const containerRef = useRef<HTMLElement>(null);
+
+  useGSAP(() => {
+    if (!containerRef.current) return;
+    const items = containerRef.current.querySelectorAll(".faq-item");
+    gsap.fromTo(items, 
+      { opacity: 0, y: 30 },
+      { 
+        opacity: 1, 
+        y: 0, 
+        duration: 0.6, 
+        stagger: 0.1,
+        ease: "power2.out",
+        scrollTrigger: {
+          trigger: containerRef.current,
+          start: "top 80%"
+        }
+      }
+    );
+  }, { scope: containerRef });
+
   return (
-    <motion.section 
-      initial={{ opacity: 0, y: 24 }}
-      whileInView={{ opacity: 1, y: 0 }}
-      viewport={{ once: true, margin: "-100px" }}
-      transition={{ duration: 0.5, ease: [0.25, 0.1, 0.25, 1.0] }}
-      className="py-32 bg-white"
-    >
+    <section ref={containerRef} className="py-24 md:py-32 bg-white">
       <div className="max-w-3xl mx-auto px-6">
-        <motion.div
-          initial={{ opacity: 0, y: 30 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          className="text-center mb-16"
-        >
+        <div className="text-center mb-16">
           <span className="text-[#C9A96E] text-sm font-medium uppercase tracking-wider">FAQ</span>
-          <h2 className="font-heading text-4xl text-[#1E1B2E] mt-3">Questions? Answered.</h2>
-        </motion.div>
+          <WordReveal text="Questions? Answered." className="font-heading text-4xl md:text-5xl text-[#1E1B2E] mt-3" tag="h2" />
+        </div>
 
         <div className="space-y-4">
           {[
             {
               q: "Is the AI tutor really 24/7?",
-              a: "Yes! Our AI tutor is powered by GPT-4o-mini and is available instantly, any time of day. No waiting for human responses."
+              a: "Yes! Our AI tutor is powered by advanced LLMs and is available instantly, any time of day. No waiting for human responses."
             },
             {
               q: "Can I switch between courses?",
@@ -471,96 +339,55 @@ function FAQSection() {
               a: "Yes — 14 days free, no credit card required. Cancel anytime before the trial ends and pay nothing."
             }
           ].map((faq, i) => (
-            <motion.div
-              key={i}
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ delay: i * 0.1 }}
-              className="border border-[rgba(30,27,46,0.08)] rounded-xl overflow-hidden bg-white hover:border-[#C9A96E]/30 transition-colors"
-            >
+            <div key={i} className="faq-item border border-[rgba(30,27,46,0.08)] rounded-xl overflow-hidden bg-white hover:border-[#C9A96E]/30 transition-colors">
               <details className="group">
-                <summary className="flex items-center justify-between p-5 cursor-pointer list-none hover:bg-[#F5F1EB] transition-colors outline-none">
-                  <span className="font-medium text-[#1E1B2E]">{faq.q}</span>
-                  <motion.div
-                    className="w-6 h-6 rounded-full bg-[#F5F1EB] flex items-center justify-center group-open:bg-[#C9A96E] transition-colors"
-                  >
-                    <ChevronDown className="w-4 h-4 text-[#8E8E93] group-open:text-[#1E1B2E] group-open:rotate-180 transition-all duration-300" />
-                  </motion.div>
+                <summary className="flex items-center justify-between p-6 cursor-pointer list-none hover:bg-[#F5F1EB] transition-colors outline-none">
+                  <span className="font-medium text-lg text-[#1E1B2E]">{faq.q}</span>
+                  <div className="w-8 h-8 rounded-full bg-[#F5F1EB] flex items-center justify-center group-open:bg-[#C9A96E] transition-colors shrink-0 ml-4">
+                    <ChevronDown className="w-5 h-5 text-[#8E8E93] group-open:text-[#1E1B2E] group-open:rotate-180 transition-all duration-300" />
+                  </div>
                 </summary>
-                <div className="px-5 pb-5 text-[#8E8E93] leading-relaxed">
+                <div className="px-6 pb-6 text-[#8E8E93] text-lg leading-relaxed">
                   {faq.a}
                 </div>
               </details>
-            </motion.div>
+            </div>
           ))}
         </div>
       </div>
-    </motion.section>
+    </section>
   );
 }
 
 function FinalCTASection() {
   return (
-    <motion.section 
-      initial={{ opacity: 0, y: 24 }}
-      whileInView={{ opacity: 1, y: 0 }}
-      viewport={{ once: true, margin: "-100px" }}
-      transition={{ duration: 0.5, ease: [0.25, 0.1, 0.25, 1.0] }}
-      className="py-32 bg-[#1E1B2E] relative overflow-hidden"
-    >
-      {/* Background effects */}
-      <div className="absolute inset-0">
-        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-[#C9A96E]/10 rounded-full blur-3xl pointer-events-none" />
-      </div>
-
-      <motion.div
-        initial={{ opacity: 0, y: 30 }}
-        whileInView={{ opacity: 1, y: 0 }}
-        viewport={{ once: true }}
-        className="relative z-10 max-w-3xl mx-auto px-6 text-center"
-      >
-        <motion.div
-          animate={{ y: [0, -10, 0] }}
-          transition={{ duration: 3, repeat: Infinity }}
-          className="w-20 h-20 rounded-2xl bg-[rgba(201,169,110,0.15)] flex items-center justify-center mx-auto mb-8 border border-[#C9A96E]/20"
-        >
-          <Rocket className="w-10 h-10 text-[#C9A96E]" />
-        </motion.div>
-
-        <h2 className="font-heading text-5xl text-white mb-6">
-          Ready to start learning<br />
-          <span className="text-[#C9A96E]">smarter, not harder?</span>
-        </h2>
-        
-        <p className="text-white/60 text-lg mb-10 max-w-xl mx-auto">
+    <section className="relative py-32 md:py-40 bg-[#1E1B2E] overflow-hidden">
+      {/* Subtle gold radial glow */}
+      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-[radial-gradient(circle,rgba(201,169,110,0.08)_0%,transparent_70%)] pointer-events-none" />
+      
+      <div className="relative z-10 max-w-4xl mx-auto text-center px-6">
+        <WordReveal 
+          text="Ready to start learning smarter, not harder?" 
+          className="text-4xl md:text-6xl lg:text-7xl font-serif text-white leading-tight mb-8"
+          tag="h2"
+        />
+        <p className="text-lg text-[rgba(255,255,255,0.6)] mb-10 max-w-xl mx-auto">
           Join 50,000+ students already mastering new skills with AI-powered tutoring and a supportive community.
         </p>
-
-        <div className="flex flex-wrap gap-4 justify-center">
+        <div className="flex flex-col sm:flex-row gap-4 justify-center">
           <Link href="/register">
-            <motion.button
-              whileHover={{ scale: 1.03 }}
-              whileTap={{ scale: 0.97 }}
-              className="px-10 py-4 rounded-xl bg-[#C9A96E] text-[#1E1B2E] font-medium text-lg"
-            >
+            <button className="w-full sm:w-auto px-8 py-4 bg-[#C9A96E] text-[#1E1B2E] rounded-full font-medium text-lg hover:bg-[#b8985d] transition-colors">
               Create Free Account
-            </motion.button>
+            </button>
           </Link>
           <Link href="/courses">
-            <motion.button
-              whileHover={{ scale: 1.03 }}
-              whileTap={{ scale: 0.97 }}
-              className="px-10 py-4 rounded-xl border border-white/20 text-white font-medium text-lg hover:bg-white/10 transition-colors"
-            >
+            <button className="w-full sm:w-auto px-8 py-4 border border-[rgba(255,255,255,0.2)] text-white rounded-full font-medium text-lg hover:bg-[rgba(255,255,255,0.05)] transition-colors">
               Explore Courses
-            </motion.button>
+            </button>
           </Link>
         </div>
-
-        <p className="text-white/30 text-sm mt-6">No credit card required. Start learning in 30 seconds.</p>
-      </motion.div>
-    </motion.section>
+      </div>
+    </section>
   );
 }
 
@@ -651,19 +478,41 @@ function HeroSection() {
 export default function Homepage() {
   return (
     <div className="min-h-screen bg-[#F5F1EB]">
-      <main className="flex-1 flex flex-col">
-        <HeroSection />
-
-        <SolutionSection />
-        <RoleInteractiveDemo />
-        <FeaturesBentoSection />
-        <HowItWorksSection />
-        <BenefitsSection />
-        <PopularLearningPathsSection />
-        <CommunityFeedbackSection />
-        <FAQSection />
-        <FinalCTASection />
-      </main>
+      {/* RootLayout handles the footer margin and relative z-[2] wrapper, so we just return sections */}
+      <HeroSection />
+      
+      {/* 1. The Solution */}
+      <SolutionSection />
+      
+      {/* 2. Marquee Banner */}
+      <MarqueeBanner />
+      
+      {/* 3. Designed for Everyone (RoleInteractiveDemo) */}
+      <RoleInteractiveDemo />
+      
+      {/* 4. Sticky Words */}
+      <StickyWords />
+      
+      {/* 5. Process Steps */}
+      <ProcessSteps />
+      
+      {/* 6. Feature Cards */}
+      <FeatureCardsAsymmetric />
+      
+      {/* 7. Benefits */}
+      <BenefitsSection />
+      
+      {/* 8. Popular Courses */}
+      <PopularLearningPathsSection />
+      
+      {/* 9. Testimonials */}
+      <CommunityFeedbackSection />
+      
+      {/* 10. FAQ */}
+      <FAQSection />
+      
+      {/* 11. CTA */}
+      <FinalCTASection />
     </div>
   );
 }

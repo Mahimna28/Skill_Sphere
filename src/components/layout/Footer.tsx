@@ -10,7 +10,7 @@ export function Footer() {
   };
 
   return (
-    <footer className="bg-[#1E1B2E] pt-[80px] pb-[40px]">
+    <footer className="fixed bottom-0 left-0 right-0 z-[1] bg-[#1E1B2E] pt-[80px] pb-[40px]">
       <div className="max-w-[1200px] mx-auto px-[32px]">
 
         {/* ROW 1: BRAND */}
@@ -57,7 +57,7 @@ export function Footer() {
                 { name: "Privacy Policy", url: "/privacy" },
                 { name: "Terms of Service", url: "/terms" },
                 { name: "Cookie Policy", url: "/cookies" },
-                { name: "Accessibility", url: "#" }
+                { name: "Accessibility", url: "/accessibility" }
               ]
             }
           ].map((col) => (

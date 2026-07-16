@@ -142,4 +142,14 @@ img {
 .scrollbar-thin {
   scrollbar-width: thin;
 }
+
+/* Marquee Animation */
+@keyframes marquee {
+  0% { transform: translateX(0); }
+  100% { transform: translateX(-33.3333%); }
+}
+
+.animate-marquee {
+  animation: marquee 20s linear infinite;
+}
 

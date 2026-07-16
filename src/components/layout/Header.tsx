@@ -89,8 +89,9 @@ export function Header() {
     { name: "About", href: "/about", icon: Info },
   ];
 
-  const isHomePage = pathname === "/";
-  const shouldHaveSolidBackground = scrolled || !isHomePage;
+  const publicPagesWithHero = ["/", "/features", "/courses", "/blog", "/about", "/pricing", "/faq", "/contact"];
+  const isTransparentHeroPage = publicPagesWithHero.includes(pathname ?? "");
+  const shouldHaveSolidBackground = scrolled || !isTransparentHeroPage;
 
   return (
     <header 
@@ -98,8 +99,8 @@ export function Header() {
       className={cn(
         "fixed top-0 w-full z-50 transition-all",
         shouldHaveSolidBackground 
-          ? "bg-[rgba(30,27,46,0.92)] backdrop-blur-xl shadow-[0_4px_24px_rgba(0,0,0,0.2)] py-[16px] border-b border-[rgba(255,255,255,0.08)]" 
-          : "bg-transparent py-[24px]"
+          ? "bg-[#1E1B2E]/90 backdrop-blur-md py-4 border-b border-white/10 shadow-lg" 
+          : "bg-transparent py-6 border-b border-transparent"
       )}
     >
       <div className="max-w-7xl mx-auto px-4 flex items-center justify-between">

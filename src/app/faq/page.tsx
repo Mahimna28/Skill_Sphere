@@ -84,47 +84,29 @@ function AccordionItem({ q, a, isOpen, onClick }: { q: string, a: string, isOpen
   );
 }
 
+import { SharedHeroSection } from "@/components/landing/SharedHeroSection";
+
 export default function FAQPage() {
   const [openIndex, setOpenIndex] = useState<string | null>("General-0");
 
   return (
-    <div className="min-h-screen bg-[#F5F1EB] font-sans">
+    <div className="min-h-screen bg-[#F5F1EB] font-sans flex flex-col">
+      <SharedHeroSection
+        title="How Can We Help?"
+        subtitle="Support Center"
+        description="Find answers to common questions about using our platform."
+        backgroundImage="https://images.unsplash.com/photo-1573164713988-8665fc963095?auto=format&fit=crop&q=80&w=2000"
+      />
       
-      <main className="pt-32 pb-24 px-6">
+      <main className="py-24 px-6">
         <div className="max-w-[800px] mx-auto">
-          {/* Header Section */}
-          <div className="text-center mb-16">
-            <motion.div 
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-[rgba(201,169,110,0.1)] text-[#C9A96E] text-[13px] font-semibold tracking-wide uppercase mb-6"
-            >
-              <MessageCircle size={16} />
-              Help Center
-            </motion.div>
-            <motion.h1 
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.1 }}
-              className="font-heading text-[48px] md:text-[56px] text-[#1E1B2E] font-bold leading-tight mb-6"
-            >
-              Frequently Asked <span className="text-[#C9A96E] italic">Questions</span>
-            </motion.h1>
-            <motion.p 
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.2 }}
-              className="text-[18px] text-[rgba(30,27,46,0.6)] max-w-[600px] mx-auto"
-            >
-              Everything you need to know about the product and billing. Can't find the answer you're looking for? Feel free to contact our support team.
-            </motion.p>
-          </div>
 
           {/* Accordion Section */}
           <motion.div 
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.3 }}
+            initial={{ opacity: 0, y: 30 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true, margin: "-50px" }}
+            transition={{ delay: 0.2 }}
             className="space-y-12"
           >
             {FAQS.map((category, catIndex) => (

@@ -4,6 +4,8 @@ import { useState } from "react";
 import { motion } from "framer-motion";
 import { Mail, MapPin, Phone, Send, Loader2, CheckCircle2 } from "lucide-react";
 
+import { SharedHeroSection } from "@/components/landing/SharedHeroSection";
+
 export default function ContactPage() {
   const [loading, setLoading] = useState(false);
   const [success, setSuccess] = useState(false);
@@ -42,46 +44,28 @@ export default function ContactPage() {
   };
 
   return (
-    <div className="min-h-screen bg-[#F5F1EB] font-sans">
+    <div className="min-h-screen bg-[#F5F1EB] font-sans flex flex-col">
+      <SharedHeroSection
+        title="Let's Connect"
+        subtitle="Get in Touch"
+        description="Have a question or feedback? We'd love to hear from you."
+        backgroundImage="https://images.unsplash.com/photo-1516387938699-a93567ec168e?auto=format&fit=crop&q=80&w=2000"
+      />
       
-      <main className="pt-32 pb-24 px-6 relative overflow-hidden">
+      <main className="py-24 px-6 relative overflow-hidden">
         {/* Background Accents */}
         <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-[#C9A96E]/5 rounded-full blur-3xl -z-10 translate-x-1/3 -translate-y-1/3"></div>
         <div className="absolute bottom-0 left-0 w-[500px] h-[500px] bg-[#1E1B2E]/5 rounded-full blur-3xl -z-10 -translate-x-1/3 translate-y-1/3"></div>
 
         <div className="max-w-[1200px] mx-auto">
-          <div className="text-center mb-16">
-            <motion.div 
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-[rgba(30,27,46,0.05)] text-[#1E1B2E] text-[13px] font-semibold tracking-wide uppercase mb-6"
-            >
-              Get In Touch
-            </motion.div>
-            <motion.h1 
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.1 }}
-              className="font-heading text-[48px] md:text-[64px] text-[#1E1B2E] font-bold leading-tight mb-6"
-            >
-              Let's start a <span className="text-[#C9A96E] italic">conversation</span>
-            </motion.h1>
-            <motion.p 
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.2 }}
-              className="text-[18px] text-[rgba(30,27,46,0.6)] max-w-[600px] mx-auto"
-            >
-              Have a question, feedback, or need support? Fill out the form below and our team will get back to you as soon as possible.
-            </motion.p>
-          </div>
 
           <div className="grid md:grid-cols-[1fr_1.5fr] gap-12 items-start">
             {/* Contact Info */}
             <motion.div 
               initial={{ opacity: 0, x: -30 }}
-              animate={{ opacity: 1, x: 0 }}
-              transition={{ delay: 0.3 }}
+              whileInView={{ opacity: 1, x: 0 }}
+              viewport={{ once: true, margin: "-50px" }}
+              transition={{ delay: 0.2 }}
               className="bg-[#1E1B2E] rounded-3xl p-8 md:p-10 text-white relative overflow-hidden h-full"
             >
               <div className="absolute top-0 right-0 w-64 h-64 bg-[#C9A96E]/20 rounded-full blur-3xl translate-x-1/2 -translate-y-1/2"></div>
@@ -128,8 +112,9 @@ export default function ContactPage() {
             {/* Contact Form */}
             <motion.div 
               initial={{ opacity: 0, x: 30 }}
-              animate={{ opacity: 1, x: 0 }}
-              transition={{ delay: 0.4 }}
+              whileInView={{ opacity: 1, x: 0 }}
+              viewport={{ once: true, margin: "-50px" }}
+              transition={{ delay: 0.3 }}
               className="bg-white rounded-3xl p-8 md:p-12 shadow-[0_8px_30px_rgba(0,0,0,0.04)] border border-[rgba(30,27,46,0.04)]"
             >
               {success ? (

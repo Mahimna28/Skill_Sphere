@@ -4,7 +4,7 @@ import Image from "next/image";
 import Link from "next/link";
 import React, { useRef, useState, useEffect } from "react";
 import { motion, AnimatePresence, useScroll, useTransform, useInView } from "framer-motion";
-import { ChevronDown, Sparkles, BookOpen, Users, Trophy, MessageSquare, BarChart, UserPlus, Search, PlayCircle, Award, Quote } from "lucide-react";
+import { ChevronDown, MessageSquare, BarChart, UserPlus, Search, PlayCircle, Award, Quote } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 import { useReducedMotion, useIsMobile } from "@/lib/animations";
@@ -12,18 +12,26 @@ import { FadeIn } from "@/components/animations/FadeIn";
 import { SlideUp } from "@/components/animations/SlideUp";
 import { StaggerContainer, StaggerItem } from "@/components/animations/StaggerContainer";
 
-const FEATURES = [
-  { icon: Sparkles, title: "AI Study Tutor", desc: "Get instant, personalized help from our AI tutor. Available 24/7 for any subject, any question.", img: "/images/Dashboards/Student/AI_Study_Tutor.png" },
-  { icon: BookOpen, title: "Expert-Led Course Studio", desc: "Learn from industry professionals with curated courses designed for real-world application.", img: "/images/Dashboards/Teacher_InstituteAdmin/CourseStudio.png" },
-  { icon: Users, title: "Community Learning", desc: "Join discussions, ask questions, and collaborate with peers in course-specific chat rooms.", img: "/images/Dashboards/Student/Course_Chat.png" },
-  { icon: Trophy, title: "Gamified Progress", desc: "Earn points, climb the leaderboard, and stay motivated with achievement tracking.", img: "/images/Dashboards/Student/Leaderboard.png" },
-];
+
 
 const STEPS = [
   { num: "01", icon: UserPlus, title: "Sign Up", desc: "Create your free account in seconds." },
   { num: "02", icon: Search, title: "Explore", desc: "Browse courses and find your path." },
   { num: "03", icon: PlayCircle, title: "Learn", desc: "Watch lessons, complete quizzes, build projects." },
   { num: "04", icon: Award, title: "Achieve", desc: "Earn certificates and track your progress." }
+];
+
+const FEATURE_CARDS = [
+  { num: "01", title: "AI Study Tutor", desc: "Get instant, personalized help from your own AI tutor, available 24/7 for any subject.", img: "/images/Dashboards/Student/AI_Study_Tutor.png" },
+  { num: "02", title: "Course Studio", desc: "Learn from industry professionals with curated courses designed for real-world application.", img: "/images/Dashboards/Teacher_InstituteAdmin/CourseStudio.png" },
+  { num: "03", title: "Community Chat", desc: "Join discussions, ask questions, and collaborate with peers in course-specific chat rooms.", img: "/images/Dashboards/Student/Course_Chat.png" },
+  { num: "04", title: "Gamified Progress", desc: "Earn points, climb the leaderboard, and stay motivated with achievement tracking.", img: "/images/Dashboards/Student/Leaderboard.png" },
+];
+
+const STATS = [
+  { value: "10K+", label: "Students learning" },
+  { value: "200+", label: "Courses available" },
+  { value: "98%", label: "Student satisfaction" },
 ];
 
 const TESTIMONIALS = [
@@ -124,7 +132,7 @@ export default function FeaturesPageClient() {
                 </div>
                 
                 {/* Number watermark */}
-                <span className="font-heading text-[56px] font-bold text-white/5 leading-none select-none">
+                <span className="font-heading text-[56px] font-bold text-white/10 leading-none select-none">
                   {step.num}
                 </span>
                 
@@ -143,120 +151,61 @@ export default function FeaturesPageClient() {
         </div>
       </section>
 
-      {/* 4. INTERACTIVE DEMO SECTION */}
-      <section className="py-[80px] px-[32px] bg-[#1E1B2E] border-y border-white/5 relative overflow-hidden">
-        {/* Glow */}
-        <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-[#C9A96E]/5 rounded-full blur-[120px] pointer-events-none" />
-        
-        <div className="max-w-[1000px] mx-auto w-full relative z-10">
-          <div className="text-center mb-[48px]">
+      {/* 3. NUMBERED FEATURE CARDS */}
+      <section className="py-[120px] px-[32px] bg-[#0A0810] relative">
+        <div className="max-w-[1200px] mx-auto w-full flex flex-col gap-[64px]">
+          <div className="mb-[32px]">
             <FadeIn>
-              <h2 className="font-heading text-[32px] text-white">See It In Action</h2>
+              <h2 className="font-heading text-[14px] text-white/50 tracking-widest uppercase mb-4">Our Products</h2>
             </FadeIn>
           </div>
-
-          <StaggerContainer staggerDelay={getStaggerDelay(0.2)} className="grid grid-cols-1 md:grid-cols-2 gap-[24px]">
-            
-            {/* Left Card: AI Tutor Demo */}
-            <StaggerItem>
-              <SlideUp y={20} className="h-full">
-                <div className="bg-[#0D0B14] rounded-2xl p-[32px] shadow-[0_8px_32px_rgba(0,0,0,0.4)] h-full flex flex-col border border-white/10">
-                  <div className="flex items-center gap-[8px] pb-[16px] border-b border-white/10">
-                    <div className="w-[8px] h-[8px] rounded-full bg-[#22C55E] shadow-[0_0_8px_rgba(34,197,94,0.6)]" />
-                    <span className="font-sans text-[14px] font-bold text-white">AI Tutor <span className="font-normal text-white/50">Online</span></span>
+          {FEATURE_CARDS.map((card, idx) => (
+            <SlideUp key={idx} y={40} delay={0.1}>
+              <div className="bg-[#1E1B2E] rounded-[32px] border border-white/10 p-[40px] md:p-[64px] flex flex-col shadow-[0_20px_50px_rgba(0,0,0,0.4)]">
+                {/* Header Row */}
+                <div className="flex justify-between items-center pb-[32px] border-b border-white/10 mb-[40px]">
+                  <span className="font-heading text-[24px] text-white/30">{card.num}</span>
+                  <h3 className="font-heading text-[32px] md:text-[48px] text-white">{card.title}</h3>
+                  <div className="w-[40px] h-[40px] rounded-full border border-white/20 flex items-center justify-center text-[#C9A96E]">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
                   </div>
+                </div>
 
-                  <div className="flex flex-col gap-[16px] mt-[24px] flex-1 justify-end">
-                    <div className="self-end bg-gradient-to-r from-[#C9A96E] to-[#D4B988] text-[#1E1B2E] rounded-2xl rounded-tr-sm px-[16px] py-[12px] max-w-[85%] font-sans text-[14px] font-medium shadow-sm">
-                      Can you explain how React hooks work? I&apos;m having trouble with useEffect.
-                    </div>
-                    <div className="self-start bg-white/10 border border-white/10 text-white rounded-2xl rounded-tl-sm px-[16px] py-[12px] max-w-[85%] font-sans text-[14px] shadow-sm backdrop-blur-sm">
-                      Of course! Think of <code>useEffect</code> as a way to synchronize your component with an external system. Let&apos;s break down the dependency array first...
-                    </div>
-                    <div className="self-start bg-white/10 border border-white/10 rounded-2xl rounded-tl-sm px-[16px] py-[12px] shadow-sm flex gap-1.5 backdrop-blur-sm">
-                      <div className="w-1.5 h-1.5 bg-[#C9A96E] rounded-full animate-pulse delay-75" />
-                      <div className="w-1.5 h-1.5 bg-[#C9A96E] rounded-full animate-pulse delay-150" />
-                      <div className="w-1.5 h-1.5 bg-[#C9A96E] rounded-full animate-pulse delay-300" />
+                {/* Body Row */}
+                <div className="flex flex-col md:flex-row gap-[48px] items-center">
+                  <div className="w-full md:w-1/3">
+                    <p className="font-sans text-[18px] md:text-[20px] text-white/70 leading-[1.6]">
+                      {card.desc}
+                    </p>
+                  </div>
+                  <div className="w-full md:w-2/3">
+                    <div className="w-full aspect-[16/10] relative rounded-2xl overflow-hidden shadow-2xl border border-white/5 bg-[#0A0810]">
+                      <Image src={card.img} alt={card.title} fill className="object-cover object-top" />
                     </div>
                   </div>
                 </div>
-              </SlideUp>
-            </StaggerItem>
+              </div>
+            </SlideUp>
+          ))}
+        </div>
+      </section>
 
-            {/* Right Card: Dashboard Preview */}
-            <StaggerItem>
-              <SlideUp y={20} delay={0.2} className="h-full">
-                <div className="bg-[#0D0B14] rounded-2xl p-[32px] shadow-[0_8px_32px_rgba(0,0,0,0.4)] h-full flex flex-col justify-between border border-white/10">
-                  <div>
-                    <h4 className="font-sans text-[16px] font-bold text-white mb-[16px]">Your Dashboard Overview</h4>
-                    <div className="grid grid-cols-3 gap-[12px] mb-[32px]">
-                      <div className="bg-[#1E1B2E] rounded-lg p-[12px] text-center border border-white/5">
-                        <span className="block font-heading text-[24px] text-white">4</span>
-                        <span className="block font-sans text-[11px] text-white/50 uppercase">Courses</span>
-                      </div>
-                      <div className="bg-[#1E1B2E] rounded-lg p-[12px] text-center border border-white/5">
-                        <span className="block font-heading text-[24px] text-white">850</span>
-                        <span className="block font-sans text-[11px] text-white/50 uppercase">Points</span>
-                      </div>
-                      <div className="bg-[#1E1B2E] rounded-lg p-[12px] text-center border border-white/5">
-                        <span className="block font-heading text-[24px] text-[#C9A96E]">12</span>
-                        <span className="block font-sans text-[11px] text-[#C9A96E] uppercase">Streak</span>
-                      </div>
-                    </div>
-                    
-                    <div className="mb-[8px] flex justify-between font-sans text-[13px] font-medium text-white">
-                      <span>Advanced Web Dev</span>
-                      <span className="text-[#C9A96E]">65%</span>
-                    </div>
-                    <div className="w-full bg-white/10 rounded-full h-[8px] mb-[12px] overflow-hidden">
-                      <div className="bg-[#C9A96E] h-full rounded-full w-[65%] shadow-[0_0_10px_rgba(201,169,110,0.8)]" />
-                    </div>
-                    <p className="font-sans text-[13px] text-white/50 mb-[32px]">Next up: State Management with Redux Toolkit</p>
-                  </div>
-
-                  <button className="w-full h-[44px] bg-gradient-to-r from-[#C9A96E] to-[#D4B988] text-[#1E1B2E] font-sans font-bold rounded-xl hover:scale-[1.02] transition-transform shadow-[0_0_15px_rgba(201,169,110,0.3)]">
-                    Continue Learning
-                  </button>
-                </div>
-              </SlideUp>
-            </StaggerItem>
-
-          </StaggerContainer>
+      {/* 4. STATS STRIP */}
+      <section className="py-[80px] px-[32px] bg-[#0A0810] border-t border-white/5">
+        <div className="max-w-[1200px] mx-auto w-full grid grid-cols-1 md:grid-cols-3 gap-[40px] divide-y md:divide-y-0 md:divide-x divide-white/10">
+          {STATS.map((stat, idx) => (
+            <div key={idx} className="flex flex-col items-center justify-center pt-[40px] md:pt-0">
+              <FadeIn delay={idx * 0.1}>
+                <h4 className="font-heading text-[64px] md:text-[80px] text-white leading-none mb-[16px] text-center">{stat.value}</h4>
+                <p className="font-sans text-[16px] text-white/50 text-center">{stat.label}</p>
+              </FadeIn>
+            </div>
+          ))}
         </div>
       </section>
 
       {/* 5. TESTIMONIALS SECTION */}
-      <section className="py-[80px] px-[32px] bg-[#0A0810]">
-        <div className="max-w-[1200px] mx-auto w-full">
-          <div className="text-center mb-[48px]">
-            <FadeIn>
-              <h2 className="font-heading text-[32px] text-white">Loved by Students</h2>
-            </FadeIn>
-          </div>
-
-          <StaggerContainer staggerDelay={getStaggerDelay(0.15)} className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-[24px]">
-            {TESTIMONIALS.map((t, idx) => (
-              <StaggerItem key={idx}>
-                <div className="bg-[#1E1B2E] rounded-2xl p-[28px] shadow-lg hover:-translate-y-[4px] hover:shadow-[0_12px_40px_rgba(0,0,0,0.5)] transition-all duration-300 h-full flex flex-col border border-white/10">
-                  <Quote size={24} className="text-[#C9A96E] opacity-50" />
-                  <p className="font-sans text-[16px] text-white/90 italic leading-[1.7] mt-[12px] flex-1">
-                    "{t.quote}"
-                  </p>
-                  <div className="flex items-center gap-[12px] mt-[20px]">
-                    <div className="w-[40px] h-[40px] relative rounded-full overflow-hidden bg-white/10 border border-white/20">
-                      <Image src={t.avatar} alt={t.author} fill className="object-cover" />
-                    </div>
-                    <div>
-                      <h4 className="font-sans text-[14px] text-white font-medium leading-tight">{t.author}</h4>
-                      <p className="font-sans text-[13px] text-white/50">{t.role}</p>
-                    </div>
-                  </div>
-                </div>
-              </StaggerItem>
-            ))}
-          </StaggerContainer>
-        </div>
-      </section>
+      <TestimonialSlider />
 
       {/* 6. CTA SECTION */}
       <section className="px-[32px] pb-[80px] bg-[#0A0810]">
@@ -298,46 +247,112 @@ export default function FeaturesPageClient() {
 function StickyScrollSection() {
   const [activeIndex, setActiveIndex] = useState(0);
 
+  const ACTIONS = [
+    { word: "Adapts", desc: "Get instant, personalized help from our AI tutor. Available 24/7 for any subject, any question." },
+    { word: "Connects", desc: "Join discussions, ask questions, and collaborate with peers in course-specific chat rooms." },
+    { word: "Rewards", desc: "Earn points, climb the leaderboard, and stay motivated with achievement tracking." },
+    { word: "Empowers", desc: "Learn from industry professionals with curated courses designed for real-world application." },
+  ];
+
   return (
-    <section className="py-[120px] px-[32px] bg-[#0D0B14] relative">
-      <div className="max-w-[1200px] mx-auto w-full">
-        <div className="text-center mb-[80px]">
-          <FadeIn>
-            <h2 className="font-heading text-[32px] md:text-[48px] text-white">Why Skill Sphere Stands Out</h2>
-            <p className="font-sans text-[16px] md:text-[18px] text-white/50 mt-[12px]">Powerful tools designed to accelerate your learning journey.</p>
-          </FadeIn>
+    <section className="bg-[#0A0810] relative text-white py-[10vh]">
+      <div className="max-w-[1200px] mx-auto w-full px-[32px] flex flex-col md:flex-row relative">
+        {/* Left Sticky Side */}
+        <div className="w-full md:w-[45%] md:sticky md:top-0 h-auto md:h-screen flex items-center pt-20 md:pt-0 z-10 pointer-events-none">
+          <h2 className="font-heading text-[56px] sm:text-[72px] lg:text-[100px] leading-[1.1] text-white tracking-tight">
+            Learning<br />that
+          </h2>
         </div>
 
-        <div className="flex flex-col md:flex-row gap-12 relative items-start">
-          {/* Left side: Scrolling Text */}
-          <div className="w-full md:w-1/2 flex flex-col pb-[30vh]">
-            {FEATURES.map((feature, idx) => (
-              <FeatureTextBlock 
-                key={idx} 
-                feature={feature} 
-                index={idx} 
-                setActiveIndex={setActiveIndex}
-                isActive={activeIndex === idx} 
-              />
-            ))}
-          </div>
+        {/* Right Scrolling Side */}
+        <div className="w-full md:w-[55%] flex flex-col pb-[30vh] pt-[10vh] md:pt-[40vh]">
+          {ACTIONS.map((action, idx) => (
+            <ActionTextBlock 
+              key={idx} 
+              action={action} 
+              index={idx} 
+              setActiveIndex={setActiveIndex}
+              isActive={activeIndex === idx} 
+            />
+          ))}
+        </div>
+      </div>
+    </section>
+  );
+}
 
-          {/* Right side: Sticky Image */}
-          <div className="hidden md:block w-1/2 sticky top-[30vh]">
-            <div className="w-full aspect-video relative rounded-2xl overflow-hidden shadow-[0_32px_64px_rgba(0,0,0,0.5)] bg-[#1E1B2E] border border-white/10 flex items-center justify-center">
-              <AnimatePresence mode="wait">
-                <motion.img
-                  key={activeIndex}
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  exit={{ opacity: 0, y: -20 }}
-                  transition={{ duration: 0.5 }}
-                  src={FEATURES[activeIndex].img}
-                  alt={FEATURES[activeIndex].title}
-                  className="w-full h-full object-cover object-top absolute inset-0"
-                />
-              </AnimatePresence>
-            </div>
+function TestimonialSlider() {
+  const [activeIdx, setActiveIdx] = useState(0);
+
+  const handleNext = () => setActiveIdx((prev) => (prev + 1) % TESTIMONIALS.length);
+  const handlePrev = () => setActiveIdx((prev) => (prev - 1 + TESTIMONIALS.length) % TESTIMONIALS.length);
+
+  const current = TESTIMONIALS[activeIdx];
+  const sentences = current.quote.split('.').filter(Boolean);
+  const highlight = sentences.pop() + ".";
+  const rest = sentences.join('. ') + (sentences.length ? "." : "");
+
+  return (
+    <section className="bg-[#0A0810] border-t border-white/5 relative flex flex-col md:flex-row min-h-[80vh]">
+      {/* Left Image Side */}
+      <div className="w-full md:w-[40%] relative min-h-[50vh] md:min-h-full bg-[#1E1B2E]">
+        <AnimatePresence mode="wait">
+          <motion.img
+            key={activeIdx}
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.5 }}
+            src={current.avatar}
+            alt={current.author}
+            className="absolute inset-0 w-full h-full object-cover grayscale opacity-60"
+          />
+        </AnimatePresence>
+        <div className="absolute inset-0 bg-gradient-to-t md:bg-gradient-to-r from-[#0A0810] via-[#0A0810]/50 to-transparent" />
+        <div className="absolute bottom-0 left-0 p-[32px] md:p-[64px] z-10 w-full flex flex-col items-start gap-0">
+          <div className="bg-white p-[16px_24px] inline-block">
+            <h4 className="font-sans text-[18px] text-[#1E1B2E] font-medium">{current.author}</h4>
+          </div>
+          <div className="bg-[#C9A96E] p-[12px_24px] inline-block">
+             <p className="font-sans text-[14px] text-[#1E1B2E] font-bold">{current.role}</p>
+          </div>
+        </div>
+      </div>
+
+      {/* Right Text Side */}
+      <div className="w-full md:w-[60%] flex flex-col pt-[64px] md:pt-[120px] px-[32px] md:px-[80px] pb-[64px] relative">
+        <div className="md:absolute top-[80px] left-[80px] font-sans text-white/50 text-[14px] tracking-widest uppercase mb-12 md:mb-0">
+          Featured Testimonials
+        </div>
+        
+        <div className="flex-1 flex flex-col justify-center max-w-[800px]">
+          <AnimatePresence mode="wait">
+            <motion.div
+              key={activeIdx}
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -20 }}
+              transition={{ duration: 0.5 }}
+            >
+              <h3 className="font-sans text-[32px] md:text-[48px] lg:text-[56px] text-white leading-[1.2] mb-[40px] tracking-tight">
+                "{rest} <span className="text-[#C9A96E]">{highlight}</span>"
+              </h3>
+            </motion.div>
+          </AnimatePresence>
+        </div>
+
+        {/* Bottom Nav / Stats */}
+        <div className="flex justify-between items-end mt-[64px] border-t border-white/10 pt-[32px]">
+          <div className="text-white/50 font-sans text-[16px] tracking-widest">
+            0{activeIdx + 1} <span className="mx-2">/</span> 0{TESTIMONIALS.length}
+          </div>
+          <div className="flex -mb-[32px] -mr-[32px] md:-mr-[80px] md:-mb-[64px]">
+            <button onClick={handlePrev} className="w-[80px] h-[80px] md:w-[100px] md:h-[100px] border-t border-l border-white/10 flex items-center justify-center hover:bg-white/5 transition-colors text-white">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="m15 18-6-6 6-6"/></svg>
+            </button>
+            <button onClick={handleNext} className="w-[80px] h-[80px] md:w-[100px] md:h-[100px] border-t border-l border-white/10 flex items-center justify-center hover:bg-white/5 transition-colors text-white">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="m9 18 6-6-6-6"/></svg>
+            </button>
           </div>
         </div>
       </div>
@@ -345,9 +360,9 @@ function StickyScrollSection() {
   );
 }
 
-function FeatureTextBlock({ feature, index, setActiveIndex, isActive }: { feature: any, index: number, setActiveIndex: (idx: number) => void, isActive: boolean }) {
+function ActionTextBlock({ action, index, setActiveIndex, isActive }: { action: any, index: number, setActiveIndex: (idx: number) => void, isActive: boolean }) {
   const ref = useRef(null);
-  const isInView = useInView(ref, { margin: "-40% 0px -40% 0px" });
+  const isInView = useInView(ref, { margin: "-45% 0px -45% 0px" });
 
   useEffect(() => {
     if (isInView) {
@@ -356,18 +371,26 @@ function FeatureTextBlock({ feature, index, setActiveIndex, isActive }: { featur
   }, [isInView, index, setActiveIndex]);
 
   return (
-    <div ref={ref} className={`transition-all duration-500 ${isActive ? "opacity-100 scale-100" : "opacity-40 scale-95"} flex flex-col justify-center min-h-[60vh]`}>
-      <div className="w-[64px] h-[64px] rounded-2xl bg-[rgba(201,169,110,0.15)] flex items-center justify-center mb-[24px] border border-[#C9A96E]/20">
-        <feature.icon size={32} className="text-[#C9A96E]" />
-      </div>
-      <h3 className="font-heading text-[32px] text-white mb-4">{feature.title}</h3>
-      <p className="font-sans text-[18px] text-white/60 leading-[1.7] mb-6">
-        {feature.desc}
-      </p>
-      {/* Mobile-only image */}
-      <div className="md:hidden w-full aspect-video rounded-xl overflow-hidden shadow-[0_10px_30px_rgba(0,0,0,0.5)] mt-6 relative border border-white/10">
-        <img src={feature.img} alt={feature.title} className="w-full h-full object-cover object-top" />
-      </div>
+    <div ref={ref} className="min-h-[40vh] md:min-h-[60vh] flex flex-col justify-center py-10">
+      <motion.h3 
+        className="font-heading text-[56px] sm:text-[72px] lg:text-[100px] leading-[1.1] tracking-tight transition-colors duration-500"
+        animate={{ color: isActive ? "#C9A96E" : "rgba(255, 255, 255, 0.15)" }}
+      >
+        {action.word}
+      </motion.h3>
+      <motion.div
+        initial={false}
+        animate={{ 
+          opacity: isActive ? 1 : 0, 
+          height: isActive ? "auto" : 0,
+          marginTop: isActive ? 24 : 0
+        }}
+        className="overflow-hidden max-w-[400px]"
+      >
+        <p className="font-sans text-[18px] text-white/60 leading-[1.6]">
+          {action.desc}
+        </p>
+      </motion.div>
     </div>
   );
 }

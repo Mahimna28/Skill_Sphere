@@ -10,6 +10,7 @@ import { cn } from "@/lib/utils";
 
 import { useReducedMotion, useIsMobile } from "@/lib/animations";
 import { FadeIn } from "@/components/animations/FadeIn";
+import { SlideUp } from "@/components/animations/SlideUp";
 import { StaggerContainer, StaggerItem } from "@/components/animations/StaggerContainer";
 
 interface Course {
@@ -31,6 +32,8 @@ interface Props {
   initialEnrolledIds: string[];
 }
 
+
+import { SharedHeroSection } from "@/components/landing/SharedHeroSection";
 
 export default function CoursesPageClient({ courses, userRole, initialEnrolledIds }: Props) {
   const isMobile = useIsMobile();
@@ -85,23 +88,17 @@ export default function CoursesPageClient({ courses, userRole, initialEnrolledId
   return (
     <div className="flex flex-col bg-[#F5F1EB] min-h-screen">
       
-      {/* HERO SECTION */}
-      <section className="pt-[100px] pb-[40px] px-[32px] max-w-[800px] mx-auto text-center w-full">
-        <FadeIn delay={0.1}>
-          <span className="font-sans text-[12px] uppercase text-[#C9A96E] tracking-[0.08em] font-semibold block mb-4">OUR COURSES</span>
-        </FadeIn>
-        
-        <FadeIn delay={0.2} direction="up">
-          <h1 className="font-heading text-[42px] text-[#1E1B2E] leading-[1.15]">Explore Our Courses</h1>
-        </FadeIn>
-        
-        <FadeIn delay={0.3}>
-          <p className="font-sans text-[16px] text-[#8E8E93] mt-[12px] mb-10">
-            Find the perfect course to advance your skills.
-          </p>
-        </FadeIn>
+      <SharedHeroSection
+        title="Expand Your Skillset"
+        subtitle="Expert Curriculum"
+        description="Browse our extensive library of interactive courses designed by industry experts."
+        backgroundImage="https://images.unsplash.com/photo-1522202176988-66273c2fd55f?auto=format&fit=crop&q=80&w=2000"
+      />
 
-        <FadeIn delay={0.4}>
+      {/* FILTER SECTION */}
+      <section className="pt-[60px] pb-[40px] px-[32px] max-w-[800px] mx-auto text-center w-full">
+        <SlideUp delay={0.2} y={50}>
+          <h2 className="font-heading text-3xl md:text-4xl text-[#1E1B2E] font-bold mb-6">Our Courses</h2>
           <div className="flex flex-row items-center bg-white rounded-full h-[56px] max-w-[600px] mx-auto shadow-[0_4px_20px_rgba(0,0,0,0.06)] overflow-hidden focus-within:shadow-inner transition-shadow">
             <Search className="text-[#8E8E93] ml-[20px] shrink-0" size={20} />
             <input
@@ -115,7 +112,7 @@ export default function CoursesPageClient({ courses, userRole, initialEnrolledId
               <Search size={18} />
             </button>
           </div>
-        </FadeIn>
+        </SlideUp>
 
         <StaggerContainer staggerDelay={getStaggerDelay(0.05)} delayChildren={0.5} className="flex flex-row flex-wrap justify-center gap-[10px] mt-[24px]">
           {filterCategories.map((cat, i) => (
