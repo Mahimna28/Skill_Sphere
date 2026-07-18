@@ -1,31 +1,351 @@
+/* ==========================================================================
+   SKILL SPHERE - COURSE COMPLETION CERTIFICATE
+   Dark Navy Theme — matches live production website
+   ========================================================================== */
+
+/* --- CSS Variables --- */
+:root {
+  --bg-color: #0F0D1A;
+  --card-bg: #1A1730;
+  --text-primary: #FFFFFF;
+  --text-secondary: #A89BC2;
+  --gold-luxury: #C9A96E;
+  --gold-soft: #D6B87D;
+  --gold-dim: rgba(201, 169, 110, 0.4);
+  --border-color: rgba(201, 169, 110, 0.5);
+  --shadow-color: rgba(0, 0, 0, 0.4);
+
+  --font-heading: 'Playfair Display', Georgia, serif;
+  --font-body: 'Inter', sans-serif;
+  --font-script: 'Great Vibes', cursive;
+
+  --cert-max-width: 1400px;
+  --cert-aspect-ratio: 16 / 9;
+  --border-radius: 20px;
+}
+
+/* --- Animations --- */
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(12px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes goldShimmer {
+  0%   { border-color: rgba(201,169,110,0.35); box-shadow: 0 0 0px rgba(201,169,110,0); }
+  50%  { border-color: rgba(201,169,110,0.7);  box-shadow: 0 0 25px rgba(201,169,110,0.12); }
+  100% { border-color: rgba(201,169,110,0.35); box-shadow: 0 0 0px rgba(201,169,110,0); }
+}
+
+/* --- Certificate Container --- */
+.certificate-container {
+  position: relative;
+  width: 1400px;
+  aspect-ratio: var(--cert-aspect-ratio);
+  background-color: var(--bg-color);
+  background-image:
+    radial-gradient(ellipse at 20% 20%, rgba(201,169,110,0.05) 0%, transparent 50%),
+    radial-gradient(ellipse at 80% 80%, rgba(30,27,46,0.8) 0%, transparent 60%);
+  border: 2px solid var(--gold-luxury);
+  border-radius: var(--border-radius);
+  padding: 20px;
+  box-shadow:
+    0 30px 80px rgba(0,0,0,0.6),
+    0 0 0 1px rgba(201,169,110,0.08) inset;
+  overflow: hidden;
+  animation: fadeIn 0.9s ease-out forwards;
+}
+
+/* Corner Ornaments */
+.certificate-container::before,
+.certificate-container::after {
+  content: '';
+  position: absolute;
+  width: 60px;
+  height: 60px;
+  border-color: var(--gold-luxury);
+  border-style: solid;
+  opacity: 0.45;
+  pointer-events: none;
+  z-index: 3;
+}
+.certificate-container::before {
+  top: 12px; left: 12px;
+  border-width: 2px 0 0 2px;
+  border-radius: 4px 0 0 0;
+}
+.certificate-container::after {
+  bottom: 12px; right: 12px;
+  border-width: 0 2px 2px 0;
+  border-radius: 0 0 4px 0;
+}
+
+/* Inner border */
+.certificate-inner {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  border: 1px solid rgba(201,169,110,0.35);
+  border-radius: calc(var(--border-radius) - 8px);
+  padding: 4% 7%;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  z-index: 2;
+  animation: goldShimmer 5s infinite ease-in-out;
+}
+
+.certificate-inner::before,
+.certificate-inner::after {
+  content: '';
+  position: absolute;
+  width: 40px;
+  height: 40px;
+  border-color: rgba(201,169,110,0.35);
+  border-style: solid;
+  pointer-events: none;
+}
+.certificate-inner::before {
+  top: -1px; right: -1px;
+  border-width: 2px 2px 0 0;
+  border-radius: 0 4px 0 0;
+}
+.certificate-inner::after {
+  bottom: -1px; left: -1px;
+  border-width: 0 0 2px 2px;
+  border-radius: 0 0 0 4px;
+}
+
+/* Watermark */
+.watermark {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  font-family: var(--font-heading);
+  font-size: 9vw;
+  font-weight: 900;
+  color: rgba(201,169,110,0.04);
+  line-height: 1;
+  pointer-events: none;
+  z-index: 1;
+  user-select: none;
+  white-space: nowrap;
+  letter-spacing: 0.05em;
+}
+
+/* --- Header --- */
+.cert-header {
+  text-align: center;
+  animation: fadeIn 0.9s ease-out 0.15s both;
+}
+
+.medal-wrapper {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 1rem;
+}
+
+.medal-circle {
+  width: 64px;
+  height: 64px;
+  border-radius: 50%;
+  border: 1.5px solid rgba(201,169,110,0.5);
+  background: rgba(201,169,110,0.07);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.label-small {
+  display: block;
+  font-family: var(--font-body);
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.3em;
+  color: var(--gold-luxury);
+  text-transform: uppercase;
+  margin-bottom: 1rem;
+}
+
+.main-title {
+  font-family: var(--font-heading);
+  font-size: 3.8rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
+  margin-bottom: 0.3rem;
+  line-height: 1.1;
+}
+
+.subtitle {
+  font-family: var(--font-body);
+  font-size: 1rem;
+  color: var(--text-secondary);
+  font-style: italic;
+  margin-top: 0.2rem;
+}
+
+/* --- Body --- */
+.cert-body {
+  text-align: center;
+  flex-grow: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  animation: fadeIn 0.9s ease-out 0.3s both;
+}
+
+.student-name-container {
+  padding: 0.25rem 2rem;
+  margin-bottom: 1rem;
+}
+
+.student-name {
+  font-family: var(--font-script);
+  font-size: 5rem;
+  font-weight: 400;
+  background: linear-gradient(135deg, var(--gold-luxury) 0%, var(--gold-soft) 50%, var(--gold-luxury) 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  letter-spacing: 0.02em;
+  line-height: 1.2;
+}
+
+.reason-text {
+  font-size: 0.95rem;
+  color: var(--text-secondary);
+  margin-bottom: 0.75rem;
+}
+
+.course-name-title {
+  font-family: var(--font-heading);
+  font-size: 2.1rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  line-height: 1.2;
+}
+
+/* --- Footer --- */
+.cert-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  animation: fadeIn 0.9s ease-out 0.5s both;
+}
+
+.signature-section {
+  text-align: center;
+}
+
+.signature-line {
+  width: 200px;
+  margin: 0 auto 0.4rem auto;
+  display: flex;
+  justify-content: center;
+  align-items: flex-end;
+  border-bottom: 1px solid rgba(201,169,110,0.35);
+  min-height: 52px;
+  padding-bottom: 6px;
+}
+
+.date-display {
+  font-family: var(--font-heading);
+  font-size: 1.2rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+}
+
+.signature-font {
+  font-family: var(--font-script);
+  font-size: 2.8rem;
+  color: var(--gold-soft);
+  line-height: 1;
+}
+
+.detail-label {
+  display: block;
+  font-size: 0.58rem;
+  text-transform: uppercase;
+  letter-spacing: 0.2em;
+  color: var(--text-secondary);
+  margin-top: 0.4rem;
+}
+
+/* Verified Badge */
+.verified-badge {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+}
+
+.verified-outer {
+  width: 86px;
+  height: 86px;
+  border-radius: 50%;
+  border: 2px solid var(--gold-luxury);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 6px;
+  margin: 0 auto;
+}
+
+.verified-inner {
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  border: 1px solid rgba(201,169,110,0.45);
+  background: rgba(201,169,110,0.06);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  gap: 3px;
+}
+
+.verified-text-badge {
+  font-size: 8px;
+  letter-spacing: 0.12em;
+  color: var(--gold-luxury);
+  text-transform: uppercase;
+  font-weight: 600;
+}
+
+/* --- Print Styles --- */
 @media print {
-  body * {
-    visibility: hidden;
+  @page { size: landscape; margin: 0; }
+
+  body {
+    background: var(--bg-color) !important;
+    padding: 0;
+    margin: 0;
   }
-  .print-hidden {
-    display: none !important;
-  }
-  #certificate-wrapper,
-  #certificate-wrapper * {
-    visibility: visible;
-  }
-  #certificate-wrapper {
-    position: fixed;
-    left: 0;
-    top: 0;
+
+  .certificate-container {
+    max-width: 100%;
     width: 100vw;
     height: 100vh;
-    border: 8px solid black !important;
-    box-shadow: none !important;
-    margin: 0 !important;
-    max-width: none !important;
+    border-radius: 0;
+    box-shadow: none;
+    animation: none !important;
   }
-  * {
-    -webkit-print-color-adjust: exact !important;
-    print-color-adjust: exact !important;
+
+  .certificate-inner { animation: none !important; }
+
+  .student-name {
+    -webkit-text-fill-color: var(--gold-luxury);
+    text-shadow: none;
   }
-  @page {
-    size: A4 landscape;
-    margin: 0mm;
-  }
+
+  .cert-header, .cert-body, .cert-footer { animation: none !important; }
 }

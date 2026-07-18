@@ -8,6 +8,7 @@ import { ReactNode, useEffect } from "react";
 export function HeaderFooterWrapper({ children }: { children: ReactNode }) {
   const pathname = usePathname();
   const isDashboard = pathname?.startsWith("/dashboard");
+  const isCertificates = pathname?.startsWith("/certificates");
   const isAuth = pathname === "/login" || pathname === "/register" || pathname === "/forgot-password";
   const hideHeaderFooter = isDashboard || isAuth;
 
@@ -45,7 +46,7 @@ export function HeaderFooterWrapper({ children }: { children: ReactNode }) {
 
   return (
     <>
-      <main className="flex-1 relative z-[2] bg-[#F5F1EB] shadow-[0_10px_30px_rgba(0,0,0,0.5)]">
+      <main className={`flex-1 relative z-[2] ${isCertificates ? 'bg-[#0F0D1A]' : 'bg-[#F5F1EB]'} shadow-[0_10px_30px_rgba(0,0,0,0.5)]`}>
         <Header />
         <div key={pathname}>
           {children}

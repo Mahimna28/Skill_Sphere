@@ -17,8 +17,8 @@ export const TEAM_MEMBERS = [
   },
   {
     name: "Swayam Chaudhari",
-    role: "Frontend Developer",
-    bio: "UI/UX craftsman responsible for the premium aesthetic you see today. Specializes in React, Next.js, Framer Motion, and design systems.",
+    role: "QA Tester",
+    bio: "Quality assurance specialist ensuring every feature works flawlessly before release. Specializes in test planning, bug tracking, and ensuring a seamless user experience across all devices.",
     socials: { github: "https://github.com/SwamPy-bot", linkedin: "https://www.linkedin.com/in/swayam-chaudhari-b85b66347", email: "cse.230840131015@gmail.com" },
     img: "/images/team/swayam.jpg",
     slug: "swayam-chaudhari",
@@ -65,7 +65,7 @@ export const TEAM_MEMBERS_DETAIL = [
   {
     name: "Swayam Chaudhari",
     slug: "swayam-chaudhari",
-    role: "Frontend Developer",
+    role: "QA Tester",
     img: "/images/team/swayam.jpg",
     socials: { github: "https://github.com/SwamPy-bot", linkedin: "https://www.linkedin.com/in/swayam-chaudhari-b85b66347", email: "cse.230840131015@gmail.com" },
     fullBio: [

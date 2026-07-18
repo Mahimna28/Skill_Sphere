@@ -1,10 +1,16 @@
 import { NextResponse } from "next/server";
-import { writeFile, mkdir } from "fs/promises";
-import path from "path";
+import { v2 as cloudinary } from "cloudinary";
 import { cookies } from "next/headers";
 import { verifyToken } from "@/lib/auth";
 
 const IMAGE_TYPES = ["image/jpeg", "image/png", "image/webp", "image/gif", "image/jpg"];
+
+// Configure Cloudinary
+cloudinary.config({
+  cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
+  api_key: process.env.CLOUDINARY_API_KEY,
+  api_secret: process.env.CLOUDINARY_API_SECRET,
+});
 
 export async function POST(req: Request) {
   try {
@@ -27,26 +33,27 @@ export async function POST(req: Request) {
     const bytes = await file.arrayBuffer();
     const buffer = Buffer.from(bytes);
 
-    // 3. Decide folder: images go to thumbnails/, documents go to materials/
+    // 3. Decide folder
     const isImage = IMAGE_TYPES.includes(file.type) || /\.(jpg|jpeg|png|webp|gif)$/i.test(file.name);
-    const subDir = isImage ? "thumbnails" : "materials";
+    const folder = isImage ? "skill-sphere/thumbnails" : "skill-sphere/materials";
 
-    const uploadDir = path.join(process.cwd(), "public", "uploads", subDir);
-
-    // Create directory if it doesn't exist
-    await mkdir(uploadDir, { recursive: true });
-
-    // Sanitize file name
-    const safeName = file.name.replace(/[^a-zA-Z0-9._-]/g, "-");
-    const fileName = `${Date.now()}-${safeName}`;
-    const uploadPath = path.join(uploadDir, fileName);
-
-    await writeFile(uploadPath, buffer);
-
-    const fileUrl = `/uploads/${subDir}/${fileName}`;
+    // 4. Upload to Cloudinary
+    const uploadResult = await new Promise<any>((resolve, reject) => {
+      const uploadStream = cloudinary.uploader.upload_stream(
+        {
+          folder,
+          resource_type: isImage ? "image" : "raw",
+        },
+        (error, result) => {
+          if (error) reject(error);
+          else resolve(result);
+        }
+      );
+      uploadStream.end(buffer);
+    });
 
     return NextResponse.json({
-      url: fileUrl,
+      url: uploadResult.secure_url,
       name: file.name,
       type: isImage ? "image" : (file.name.split(".").pop()?.toLowerCase() ?? "file"),
     });
